@@ -1,0 +1,7 @@
+{
+  "name": "ParkBlazerApp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
