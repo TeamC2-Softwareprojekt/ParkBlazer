@@ -12,8 +12,15 @@ const Home: React.FC = () => {
       zoom: 14, // starting zoom
     });
 
+    // Marker hinzufügen
+    const marker = new maptilersdk.Marker({
+    })
+      .setLngLat([8.9189, 52.2900]) // Längen- und Breitengrad des Markers setzen
+      .addTo(map);
+
     return () => {
-      // Aufräumen beim Komponentenabbau, z.B. Karte zerstören
+      // Aufräumen beim Komponentenabbau, z.B. Marker entfernen
+      marker.remove();
       map.remove();
     };
   }, []);
