@@ -9,8 +9,12 @@ const Home: React.FC = () => {
       container: 'map', // container's id or the HTML element to render the map
       style: 'streets-v2',
       center: [8.9189, 52.2900], // Minden, Deutschland (Längengrad, Breitengrad)
-      zoom: 14, // starting zoom
+      zoom: 9, // starting zoom
     });
+
+    const marker = new maptilersdk.Marker()
+    .setLngLat([8.9189, 52.2900])
+    .addTo(map);
 
     return () => {
       // Aufräumen beim Komponentenabbau, z.B. Karte zerstören
