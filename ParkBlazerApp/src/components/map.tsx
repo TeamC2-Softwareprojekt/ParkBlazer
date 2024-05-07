@@ -16,9 +16,14 @@ export default function Map() {
     map.current = new maptilersdk.Map({
       container: mapContainer.current!,
       style: maptilersdk.MapStyle.STREETS,
-      center: [tokyo.lng, tokyo.lat],
+      center: [8.9167, 52.2833],
       zoom: zoom
     });
+    
+
+    new maptilersdk.Marker({color: "#FF0000"})
+    .setLngLat([8.9167, 52.2833])
+    .addTo(map.current);
 
   }, [tokyo.lng, tokyo.lat, zoom]);
 
