@@ -1,5 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as maptilersdk from '@maptiler/sdk';
+import { GeocodingControl } from "@maptiler/geocoding-control/react";
+import { createMapLibreGlMapController } from "@maptiler/geocoding-control/maplibregl-controller";
+import maplibregl from 'maplibre-gl';
+import "@maptiler/geocoding-control/style.css";
+import 'maplibre-gl/dist/maplibre-gl.css';
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import './map.css';
 
@@ -8,6 +13,7 @@ export default function Map() {
   const map = useRef<maptilersdk.Map | null>(null); // Hier Typangabe hinzugefügt
   const tokyo = { lng: 139.753, lat: 35.6844 };
   const [zoom] = useState<number>(14); // Hier Typangabe hinzugefügt
+  const [mapController, setMapController] = useState<any>();
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT';
 
   useEffect(() => {
@@ -20,16 +26,20 @@ export default function Map() {
       zoom: zoom
     });
     
-
-    new maptilersdk.Marker({color: "#FF0000"})
-    .setLngLat([8.9167, 52.2833])
-    .addTo(map.current);
-
+    setMapController(createMapLibreGlMapController(map.current, maplibregl));
   }, [tokyo.lng, tokyo.lat, zoom]);
+
+
+  function handleSearch(event: any) {
+    console.log("search", event);
+  };
 
   return (
     <div className="map-wrap">
-      <div ref={mapContainer} className="map" />
+      <div className="geocoding">
+        <GeocodingControl apiKey={maptilersdk.config.apiKey} mapController={mapController} onPick={(e) => handleSearch(e)} />
+      </div>
+        <div ref={mapContainer} className="map" />
     </div>
   );
 }
