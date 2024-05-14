@@ -38,16 +38,27 @@ export default function Map() {
 
   // Diese Funktion zeigt die Parkplätze auf der Karte an
   const displayParkingSpotsOnMap = (parkingSpots: any[]) => {
-    if (!map.current) return; // prüft ob die Karte bereits geladen wurde
-
-    // Marker für jeden Parkplatz hinzufügen
+    if (!map.current) return;
+  
     parkingSpots.forEach((spot) => {
-      const { longitude, latitude, name, description } = spot;
-
+      const { longitude, latitude, name, description, available_spaces, image_url, address } = spot;
+  
+      // HTML für das Popup
+      //#TODO: Parkplatzbild prüfen, und wenn nicht vorhanden dann kein Bild anzeigen
+      const popupContent = `
+        <div>
+          <h3>${name}</h3>
+          <p>${description}</p>
+          <p>Verfügbare Plätze: ${available_spaces}</p>
+          <p><img src="${image_url}" alt="Parkplatzbild" style="max-width: 100px;"></p>
+          <p>Adresse: ${address}</p>
+        </div>
+      `;
+  
       // Marker zur Karte hinzufügen
       new maptilersdk.Marker({ color: "#FF0000" })
-        .setLngLat([parseFloat(longitude), parseFloat(latitude)]) // Position setzen
-        .setPopup(new maptilersdk.Popup().setHTML(`<h3>${name}</h3><p>${description}</p>`)) // Popup hinzufügen
+        .setLngLat([parseFloat(longitude), parseFloat(latitude)])
+        .setPopup(new maptilersdk.Popup().setHTML(popupContent))
         .addTo(map.current!);
     });
   };
