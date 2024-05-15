@@ -1,19 +1,4 @@
-body {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-  }
-
-  .login-grid {
+.registration-grid {
     background-image: url("src/pages/images/Parkplatz-Image.jpg");
     background-size: cover; /* Bild wird so skaliert, dass es den gesamten Hintergrund bedeckt */
     background-position: center; /* Bild wird zentriert im Hintergrund positioniert */
@@ -25,7 +10,7 @@ body {
     align-items: center; /* Inhalte vertikal zentrieren */
 }
 
-  .login-input {
+.registration-input {
     margin-bottom: 10px; /* Abstand zwischen den Input-Feldern */
     width: 500% !important; /* Eingabefelder nehmen die volle Breite der Spalte ein */
     height: 40px !important; /* Höhe der Eingabefelder */

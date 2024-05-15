@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { IonInput, IonCol, IonGrid, IonRow, IonButton, IonAlert, IonText } from '@ionic/react';
 import axios from 'axios';
+import './Registration.css';
 
 const Registration: React.FC = () => {
     const [username, setUsername] = useState<string>('');
@@ -50,7 +51,7 @@ const Registration: React.FC = () => {
     };
 
     return (
-        <IonGrid fixed={true}>
+        <IonGrid fixed={true} className="registration-grid">
             <IonRow className="ion-justify-content-center">
                 <IonCol size="12" size-sm="4">
                     <IonInput
@@ -58,48 +59,56 @@ const Registration: React.FC = () => {
                         placeholder="Username"
                         value={username}
                         onIonChange={(e) => setUsername(e.detail.value!)}
+                        className="registration-input"
                     ></IonInput>
                     <IonInput
                         type="email"
                         placeholder="Email"
                         value={email}
                         onIonChange={(e) => setEmail(e.detail.value!)}
+                        className="registration-input"
                     ></IonInput>
                     <IonInput
                         type="password"
                         placeholder="Password"
                         value={password}
                         onIonChange={(e) => setPassword(e.detail.value!)}
+                        className="registration-input"
                     ></IonInput>
                     <IonInput
                         type="password"
                         placeholder="Confirm Password"
                         value={confirmPassword}
                         onIonChange={(e) => setConfirmPassword(e.detail.value!)}
+                        className="registration-input"
                     ></IonInput>
                     <IonInput
                         type="text"
                         placeholder="First Name"
                         value={firstname}
                         onIonChange={(e) => setFirstname(e.detail.value!)}
+                        className="registration-input"
                     ></IonInput>
                     <IonInput
                         type="text"
                         placeholder="Last Name"
                         value={lastname}
                         onIonChange={(e) => setLastname(e.detail.value!)}
+                        className="registration-input"
                     ></IonInput>
                     <IonInput
                         type="text"
                         placeholder="Birth Date"
                         value={birthdate}
                         onIonChange={(e) => setBirthdate(e.detail.value!)}
+                        className="registration-input"
                     ></IonInput>
                     <IonInput
                         type="text"
                         placeholder="Address"
                         value={address}
                         onIonChange={(e) => setAddress(e.detail.value!)}
+                        className="registration-input"
                     ></IonInput>
                     <IonButton onClick={handleRegister}>Register</IonButton>
                     {error && <IonAlert isOpen={!!error} message={error} buttons={['OK']} />}
