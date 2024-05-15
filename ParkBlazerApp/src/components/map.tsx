@@ -8,9 +8,11 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import './map.css';
 
+let map: React.MutableRefObject<maptilersdk.Map | null>;
+
 export default function Map() {
   const mapContainer = useRef<HTMLDivElement>(null); // Hier Typangabe hinzugefügt
-  const map = useRef<maptilersdk.Map | null>(null); // Hier Typangabe hinzugefügt
+  map = useRef<maptilersdk.Map | null>(null); // Hier Typangabe hinzugefügt
   const tokyo = { lng: 139.753, lat: 35.6844 };
   const [zoom] = useState<number>(14); // Hier Typangabe hinzugefügt
   const [mapController, setMapController] = useState<any>();
@@ -43,3 +45,5 @@ export default function Map() {
     </div>
   );
 }
+
+export {map};

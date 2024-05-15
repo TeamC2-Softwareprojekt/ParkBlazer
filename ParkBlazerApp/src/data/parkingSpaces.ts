@@ -8,6 +8,7 @@ export interface parkingSpace {
     amount: number;
     private: boolean;
     price: number;
+    center: number[];
   }
   
   const parkingSpaces: parkingSpace[] = [
@@ -20,7 +21,8 @@ export interface parkingSpace {
       type_truck: false,
       amount: 4,
       private: false,
-      price: 0
+      price: 0,
+      center: [8.904864, 52.296575]
     },
     {
       id: 1,
@@ -31,7 +33,8 @@ export interface parkingSpace {
       type_truck: false,
       amount: 2,
       private: false,
-      price: 0
+      price: 0,
+      center: [8.913536, 52.286253]
     },
     {
       id: 2,
@@ -42,7 +45,8 @@ export interface parkingSpace {
       type_truck: true,
       amount: 1,
       private: true,
-      price: 5
+      price: 5,
+      center: [8.913897, 52.286472]
     },
     {
       id: 3,
@@ -53,7 +57,8 @@ export interface parkingSpace {
       type_truck: true,
       amount: 1,
       private: false,
-      price: 0
+      price: 0,
+      center: [8.913394, 52.286253]
     },
     {
       id: 4,
@@ -64,21 +69,11 @@ export interface parkingSpace {
       type_truck: true,
       amount: 1,
       private: true,
-      price: 3
+      price: 3,
+      center: [8.91371, 52.286423]
     },
     {
       id: 5,
-      adress: 'Königstraße 5',
-      city: '42427 Minden',
-      type_bike: false,
-      type_car: true,
-      type_truck: false,
-      amount: 1,
-      private: false,
-      price: 0
-    },
-    {
-      id: 6,
       adress: 'Königstraße 6',
       city: '42427 Minden',
       type_bike: false,
@@ -86,10 +81,11 @@ export interface parkingSpace {
       type_truck: false,
       amount: 5,
       private: true,
-      price: 6
+      price: 6,
+      center: [8.913582, 52.286431]
     },
     {
-      id: 7,
+      id: 6,
       adress: 'Königstraße 7',
       city: '42427 Minden',
       type_bike: true,
@@ -97,7 +93,8 @@ export interface parkingSpace {
       type_truck: false,
       amount: 1,
       private: false,
-      price: 0
+      price: 0,
+      center: [8.912918, 52.286216]
     }
   ];
   

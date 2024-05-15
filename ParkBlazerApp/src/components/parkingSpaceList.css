@@ -25,11 +25,12 @@
 
 ion-content {
     position: absolute;
-    top: 240px;
+    bottom: 10px;
     right: 10px;
     width: 16%;
     height: 70%;
     border: 1px solid black;
+    min-Width: 300px;
     scrollbar-color: gray white;
     --background: white;
 }

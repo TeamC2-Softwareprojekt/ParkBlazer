@@ -1,6 +1,8 @@
 import React from 'react';
 import './parkingSpaceList.css';
 import { getParkingSpaces } from '../data/parkingSpaces';
+import { map } from './map';
+import * as maptilersdk from '@maptiler/sdk';
 import {
   IonContent,
   IonList,
@@ -11,9 +13,11 @@ import {
   IonIcon
 } from '@ionic/react';
 
+let marker: maptilersdk.Marker;
+
 const parkingSpaces = getParkingSpaces().map((parkingSpace) => {
   return (
-    <IonItem button={true}>
+    <IonItem button={true} onClick={() => onClick(parkingSpace)}>
       <div className="parkingSpace-container">
         <div className="private-indicator" style={{backgroundColor: parkingSpace.private ? "#1BB367": "#4d8dff"}}></div>
         <div className="address-container">
@@ -52,6 +56,16 @@ const parkingSpaces = getParkingSpaces().map((parkingSpace) => {
     </IonItem>
   );
 });
+
+function onClick(parkingSpace: any) {
+  map.current?.flyTo({center: parkingSpace.center, zoom: 18});
+ 
+  if(marker) marker.remove();
+  
+  marker = new maptilersdk.Marker()
+    .setLngLat(parkingSpace.center)
+    .addTo(map.current!);
+}
 
 export default function ParkingSpaceList(){
   return (
