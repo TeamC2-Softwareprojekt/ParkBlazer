@@ -6,22 +6,66 @@ import axios from 'axios';
 const Registration: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [email, setEmail] = useState<string>('');
+    const [emailValid, setEmailValid] = useState<boolean>(true);
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [passwordValid, setPasswordValid] = useState<boolean>(true);
     const [firstname, setFirstname] = useState<string>('');
     const [lastname, setLastname] = useState<string>('');
     const [birthdate, setBirthdate] = useState<string>('');
+    const [birthdateValid, setBirthdateValid] = useState<boolean>(true);
     const [address, setAddress] = useState<string>('');
+    const [addressValid, setAddressValid] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
     const history = useHistory();  // useHistory Hook initialisieren
+   
+    
+    // Funktion zur Überprüfung einer E-Mail-Adresse
+    function isValidEmail(checkEmail: string) {
+        // Regulärer Ausdruck für eine einfache E-Mail-Adressvalidierung
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(checkEmail);
+    }
+
+    function isValidDate(dateString: string) {
+        const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.(19|20)\d{2}$/;
+        return dateRegex.test(dateString);
+    }
+    
+
+    function isValidAddress(address: string) {
+        const addressRegex = /^([^\d]+)\s+(\d+.*)$/;
+        return addressRegex.test(address);
+    }
+    
 
     const handleRegister = async () => {
+        setEmailValid(true);
+        setPasswordValid(true);
+        setBirthdateValid(true);
+        setAddressValid(true);
+
+        if (!isValidEmail(email)) {
+            setEmailValid(false);
+            setError('Ungültige E-Mail-Adresse.');
+            return;
+        }
         if (password !== confirmPassword) {
+            setPasswordValid(false)
             setError('Passwords do not match');
             return;
         }
-
+        if (!isValidDate(birthdate)){
+            setBirthdateValid(false)
+            setError('Ungültiges Geburtsdatum')
+            return;
+        }
+        if (!isValidAddress(address)){
+            setAddressValid(false)
+            setError('Ungültige Address.');
+            return;
+        }
          try {
       const response = await axios.post('https://server-y2mz.onrender.com/api/register_user', 
       {username,
@@ -41,9 +85,11 @@ const Registration: React.FC = () => {
 
         setError(error.response.data.error);
 
+
       } else {
 
         setError('An error occurred while register in. Please try again later.');
+
 
       }
     }
@@ -64,18 +110,21 @@ const Registration: React.FC = () => {
                         placeholder="Email"
                         value={email}
                         onIonChange={(e) => setEmail(e.detail.value!)}
+                        color={emailValid ? "primary" : "danger"}
                     ></IonInput>
                     <IonInput
                         type="password"
                         placeholder="Password"
                         value={password}
                         onIonChange={(e) => setPassword(e.detail.value!)}
+                        color={passwordValid ? "primary" : "danger"}
                     ></IonInput>
                     <IonInput
                         type="password"
                         placeholder="Confirm Password"
                         value={confirmPassword}
                         onIonChange={(e) => setConfirmPassword(e.detail.value!)}
+                        color={passwordValid ? "primary" : "danger"}
                     ></IonInput>
                     <IonInput
                         type="text"
@@ -94,12 +143,14 @@ const Registration: React.FC = () => {
                         placeholder="Birth Date"
                         value={birthdate}
                         onIonChange={(e) => setBirthdate(e.detail.value!)}
+                        color={birthdateValid ? "primary" : "danger"}
                     ></IonInput>
                     <IonInput
                         type="text"
                         placeholder="Address"
                         value={address}
                         onIonChange={(e) => setAddress(e.detail.value!)}
+                        color={addressValid ? "primary" : "danger"}
                     ></IonInput>
                     <IonButton onClick={handleRegister}>Register</IonButton>
                     {error && <IonAlert isOpen={!!error} message={error} buttons={['OK']} />}

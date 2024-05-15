@@ -53,25 +53,21 @@ const App: React.FC = () => (
           <Home />
         </Route>
         <Route path="/message/:id">
-           <ViewMessage />
+          <ViewMessage />
         </Route>
         <Route path="/login">
-          
           {AuthService.isLoggedIn() ? (
             <Redirect to="/home" />
-              ) : (
-          <Redirect to="/login" />
-              )}
-           <Login />
+          ) : (
+            <Login />
+          )}
         </Route>
         <Route path="/registration">
-          
           {AuthService.isLoggedIn() ? (
             <Redirect to="/home" />
-              ) : (
-          <Redirect to="/registration" />
-              )}
-           <Login />
+          ) : (
+            <Registration />
+          )}
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>
