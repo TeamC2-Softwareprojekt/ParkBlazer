@@ -58,16 +58,28 @@ const App: React.FC = () => (
         <Route path="/login">
           {AuthService.isLoggedIn() ? (
             <Redirect to="/home" />
+<<<<<<< HEAD
           ) : (
             <Login />
           )}
+=======
+              ) : (
+              <Login />
+              ) }
+>>>>>>> 5401c291ab0459c9d9ef4583715ceaf5d0f9d025
         </Route>
         <Route path="/registration">
           {AuthService.isLoggedIn() ? (
             <Redirect to="/home" />
+<<<<<<< HEAD
           ) : (
             <Registration />
           )}
+=======
+              ) : (
+                <Registration />
+              )}
+>>>>>>> 5401c291ab0459c9d9ef4583715ceaf5d0f9d025
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>
