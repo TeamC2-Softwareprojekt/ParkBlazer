@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { IonInput, IonCol, IonGrid, IonRow, IonButton, IonAlert } from '@ionic/react';
 import AuthService from '../AuthService';
 
@@ -6,6 +7,7 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const history = useHistory();  // useHistory Hook initialisieren
 
     useEffect(() => {
         setError(''); 
@@ -16,6 +18,8 @@ function Login() {
             setError(''); 
             await AuthService.login(email, password);
             console.log("Logged in!")
+            history.push('/home')
+
         } catch (error: any) {
             setError(error.message);
         }

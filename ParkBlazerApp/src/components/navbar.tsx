@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { IonButton, IonToolbar, IonTitle, IonButtons, IonHeader } from '@ionic/react';
 import AuthService from '../AuthService';
+import { useHistory } from 'react-router-dom';
 
 function Navbar() {
     const [loggedIn, setLoggedIn] = useState(AuthService.isLoggedIn());
+    const history = useHistory();  // useHistory Hook initialisieren
 
     const handleLogout = () => {
         AuthService.logout();
         setLoggedIn(false); // Aktualisiere den Zustand des eingeloggten Benutzers
+        history.push('/home')
     };
 
     useEffect(() => {

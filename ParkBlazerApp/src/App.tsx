@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Registration from './pages/Registration';
 
 
+
 import ViewMessage from './pages/ViewMessage';
 
 /* Core CSS required for Ionic components to work properly */
@@ -37,6 +38,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import AuthService from './AuthService';
 
 setupIonicReact();
 
@@ -54,10 +56,22 @@ const App: React.FC = () => (
            <ViewMessage />
         </Route>
         <Route path="/login">
+          
+          {AuthService.isLoggedIn() ? (
+            <Redirect to="/home" />
+              ) : (
+          <Redirect to="/login" />
+              )}
            <Login />
         </Route>
         <Route path="/registration">
-           <Registration />
+          
+          {AuthService.isLoggedIn() ? (
+            <Redirect to="/home" />
+              ) : (
+          <Redirect to="/registration" />
+              )}
+           <Login />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

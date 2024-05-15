@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { IonInput, IonCol, IonGrid, IonRow, IonButton, IonAlert, IonText } from '@ionic/react';
+import axios from 'axios';
 
 const Registration: React.FC = () => {
     const [username, setUsername] = useState<string>('');
@@ -12,46 +14,39 @@ const Registration: React.FC = () => {
     const [address, setAddress] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
+    const history = useHistory();  // useHistory Hook initialisieren
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (password !== confirmPassword) {
             setError('Passwords do not match');
             return;
         }
 
-        const userData = {
-            username,
-            email,
-            password,
-            firstname,
-            lastname,
-            birthdate,
-            address
-        };
+         try {
+      const response = await axios.post('https://server-y2mz.onrender.com/api/register_user', 
+      {username,
+      email,
+      password,
+      firstname,
+      lastname,
+      birthdate,
+      address  });
 
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(userData)
-        };
+      setSuccess(response.data.message)
+      history.push('/login')
 
-        fetch("https://server-y2mz.onrender.com/api/register_user", requestOptions)
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return res.json();
-            })
-            .then((data) => {
-                setSuccess('Registration successful!');
-                setError('');
-            })
-            .catch((err) => {
-                setError('Registration failed. Please try again.');
-                setSuccess('');
-            });
+    } catch (error: any) {
+
+      if (error.response && error.response.data && error.response.data.error) {
+
+        setError(error.response.data.error);
+
+      } else {
+
+        setError('An error occurred while register in. Please try again later.');
+
+      }
+    }
     };
 
     return (
