@@ -112,33 +112,24 @@ const Registration: React.FC = () => {
                         placeholder="Email"
                         value={email}
                         onIonChange={(e) => setEmail(e.detail.value!)}
-<<<<<<< HEAD
                         color={emailValid ? "primary" : "danger"}
-=======
                         className="registration-input"
->>>>>>> 5401c291ab0459c9d9ef4583715ceaf5d0f9d025
                     ></IonInput>
                     <IonInput
                         type="password"
                         placeholder="Password"
                         value={password}
                         onIonChange={(e) => setPassword(e.detail.value!)}
-<<<<<<< HEAD
                         color={passwordValid ? "primary" : "danger"}
-=======
                         className="registration-input"
->>>>>>> 5401c291ab0459c9d9ef4583715ceaf5d0f9d025
                     ></IonInput>
                     <IonInput
                         type="password"
                         placeholder="Confirm Password"
                         value={confirmPassword}
                         onIonChange={(e) => setConfirmPassword(e.detail.value!)}
-<<<<<<< HEAD
                         color={passwordValid ? "primary" : "danger"}
-=======
                         className="registration-input"
->>>>>>> 5401c291ab0459c9d9ef4583715ceaf5d0f9d025
                     ></IonInput>
                     <IonInput
                         type="text"
@@ -159,22 +150,16 @@ const Registration: React.FC = () => {
                         placeholder="Birth Date"
                         value={birthdate}
                         onIonChange={(e) => setBirthdate(e.detail.value!)}
-<<<<<<< HEAD
                         color={birthdateValid ? "primary" : "danger"}
-=======
                         className="registration-input"
->>>>>>> 5401c291ab0459c9d9ef4583715ceaf5d0f9d025
                     ></IonInput>
                     <IonInput
                         type="text"
                         placeholder="Address"
                         value={address}
                         onIonChange={(e) => setAddress(e.detail.value!)}
-<<<<<<< HEAD
                         color={addressValid ? "primary" : "danger"}
-=======
                         className="registration-input"
->>>>>>> 5401c291ab0459c9d9ef4583715ceaf5d0f9d025
                     ></IonInput>
                     <IonButton onClick={handleRegister}>Register</IonButton>
                     {error && <IonAlert isOpen={!!error} message={error} buttons={['OK']} />}
