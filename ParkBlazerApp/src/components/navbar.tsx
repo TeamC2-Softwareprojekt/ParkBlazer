@@ -23,7 +23,11 @@ function Navbar() {
                     {loggedIn ? (
                         <IonButton onClick={handleLogout}>Logout</IonButton>
                     ) : (
+                        <>
                         <IonButton routerLink="/login">Login</IonButton>
+                        <IonButton routerLink="/registration">Registration</IonButton>
+                        </>
+                        
                     )}
                 </IonButtons>
             </IonToolbar>
