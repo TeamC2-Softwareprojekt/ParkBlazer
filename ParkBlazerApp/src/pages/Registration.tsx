@@ -1,169 +1,186 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { IonInput, IonCol, IonGrid, IonRow, IonButton, IonAlert, IonText } from '@ionic/react';
-import axios from 'axios';
-import './Registration.css';
+import React, { useState, useEffect, useCallback } from "react";
+import { useHistory } from "react-router-dom";
+import {
+    IonInput,
+    IonCol,
+    IonGrid,
+    IonRow,
+    IonButton,
+    IonAlert
+} from "@ionic/react";
+import "./Registration.css";
+import axios from "axios";
 
 const Registration: React.FC = () => {
-    const [username, setUsername] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
-    const [emailValid, setEmailValid] = useState<boolean>(true);
-    const [password, setPassword] = useState<string>('');
-    const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const [passwordValid, setPasswordValid] = useState<boolean>(true);
-    const [firstname, setFirstname] = useState<string>('');
-    const [lastname, setLastname] = useState<string>('');
-    const [birthdate, setBirthdate] = useState<string>('');
-    const [birthdateValid, setBirthdateValid] = useState<boolean>(true);
-    const [address, setAddress] = useState<string>('');
-    const [addressValid, setAddressValid] = useState<boolean>(true);
-    const [error, setError] = useState<string>('');
-    const [success, setSuccess] = useState<string>('');
-    const history = useHistory();  // useHistory Hook initialisieren
-   
-    
-    // Funktion zur Überprüfung einer E-Mail-Adresse
-    function isValidEmail(checkEmail: string) {
-        // Regulärer Ausdruck für eine einfache E-Mail-Adressvalidierung
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(checkEmail);
-    }
+    const [username, setUsername] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [firstname, setFirstname] = useState<string>("");
+    const [lastname, setLastname] = useState<string>("");
+    const [birthdate, setBirthdate] = useState<string>("");
+    const [address, setAddress] = useState<string>("");
+    const [isEmailValid, setIsEmailValid] = useState<boolean>(true);
+    const [isPasswordValid, setIsPasswordValid] = useState<boolean>(true);
+    const [isBirthdateValid, setIsBirthdateValid] = useState<boolean>(true);
+    const [isEmailTouched, setIsEmailTouched] = useState<boolean>(false);
+    const [isPasswordTouched, setIsPasswordTouched] = useState<boolean>(false);
+    const [isBirthdateTouched, setIsBirthdateTouched] = useState<boolean>(false);
+    const [isValid, setIsValid] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
+    const history = useHistory();
 
-    function isValidDate(dateString: string) {
-        const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\.(0[1-9]|1[0-2])\.(19|20)\d{2}$/;
-        return dateRegex.test(dateString);
-    }
-    
+    useEffect(() => {
+        setError("");
+    }, []);
 
-    function isValidAddress(address: string) {
-        const addressRegex = /^([^\d]+)\s+(\d+.*)$/;
-        return addressRegex.test(address);
-    }
-    
+    const validateEmail = useCallback((email: string) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }, []);
+
+    const validatePassword = useCallback((password: string) => {
+        return password.length > 10;
+    }, []);
+
+    const validateBirthdate = useCallback((birthdate: string) => {
+        const today = new Date();
+        const inputDate = new Date(birthdate);
+        let age = today.getFullYear() - inputDate.getFullYear();
+        const monthDiff = today.getMonth() - inputDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < inputDate.getDate())) {
+            age--;
+        }
+        return age >= 18;
+    }, []);
+
+    useEffect(() => {
+        setIsValid(
+            isEmailValid &&
+            isPasswordValid &&
+            isBirthdateValid &&
+            firstname.trim().length > 0 &&
+            lastname.trim().length > 0 &&
+            address.trim().length > 0
+        );
+    }, [isEmailValid, isPasswordValid, isBirthdateValid, firstname, lastname, address]);
+
+    const handleEmailChange = (event: CustomEvent) => {
+        const value = event.detail.value!;
+        setEmail(value);
+        setIsEmailTouched(true);
+        setIsEmailValid(validateEmail(value));
+    };
+
+    const handlePasswordChange = (event: CustomEvent) => {
+        const value = event.detail.value!;
+        setPassword(value);
+        setIsPasswordTouched(true);
+        setIsPasswordValid(validatePassword(value));
+    };
+
+    const handleBirthdateChange = (event: CustomEvent) => {
+        const value = event.detail.value!;
+        setBirthdate(value);
+        setIsBirthdateTouched(true);
+        setIsBirthdateValid(validateBirthdate(value));
+    };
 
     const handleRegister = async () => {
-        setEmailValid(true);
-        setPasswordValid(true);
-        setBirthdateValid(true);
-        setAddressValid(true);
-
-        if (!isValidEmail(email)) {
-            setEmailValid(false);
-            setError('Ungültige E-Mail-Adresse.');
-            return;
+        if (isValid) {
+            try {
+                setError("");
+                // Register logic here
+                const response = await axios.post('https://server-y2mz.onrender.com/api/register_user', {
+                    username,
+                    email,
+                    password,
+                    firstname,
+                    lastname,
+                    birthdate,
+                    address
+                });
+                console.log("Registered!");
+                history.push("/login"); // Redirect to login after successful registration
+            } catch (error: any) {
+                setError("An error occurred while registering. Please try again later.");
+            }
+        } else {
+            setError("Please fill out all fields correctly.");
         }
-        if (password !== confirmPassword) {
-            setPasswordValid(false)
-            setError('Passwords do not match');
-            return;
-        }
-        if (!isValidDate(birthdate)){
-            setBirthdateValid(false)
-            setError('Ungültiges Geburtsdatum')
-            return;
-        }
-        if (!isValidAddress(address)){
-            setAddressValid(false)
-            setError('Ungültige Address.');
-            return;
-        }
-         try {
-      const response = await axios.post('https://server-y2mz.onrender.com/api/register_user', 
-      {username,
-      email,
-      password,
-      firstname,
-      lastname,
-      birthdate,
-      address  });
-
-      setSuccess(response.data.message)
-      history.push('/login')
-
-    } catch (error: any) {
-
-      if (error.response && error.response.data && error.response.data.error) {
-
-        setError(error.response.data.error);
-
-
-      } else {
-
-        setError('An error occurred while register in. Please try again later.');
-
-
-      }
-    }
     };
 
     return (
-        <IonGrid fixed={true} className="registration-grid">
-            <IonRow className="ion-justify-content-center">
-                <IonCol size="12" size-sm="4">
-                    <IonInput
-                        type="text"
-                        placeholder="Username"
-                        value={username}
-                        onIonChange={(e) => setUsername(e.detail.value!)}
-                        className="registration-input"
-                    ></IonInput>
-                    <IonInput
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onIonChange={(e) => setEmail(e.detail.value!)}
-                        color={emailValid ? "primary" : "danger"}
-                        className="registration-input"
-                    ></IonInput>
-                    <IonInput
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onIonChange={(e) => setPassword(e.detail.value!)}
-                        color={passwordValid ? "primary" : "danger"}
-                        className="registration-input"
-                    ></IonInput>
-                    <IonInput
-                        type="password"
-                        placeholder="Confirm Password"
-                        value={confirmPassword}
-                        onIonChange={(e) => setConfirmPassword(e.detail.value!)}
-                        color={passwordValid ? "primary" : "danger"}
-                        className="registration-input"
-                    ></IonInput>
-                    <IonInput
-                        type="text"
-                        placeholder="First Name"
-                        value={firstname}
-                        onIonChange={(e) => setFirstname(e.detail.value!)}
-                        className="registration-input"
-                    ></IonInput>
-                    <IonInput
-                        type="text"
-                        placeholder="Last Name"
-                        value={lastname}
-                        onIonChange={(e) => setLastname(e.detail.value!)}
-                        className="registration-input"
-                    ></IonInput>
-                    <IonInput
-                        type="text"
-                        placeholder="Birth Date"
-                        value={birthdate}
-                        onIonChange={(e) => setBirthdate(e.detail.value!)}
-                        color={birthdateValid ? "primary" : "danger"}
-                        className="registration-input"
-                    ></IonInput>
-                    <IonInput
-                        type="text"
-                        placeholder="Address"
-                        value={address}
-                        onIonChange={(e) => setAddress(e.detail.value!)}
-                        color={addressValid ? "primary" : "danger"}
-                        className="registration-input"
-                    ></IonInput>
-                    <IonButton onClick={handleRegister}>Register</IonButton>
-                    {error && <IonAlert isOpen={!!error} message={error} buttons={['OK']} />}
-                    {success && <IonAlert isOpen={!!success} message={success} buttons={['OK']} />}
+        <IonGrid fixed className="register-grid">
+            <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+                <IonCol size="12" size-sm="8" size-md="8">
+                    <div className="register-container">
+                        <h1 className="register-heading">REGISTER</h1>
+                        <IonInput
+                            className={`register-input ${isEmailTouched && !isEmailValid ? "ion-invalid" : ""}`}
+                            type="email"
+                            fill="solid"
+                            label="Email"
+                            labelPlacement="floating"
+                            value={email}
+                            onIonChange={handleEmailChange}
+                            errorText={isEmailTouched && !isEmailValid ? "Keine valide Email!" : ""}
+                        />
+                        <IonInput
+                            className={`register-input ${isPasswordTouched && !isPasswordValid ? "ion-invalid" : ""}`}
+                            type="password"
+                            fill="solid"
+                            label="Password"
+                            labelPlacement="floating"
+                            value={password}
+                            onIonChange={handlePasswordChange}
+                            errorText={isPasswordTouched && !isPasswordValid ? "Passwort muss länger als 10 Zeichen sein!" : ""}
+                        />
+                        <IonInput
+                            className={`register-input ${isBirthdateTouched && !isBirthdateValid ? "ion-invalid" : ""}`}
+                            type="date"
+                            fill="solid"
+                            label="Birth Date"
+                            labelPlacement="floating"
+                            value={birthdate}
+                            onIonChange={handleBirthdateChange}
+                            errorText={isBirthdateTouched && !isBirthdateValid ? "Keine 18 Jahre alt!" : ""}
+                        />
+                        <IonInput
+                            className="register-input"
+                            type="text"
+                            fill="solid"
+                            label="First Name"
+                            labelPlacement="floating"
+                            value={firstname}
+                            onIonChange={(e) => setFirstname(e.detail.value!)}
+                        />
+                        <IonInput
+                            className="register-input"
+                            type="text"
+                            fill="solid"
+                            label="Last Name"
+                            labelPlacement="floating"
+                            value={lastname}
+                            onIonChange={(e) => setLastname(e.detail.value!)}
+                        />
+                        <IonInput
+                            className="register-input"
+                            type="text"
+                            fill="solid"
+                            label="Address"
+                            labelPlacement="floating"
+                            value={address}
+                            onIonChange={(e) => setAddress(e.detail.value!)}
+                        />
+                        <IonButton
+                            expand="block"
+                            onClick={handleRegister}
+                            className="register-button"
+                            disabled={!isValid}
+                        >
+                            Register
+                        </IonButton>
+                        {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
+                    </div>
                 </IonCol>
             </IonRow>
         </IonGrid>

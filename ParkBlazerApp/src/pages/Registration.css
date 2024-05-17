@@ -1,17 +1,17 @@
-.registration-grid {
-    background-image: url("src/pages/images/Parkplatz-Image.jpg");
-    background-size: cover; /* Bild wird so skaliert, dass es den gesamten Hintergrund bedeckt */
-    background-position: center; /* Bild wird zentriert im Hintergrund positioniert */
-    background-repeat: no-repeat; /* Bild wird nicht wiederholt */
-    height: 100vh; /* Bild nimmt die gesamte Höhe des Viewports ein */
-    width: 200vh; /* Bild nimmt die gesamte Breite des Viewports ein */
-    display: flex; /* Flex-Layout verwenden, um Inhalte zu zentrieren */
-    justify-content: center; /* Inhalte horizontal zentrieren */
-    align-items: center; /* Inhalte vertikal zentrieren */
+.register-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 16px;
+    padding: 16px;
+}
+.register-heading {
+	font-weight: bold;
+}
+.register-button {
+	width: 100%;
 }
 
-.registration-input {
-    margin-bottom: 10px; /* Abstand zwischen den Input-Feldern */
-    width: 500% !important; /* Eingabefelder nehmen die volle Breite der Spalte ein */
-    height: 40px !important; /* Höhe der Eingabefelder */
+.input-bottom.sc-ion-input-md .error-text.sc-ion-input-md {
+	display: block;
 }

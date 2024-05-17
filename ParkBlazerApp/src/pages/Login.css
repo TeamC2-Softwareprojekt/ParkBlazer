@@ -13,20 +13,40 @@ body {
     monospace;
   }
 
-  .login-grid {
-    background-image: url("src/pages/images/Parkplatz-Image.jpg");
-    background-size: cover; /* Bild wird so skaliert, dass es den gesamten Hintergrund bedeckt */
-    background-position: center; /* Bild wird zentriert im Hintergrund positioniert */
-    background-repeat: no-repeat; /* Bild wird nicht wiederholt */
-    height: 100vh; /* Bild nimmt die gesamte Höhe des Viewports ein */
-    width: 200vh; /* Bild nimmt die gesamte Breite des Viewports ein */
-    display: flex; /* Flex-Layout verwenden, um Inhalte zu zentrieren */
-    justify-content: center; /* Inhalte horizontal zentrieren */
-    align-items: center; /* Inhalte vertikal zentrieren */
-}
 
+  .full-height {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the content horizontally */
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .login-title {
+    text-align: center;
+    width: 100%;
+  }
+  
   .login-input {
-    margin-bottom: 10px; /* Abstand zwischen den Input-Feldern */
-    width: 500% !important; /* Eingabefelder nehmen die volle Breite der Spalte ein */
-    height: 40px !important; /* Höhe der Eingabefelder */
-}
+    width: 100%; 
+  }
+
+  .login-button {
+    width: 100%; /* Ensure the button takes the full width of the container */
+  }
+
+  .login-grid {
+    height: 100%;
+  }
+
+  .login-heading {
+    font-weight: bold;
+  }
+  
