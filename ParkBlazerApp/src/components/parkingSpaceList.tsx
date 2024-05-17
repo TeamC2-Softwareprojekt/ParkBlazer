@@ -17,7 +17,7 @@ let marker: maptilersdk.Marker;
 
 const parkingSpaces = getParkingSpaces().map((parkingSpace) => {
   return (
-    <IonItem button={true} onClick={() => onClick(parkingSpace)}>
+    <IonItem button={true} onClick={() => onItemClick(parkingSpace)}>
       <div className="parkingSpace-container">
         <div className="private-indicator" style={{backgroundColor: parkingSpace.private ? "#1BB367": "#4d8dff"}}></div>
         <div className="address-container">
@@ -28,26 +28,26 @@ const parkingSpaces = getParkingSpaces().map((parkingSpace) => {
           <div className="detail">
             <IonIcon src="src/icons/bike.svg"></IonIcon>
             <IonRadioGroup value={parkingSpace.type_bike}>
-              <IonRadio value={true} disabled={true}></IonRadio>
+              <IonRadio value={true} disabled></IonRadio>
             </IonRadioGroup>
           </div>
           <div className="detail">
             <IonIcon src="src/icons/car.svg"></IonIcon>
             <IonRadioGroup value={parkingSpace.type_car}>
-              <IonRadio value={true} disabled={true}></IonRadio>
+              <IonRadio value={true} disabled></IonRadio>
             </IonRadioGroup>
           </div>
           <div className="detail">
             <IonIcon src="src/icons/truck.svg"></IonIcon>
             <IonRadioGroup value={parkingSpace.type_truck}>
-              <IonRadio value={true} disabled={true}></IonRadio>
+              <IonRadio value={true} disabled></IonRadio>
             </IonRadioGroup>
           </div>
           <div className="detail">
             <IonIcon src="src/icons/amount.svg"></IonIcon>
             <IonLabel>{parkingSpace.amount}</IonLabel>
           </div>
-          <div className="detail">
+          <div className="detail" style={{visibility: parkingSpace.private  ? 'visible' : 'hidden'}}>
             <IonIcon src="src/icons/euro.svg"></IonIcon>
             <IonLabel>{parkingSpace.price}€</IonLabel>
           </div>
@@ -57,7 +57,7 @@ const parkingSpaces = getParkingSpaces().map((parkingSpace) => {
   );
 });
 
-function onClick(parkingSpace: any) {
+function onItemClick(parkingSpace: any) {
   map.current?.flyTo({center: parkingSpace.center, zoom: 18});
  
   if(marker) marker.remove();
@@ -67,7 +67,7 @@ function onClick(parkingSpace: any) {
     .addTo(map.current!);
 }
 
-export default function ParkingSpaceList(){
+export default function ParkingSpaceList() {
   return (
     <IonContent>
       <IonList>
