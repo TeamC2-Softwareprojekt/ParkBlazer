@@ -50,3 +50,6 @@ body {
     font-weight: bold;
   }
   
+  .login-input.ion-valid .input-bottom.sc-ion-input-md .error-text.sc-ion-input-md {
+    display: none;
+  }
