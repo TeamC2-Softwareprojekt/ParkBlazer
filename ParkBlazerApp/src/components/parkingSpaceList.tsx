@@ -1,9 +1,7 @@
 import React from 'react';
 import './parkingSpaceList.css';
 import { getParkingSpaces } from '../data/parkingSpaces';
-import { map } from './map';
 import ParkingSpaceListItem from './parkingSpaceListItem';
-import * as maptilersdk from '@maptiler/sdk';
 import {
   IonContent,
   IonList,

@@ -11,15 +11,15 @@ import './map.css';
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
 export default function Map() {
-  const mapContainer = useRef<HTMLDivElement>(null); // Hier Typangabe hinzugefügt
-  map = useRef<maptilersdk.Map | null>(null); // Hier Typangabe hinzugefügt
+  const mapContainer = useRef<HTMLDivElement>(null);
+  map = useRef<maptilersdk.Map | null>(null);
   const tokyo = { lng: 139.753, lat: 35.6844 };
-  const [zoom] = useState<number>(14); // Hier Typangabe hinzugefügt
+  const [zoom] = useState<number>(14);
   const [mapController, setMapController] = useState<any>();
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT';
 
   useEffect(() => {
-    if (map.current) return; // Stoppt die Initialisierung der Karte mehr als einmal
+    if (map.current) return;
 
     map.current = new maptilersdk.Map({
       container: mapContainer.current!,
