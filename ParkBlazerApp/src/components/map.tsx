@@ -28,7 +28,7 @@ export default function Map() {
   // Diese Funktion ruft die Parkplätze von der API ab und aktualisiert den State
   const getParkingSpots = async () => {
     try {
-      const response = await axios.get('https://server-y2mz.onrender.com/api/parkingspots');
+      const response = await axios.get('https://server-y2mz.onrender.com/api/get_parkingspots');
       setParkingSpots(response.data); // Parkplätze speichern
       displayParkingSpotsOnMap(response.data); // Parkplätze auf der Karte anzeigen
     } catch (error) {
@@ -41,17 +41,17 @@ export default function Map() {
     if (!map.current) return;
   
     parkingSpots.forEach((spot) => {
-      const { longitude, latitude, name, description, available_spaces, image_url, address } = spot;
+      const { longitude, latitude, name, description, available_spaces, image_url, street, house_number, zip, city, country, username } = spot;
   
       // HTML für das Popup
-      //#TODO: Parkplatzbild prüfen, und wenn nicht vorhanden dann kein Bild anzeigen
       const popupContent = `
         <div>
           <h3>${name}</h3>
           <p>${description}</p>
           <p>Verfügbare Plätze: ${available_spaces}</p>
-          <p><img src="${image_url}" alt="Parkplatzbild" style="max-width: 100px;"></p>
-          <p>Adresse: ${address}</p>
+          <p>${image_url ? `<img src="${image_url}" alt="Parkplatzbild" style="max-width: 100px;">` : ''}</p>
+          <p>Adresse: ${street} ${house_number}, ${zip} ${city}, ${country}</p>
+          <p>Benutzer: ${username}</p>
         </div>
       `;
   
