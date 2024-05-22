@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText } from '@ionic/react';
+import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
 
 function MarkerMenu() {
@@ -29,6 +29,10 @@ function MarkerMenu() {
   const [errorZip, setErrorZip] = useState('');
   const [errorCity, setErrorCity] = useState('');
   const [errorCountry, setErrorCountry] = useState('');
+
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationColor, setNotificationColor] = useState('success');
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -93,11 +97,11 @@ function MarkerMenu() {
       setErrorDescription('');
     }
 
-    if(available_spaces.trim().length === 0){
-      setErrorAvailableSpaces('Bitte geben Sie die Anzahl der Parkplätze an.')
+    if (available_spaces.trim().length === 0) {
+      setErrorAvailableSpaces('Bitte geben Sie die Anzahl der Parkplätze an.');
       valid = false;
     } else {
-      setErrorAvailableSpaces('')
+      setErrorAvailableSpaces('');
     }
 
     if (houseNumber.trim().length === 0) {
@@ -130,6 +134,21 @@ function MarkerMenu() {
 
     if (valid) {
       try {
+        // Check if parking spot already exists
+        const existingSpotsResponse = await fetch('https://server-y2mz.onrender.com/api/parkingspots');
+        const existingSpots = await existingSpotsResponse.json();
+
+        const spotExists = existingSpots.some((spot: { latitude: number; longitude: number; name: string; }) => 
+          (spot.latitude === lat && spot.longitude === lng) || spot.name === title
+        );
+
+        if (spotExists) {
+          setNotificationMessage('Parkplatz existiert bereits.');
+          setNotificationColor('danger');
+          setShowNotification(true);
+          return;
+        }
+
         const response = await fetch('https://server-y2mz.onrender.com/api/create_parkingspot', {
           method: 'POST',
           headers: {
@@ -149,9 +168,20 @@ function MarkerMenu() {
             country: country
           })
         });
-        const data = await response.json();
-        console.log('Erfolgreich gespeichert:', data);
+
+        if (response.ok) {
+          const data = await response.json();
+          setNotificationMessage('Parkplatz erfolgreich gespeichert.');
+          setNotificationColor('success');
+          setShowNotification(true);
+          console.log('Erfolgreich gespeichert:', data);
+        } else {
+          throw new Error('Fehler beim Speichern');
+        }
       } catch (error) {
+        setNotificationMessage('Fehler beim Speichern.');
+        setNotificationColor('danger');
+        setShowNotification(true);
         console.error('Fehler beim Speichern:', error);
       }
 
@@ -178,21 +208,17 @@ function MarkerMenu() {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        {/* Fab-Button */}
         <IonFab slot="fixed" vertical="bottom" horizontal="end">
           <IonFabButton onClick={toggleMenu}>
             <IonIcon icon={showMenu ? chevronUpCircle : add}></IonIcon>
           </IonFabButton>
-          {/* Fab-Liste */}
           <IonFabList side="top" className={showMenu ? 'show-menu' : ''}>
-            {/* Option zum Öffnen des Modals */}
             <IonFabButton onClick={openModal}>
               <IonIcon icon={add}></IonIcon>
             </IonFabButton>
           </IonFabList>
         </IonFab>
 
-        {/* Modal zum Erstellen eines Markers */}
         <IonModal isOpen={showModal} onDidDismiss={closeModal}>
           <IonContent>
             <IonList>
@@ -209,8 +235,7 @@ function MarkerMenu() {
           </IonContent>
         </IonModal>
 
-         {/* Modal zum Eingeben der Koordinaten */}
-         <IonModal isOpen={showModalCoordinates} onDidDismiss={closeModalCoordinates}>
+        <IonModal isOpen={showModalCoordinates} onDidDismiss={closeModalCoordinates}>
           <IonContent>
             <IonList>
               <IonItem>
@@ -218,7 +243,7 @@ function MarkerMenu() {
                   type="number"
                   placeholder="Latitude"
                   value={latitude}
-                  onIonChange={e => setLatitude(e.detail.value!)} 
+                  onIonChange={e => setLatitude(e.detail.value ? e.detail.value.replace(',', '.') : '')} 
                 />
               </IonItem>
               {errorLatitude && (
@@ -231,7 +256,7 @@ function MarkerMenu() {
                   type="number"
                   placeholder="Longitude"
                   value={longitude}
-                  onIonChange={e => setLongitude(e.detail.value!)}
+                  onIonChange={e => setLongitude(e.detail.value ? e.detail.value.replace(',', '.') : '')} 
                 />
               </IonItem>
               {errorLongitude && (
@@ -360,6 +385,14 @@ function MarkerMenu() {
             </IonList>
           </IonContent>
         </IonModal>
+        
+        <IonToast
+          isOpen={showNotification}
+          message={notificationMessage}
+          color={notificationColor}
+          duration={2000}
+          onDidDismiss={() => setShowNotification(false)}
+        />
       </IonContent>
     </>
   );
