@@ -9,9 +9,9 @@ export default function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
   const [zoom] = useState<number>(14);
-  const [parkingSpots, setParkingSpots] = useState<any[]>([]); // Parkplätze speichern in einem Array
+  const [parkingSpots, setParkingSpots] = useState<any[]>([]); // parking spots save in array
 
-  maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT'; // API Key setzen
+  maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT'; //  set API key
 
   useEffect(() => {
     if (map.current) return;
@@ -25,25 +25,25 @@ export default function Map() {
     getParkingSpots();
   }, [zoom]);
 
-  // Diese Funktion ruft die Parkplätze von der API ab und aktualisiert den State
+  // this function gets all parking spots from the server
   const getParkingSpots = async () => {
     try {
       const response = await axios.get('https://server-y2mz.onrender.com/api/get_parkingspots');
-      setParkingSpots(response.data); // Parkplätze speichern
-      displayParkingSpotsOnMap(response.data); // Parkplätze auf der Karte anzeigen
+      setParkingSpots(response.data); // save parking spots in state
+      displayParkingSpotsOnMap(response.data); // display parkingspots on map
     } catch (error) {
       console.error('Error getting all Parkingspots', error);
     }
   };
 
-  // Diese Funktion zeigt die Parkplätze auf der Karte an
+  // This function displays the parking spots on the map
   const displayParkingSpotsOnMap = (parkingSpots: any[]) => {
     if (!map.current) return;
   
     parkingSpots.forEach((spot) => {
       const { longitude, latitude, name, description, available_spaces, image_url, street, house_number, zip, city, country, username } = spot;
   
-      // HTML für das Popup
+      // HTML for the popup
       const popupContent = `
         <div>
           <h3>${name}</h3>
@@ -55,7 +55,7 @@ export default function Map() {
         </div>
       `;
   
-      // Marker zur Karte hinzufügen
+      // add Marker to the map
       new maptilersdk.Marker({ color: "#FF0000" })
         .setLngLat([parseFloat(longitude), parseFloat(latitude)])
         .setPopup(new maptilersdk.Popup().setHTML(popupContent))
