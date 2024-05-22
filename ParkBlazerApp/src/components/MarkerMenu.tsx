@@ -61,7 +61,7 @@ function MarkerMenu() {
     const lng = parseFloat(longitude);
     let valid = true;
 
-    // Validation der Eingaben
+    // Validation of input
     if (isNaN(lat) || lat < -90 || lat > 90) {
       setErrorLatitude('Bitte geben Sie eine gültige Breite zwischen -90 und 90 ein.');
       valid = false;
@@ -134,7 +134,7 @@ function MarkerMenu() {
 
     if (valid) {
       try {
-        // Überprüfe, ob der Parkplatz bereits existiert
+        // Check if spot already exists
         const existingSpotsResponse = await fetch('https://server-y2mz.onrender.com/api/get_parkingspots');
         const existingSpots = await existingSpotsResponse.json();
 
@@ -148,7 +148,7 @@ function MarkerMenu() {
           setShowNotification(true);
           return;
         }
-
+        // Send spot to server
         const response = await fetch('https://server-y2mz.onrender.com/api/create_parkingspot', {
           method: 'POST',
           headers: {
@@ -167,10 +167,10 @@ function MarkerMenu() {
             zip: zip,
             city: city,
             country: country,
-            user_id: 'TestUser'  // setze auf null, wenn nicht benötigt
+            user_id: 'TestUser' 
           })
         });
-
+        // Check if response is ok
         if (response.ok) {
           const data = await response.json();
           setNotificationMessage('Parkplatz erfolgreich gespeichert.');
@@ -192,13 +192,13 @@ function MarkerMenu() {
   };
 
   const handleUseCurrentLocation = () => {
-    // Logik aktueller Standort
+    // #TODO: Logic to use current location
     console.log('Aktuellen Standort verwenden');
     closeModal();
   };
 
   const handleSelectLocationOnMap = () => {
-    // Logik für Position auf der Karte
+    // #TODO: Logic to select location on map
     console.log('Auf der Karte auswählen');
     closeModal();
   };
