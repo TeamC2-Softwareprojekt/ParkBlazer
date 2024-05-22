@@ -61,7 +61,7 @@ function MarkerMenu() {
     const lng = parseFloat(longitude);
     let valid = true;
 
-    // Validation of the Inputs
+    // Validation der Eingaben
     if (isNaN(lat) || lat < -90 || lat > 90) {
       setErrorLatitude('Bitte geben Sie eine gültige Breite zwischen -90 und 90 ein.');
       valid = false;
@@ -134,8 +134,8 @@ function MarkerMenu() {
 
     if (valid) {
       try {
-        // Check if parking spot already exists
-        const existingSpotsResponse = await fetch('https://server-y2mz.onrender.com/api/parkingspots');
+        // Überprüfe, ob der Parkplatz bereits existiert
+        const existingSpotsResponse = await fetch('https://server-y2mz.onrender.com/api/get_parkingspots');
         const existingSpots = await existingSpotsResponse.json();
 
         const spotExists = existingSpots.some((spot: { latitude: number; longitude: number; name: string; }) => 
@@ -157,6 +157,7 @@ function MarkerMenu() {
           body: JSON.stringify({
             name: title,
             description: description,
+            type: 'public',
             available_spaces: available_spaces,
             image_url: image,
             latitude: latitude,
@@ -165,7 +166,8 @@ function MarkerMenu() {
             house_number: houseNumber,
             zip: zip,
             city: city,
-            country: country
+            country: country,
+            user_id: 'TestUser'  // setze auf null, wenn nicht benötigt
           })
         });
 
@@ -196,7 +198,7 @@ function MarkerMenu() {
   };
 
   const handleSelectLocationOnMap = () => {
-    // Logik für Postion auf der Karte
+    // Logik für Position auf der Karte
     console.log('Auf der Karte auswählen');
     closeModal();
   };
