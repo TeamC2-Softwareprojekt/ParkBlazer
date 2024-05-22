@@ -134,7 +134,7 @@ function MarkerMenu() {
 
     if (valid) {
       try {
-        // Check if spot already exists
+       // Check if spot already exists
         const existingSpotsResponse = await fetch('https://server-y2mz.onrender.com/api/get_parkingspots');
         const existingSpots = await existingSpotsResponse.json();
 
@@ -167,7 +167,6 @@ function MarkerMenu() {
             zip: zip,
             city: city,
             country: country,
-            user_id: 'TestUser' 
           })
         });
         // Check if response is ok
@@ -178,9 +177,14 @@ function MarkerMenu() {
           setShowNotification(true);
           console.log('Erfolgreich gespeichert:', data);
         } else {
-          throw new Error('Fehler beim Speichern');
+          const errorData = await response.json();
+          setNotificationMessage(errorData.message || 'Fehler beim Speichern.');
+          setNotificationColor('danger');
+          setShowNotification(true);
+          console.error('Fehler beim Speichern:', errorData);
         }
       } catch (error) {
+        console.error('Fehler beim Speichern:', error);
         setNotificationMessage('Fehler beim Speichern.');
         setNotificationColor('danger');
         setShowNotification(true);
@@ -245,7 +249,7 @@ function MarkerMenu() {
                   type="number"
                   placeholder="Latitude"
                   value={latitude}
-                  onIonChange={e => setLatitude(e.detail.value ? e.detail.value.replace(',', '.') : '')} 
+                  onIonChange={e => setLatitude(e.detail.value ? e.detail.value.replace(',', '.') : '')} // Replace comma with dot
                 />
               </IonItem>
               {errorLatitude && (
@@ -295,7 +299,7 @@ function MarkerMenu() {
               <IonItem>
                 <IonInput
                   type="text"
-                  placeholder="Adresse"
+                  placeholder="Straße"
                   value={street}
                   onIonChange={e => setStreet(e.detail.value!)} 
                 />
@@ -392,7 +396,7 @@ function MarkerMenu() {
           isOpen={showNotification}
           message={notificationMessage}
           color={notificationColor}
-          duration={2000}
+          duration={2000} 
           onDidDismiss={() => setShowNotification(false)}
         />
       </IonContent>
