@@ -23,18 +23,21 @@ const AuthService = {
     }
   },
 
+  // Logut the current user
   logout: () => {
     localStorage.removeItem(TOKEN_KEY);
     window.location.reload();
   },
 
+  // Get current user token
   getToken: () => {
     return localStorage.getItem(TOKEN_KEY);
   },
 
+  // Check if user is logged in
   isLoggedIn: () => {
     const token = localStorage.getItem(TOKEN_KEY);
-    return !!token; // True if token exists, false otherwise
+    return !!token; 
   }
 };
 

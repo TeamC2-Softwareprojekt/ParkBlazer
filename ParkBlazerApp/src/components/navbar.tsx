@@ -21,7 +21,7 @@ function Navbar() {
     return (
         <IonHeader>
             <IonToolbar>
-                <IonTitle>Meine App</IonTitle>
+                <IonTitle>ParkBlazer</IonTitle>
                 <IonButtons slot="end">
                     {loggedIn ? (
                         <IonButton onClick={handleLogout}>Logout</IonButton>

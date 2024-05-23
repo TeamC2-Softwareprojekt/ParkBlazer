@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useHistory } from "react-router-dom";
+
 import {
     IonInput,
     IonCol,
     IonGrid,
     IonRow,
     IonButton,
-    IonAlert
+    IonAlert,
+    IonText,
+    IonSelect,
+    IonSelectOption
 } from "@ionic/react";
-//import "./Registration.css";
+import "./Registration.css";
 import axios from "axios";
 
 const Registration: React.FC = () => {
@@ -18,29 +22,34 @@ const Registration: React.FC = () => {
     const [firstname, setFirstname] = useState<string>("");
     const [lastname, setLastname] = useState<string>("");
     const [birthdate, setBirthdate] = useState<string>("");
-    const [address, setAddress] = useState<string>("");
-    const [isEmailValid, setIsEmailValid] = useState<boolean>(true);
-    const [isPasswordValid, setIsPasswordValid] = useState<boolean>(true);
-    const [isBirthdateValid, setIsBirthdateValid] = useState<boolean>(true);
+    const [street, setStreet] = useState<string>("");
+    const [houseNumber, setHouseNumber] = useState<string>("");
+    const [zip, setZip] = useState<string>("");
+    const [city, setCity] = useState<string>("");
+    const [country, setCountry] = useState<string>("");
+
+    const [emailValid, setEmailValid] = useState<boolean>(true);
+    const [passwordValid, setpasswordValid] = useState<boolean>(true);
+    const [birthdateValid, setBirthdateValid] = useState<boolean>(true);
     const [isEmailTouched, setIsEmailTouched] = useState<boolean>(false);
     const [isPasswordTouched, setIsPasswordTouched] = useState<boolean>(false);
     const [isBirthdateTouched, setIsBirthdateTouched] = useState<boolean>(false);
-    const [isValid, setIsValid] = useState<boolean>(false);
+
     const [error, setError] = useState<string>("");
     const history = useHistory();
 
-    useEffect(() => {
-        setError("");
-    }, []);
 
+    // Validate the email of the input
     const validateEmail = useCallback((email: string) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        return /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(email);
     }, []);
 
+    // Validate the password of the input
     const validatePassword = useCallback((password: string) => {
         return password.length > 10;
     }, []);
 
+    // Validate the birthdate of the input
     const validateBirthdate = useCallback((birthdate: string) => {
         const today = new Date();
         const inputDate = new Date(birthdate);
@@ -52,97 +61,73 @@ const Registration: React.FC = () => {
         return age >= 18;
     }, []);
 
-    useEffect(() => {
-        setIsValid(
-            isEmailValid &&
-            isPasswordValid &&
-            isBirthdateValid &&
-            firstname.trim().length > 0 &&
-            lastname.trim().length > 0 &&
-            address.trim().length > 0
-        );
-    }, [isEmailValid, isPasswordValid, isBirthdateValid, firstname, lastname, address]);
-
     const handleEmailChange = (event: CustomEvent) => {
         const value = event.detail.value!;
         setEmail(value);
         setIsEmailTouched(true);
-        setIsEmailValid(validateEmail(value));
+        setEmailValid(validateEmail(value));
     };
 
     const handlePasswordChange = (event: CustomEvent) => {
         const value = event.detail.value!;
         setPassword(value);
         setIsPasswordTouched(true);
-        setIsPasswordValid(validatePassword(value));
+        setpasswordValid(validatePassword(value));
     };
 
     const handleBirthdateChange = (event: CustomEvent) => {
         const value = event.detail.value!;
         setBirthdate(value);
         setIsBirthdateTouched(true);
-        setIsBirthdateValid(validateBirthdate(value));
+        setBirthdateValid(validateBirthdate(value));
     };
 
     const handleRegister = async () => {
-        if (isValid) {
-            try {
-                setError("");
-                // Register logic here
-                const response = await axios.post('https://server-y2mz.onrender.com/api/register_user', {
-                    username,
-                    email,
-                    password,
-                    firstname,
-                    lastname,
-                    birthdate,
-                    address
-                });
-                console.log("Registered!");
-                history.push("/login"); // Redirect to login after successful registration
-            } catch (error: any) {
-                setError("An error occurred while registering. Please try again later.");
-            }
-        } else {
-            setError("Please fill out all fields correctly.");
+        try {
+            setError("");
+            // Register logic here
+            const response = await axios.post('https://server-y2mz.onrender.com/api/register_user', {
+                username: username,
+                email: email,
+                password: password,
+                firstname: firstname,
+                lastname: lastname,
+                birthdate: birthdate,
+                street: street,
+                house_number: houseNumber,
+                zip: zip,
+                city: city,
+                country: country
+            });
+            setError(response.data.message)
+            history.push("/login");
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message);
+              } else {
+                setError("An unexpected error occurred. Please try again later!");
+              }
         }
+
     };
+
 
     return (
         <IonGrid fixed className="register-grid">
-            <IonRow className="ion-justify-content-center ion-align-items-center full-height">
-                <IonCol size="12" size-sm="8" size-md="8">
-                    <div className="register-container">
-                        <h1 className="register-heading">REGISTER</h1>
+            <IonRow className="ion-justify-content-center ion-align-items-center full-height" overflow-scroll="true">
+                <IonCol className="register-col" size="12" size-sm="8" size-md="8" overflow-scroll="true">
+                    <div className="register-container" overflow-scroll="true">
+                        <IonText color="primary" className="register-title">
+                            <h1 className="login-heading">REGISTER</h1>
+                        </IonText>
                         <IonInput
-                            className={`register-input ${isEmailTouched && !isEmailValid ? "ion-invalid" : ""}`}
-                            type="email"
+                            className={`register-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
+                            type="text"
                             fill="solid"
-                            label="Email"
+                            label="Username"
                             labelPlacement="floating"
-                            value={email}
-                            onIonChange={handleEmailChange}
-                            errorText={isEmailTouched && !isEmailValid ? "Keine valide Email!" : ""}
-                        />
-                        <IonInput
-                            className={`register-input ${isPasswordTouched && !isPasswordValid ? "ion-invalid" : ""}`}
-                            type="password"
-                            fill="solid"
-                            label="Password"
-                            labelPlacement="floating"
-                            value={password}
-                            onIonChange={handlePasswordChange}
-                            errorText={isPasswordTouched && !isPasswordValid ? "Passwort muss länger als 10 Zeichen sein!" : ""}
-                        />
-                        <IonInput
-                            className={`register-input ${isBirthdateTouched && !isBirthdateValid ? "ion-invalid" : ""}`}
-                            type="date"
-                            fill="solid"
-                            label="Birth Date"
-                            labelPlacement="floating"
-                            value={birthdate}
-                            onIonChange={handleBirthdateChange}
-                            errorText={isBirthdateTouched && !isBirthdateValid ? "Keine 18 Jahre alt!" : ""}
+                            value={username}
+                            onIonInput={(e) => setUsername(e.detail.value!)}
                         />
                         <IonInput
                             className="register-input"
@@ -151,7 +136,7 @@ const Registration: React.FC = () => {
                             label="First Name"
                             labelPlacement="floating"
                             value={firstname}
-                            onIonChange={(e) => setFirstname(e.detail.value!)}
+                            onIonInput={(e) => setFirstname(e.detail.value!)}
                         />
                         <IonInput
                             className="register-input"
@@ -160,22 +145,84 @@ const Registration: React.FC = () => {
                             label="Last Name"
                             labelPlacement="floating"
                             value={lastname}
-                            onIonChange={(e) => setLastname(e.detail.value!)}
+                            onIonInput={(e) => setLastname(e.detail.value!)}
+                        />
+                        <IonInput
+                            className={`register-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
+                            type="email"
+                            fill="solid"
+                            label="Email"
+                            labelPlacement="floating"
+                            value={email}
+                            onIonInput={handleEmailChange}
+                            errorText={!emailValid ? "Keine valide Email!" : ""}
+                        />
+                        <IonInput
+                            className={`register-input ${isPasswordTouched && !passwordValid ? "ion-invalid" : ""}`}
+                            type="password"
+                            fill="solid"
+                            label="Password"
+                            labelPlacement="floating"
+                            value={password}
+                            onIonInput={handlePasswordChange}
+                            errorText={!passwordValid ? "Passwort muss länger als 10 Zeichen sein!" : ""}
+                        />
+                        <IonInput
+                            className={`register-input ${isBirthdateTouched && !birthdateValid ? "ion-invalid" : ""}`}
+                            type="date"
+                            fill="solid"
+                            label="Birth Date"
+                            labelPlacement="floating"
+                            value={birthdate}
+                            onIonInput={handleBirthdateChange}
+                            errorText={!birthdateValid ? "Keine 18 Jahre alt!" : ""}
                         />
                         <IonInput
                             className="register-input"
                             type="text"
                             fill="solid"
-                            label="Address"
+                            label="Street"
                             labelPlacement="floating"
-                            value={address}
-                            onIonChange={(e) => setAddress(e.detail.value!)}
+                            value={street}
+                            onIonInput={(e) => setStreet(e.detail.value!)}
                         />
+                        <IonInput
+                            className="register-input"
+                            type="text"
+                            fill="solid"
+                            label="House Number"
+                            labelPlacement="floating"
+                            value={houseNumber}
+                            onIonInput={(e) => setHouseNumber(e.detail.value!)}
+                        />
+                        <IonInput
+                            className="register-input"
+                            type="text"
+                            fill="solid"
+                            label="Zip"
+                            labelPlacement="floating"
+                            value={zip}
+                            onIonInput={(e) => setZip(e.detail.value!)}
+                        />
+                        <IonInput
+                            className="register-input"
+                            type="text"
+                            fill="solid"
+                            label="City"
+                            labelPlacement="floating"
+                            value={city}
+                            onIonInput={(e) => setCity(e.detail.value!)}
+                        />
+                        <IonSelect aria-label="Country" label="Select Country" labelPlacement="floating" fill="solid" onIonChange={(e) => setCountry(e.detail.value!)}>
+                            <IonSelectOption value="germany">Germany</IonSelectOption>
+                            <IonSelectOption value="austria">Austria</IonSelectOption>
+                            <IonSelectOption value="netherlands">Netherlands</IonSelectOption>
+                        </IonSelect>
                         <IonButton
                             expand="block"
                             onClick={handleRegister}
                             className="register-button"
-                            disabled={!isValid}
+                            disabled={!username || !firstname || !lastname || !email || !password || !birthdate || !street || !houseNumber || !zip || !city || !country || !emailValid || !passwordValid || !birthdateValid}
                         >
                             Register
                         </IonButton>
