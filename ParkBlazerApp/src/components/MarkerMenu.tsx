@@ -195,10 +195,24 @@ function MarkerMenu() {
     }
   };
 
+  // this function is for handling the current location to create a new parking spot
   const handleUseCurrentLocation = () => {
-    // #TODO: Logic to use current location
-    console.log('Aktuellen Standort verwenden');
-    closeModal();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLatitude(position.coords.latitude.toString()); // convert to string
+          setLongitude(position.coords.longitude.toString()); // convert to string
+          openModalCoordinates(); // open modal to enter additional information
+        },
+        (error) => {
+          console.error('Error getting location', error);
+          setNotificationMessage('Fehler beim Abrufen der aktuellen Position.');
+          setNotificationColor('danger');
+          setShowNotification(true);
+        }
+      );
+    } 
+
   };
 
   const handleSelectLocationOnMap = () => {

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@awesome-cordova-plugins/geolocation": "^6.7.0"
+  }
+}
