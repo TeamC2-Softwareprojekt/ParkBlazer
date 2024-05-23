@@ -176,6 +176,7 @@ function MarkerMenu() {
           setNotificationColor('success');
           setShowNotification(true);
           console.log('Erfolgreich gespeichert:', data);
+          resetAttributes();
         } else {
           const errorData = await response.json();
           setNotificationMessage(errorData.message || 'Fehler beim Speichern.');
@@ -221,6 +222,32 @@ function MarkerMenu() {
     closeModal();
   };
 
+  // reset all attributes
+  const resetAttributes = () => {
+    setLatitude('');
+    setLongitude('');
+    setTitle('');
+    setDescription('');
+    setAvailbleSpaces('');
+    setImage('');
+    setStreet('');
+    setHouseNumber('');
+    setZip('');
+    setCity('');
+    setCountry('');
+    setErrorLatitude('');
+    setErrorLongitude('');
+    setErrorTitle('');
+    setErrorDescription('');
+    setErrorAvailableSpaces('');
+    setErrorImage('');
+    setErrorStreet('');
+    setErrorHouseNumber('');
+    setErrorZip('');
+    setErrorCity('');
+    setErrorCountry('');
+  };
+  
   return (
     <>
       <IonHeader>
