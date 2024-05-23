@@ -3,23 +3,29 @@ import axios from 'axios';
 const TOKEN_KEY = 'jwtToken';
 
 const AuthService = {
+  // Handle a user login
   login: async (email: any, password: any) => {
     try {
-      const response = await axios.post('https://server-y2mz.onrender.com/api/login', { email, password });
+      // Send request to server
+      const response = await axios.post('https://server-y2mz.onrender.com/api/login_user', {
+         email: email,
+         password: password
+        });
       const token = response.data.token;
       localStorage.setItem(TOKEN_KEY, token);
       return token;
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.error) {
-        throw new Error(error.response.data.error);
+      if (error.response && error.response.data && error.response.data.message) {
+        throw new Error(error.response.data.message);
       } else {
-        throw new Error('An error occurred while logging in. Please try again later.');
+        throw new Error("An unexpected error occurred. Please try again later!");
       }
     }
   },
 
   logout: () => {
     localStorage.removeItem(TOKEN_KEY);
+    window.location.reload();
   },
 
   getToken: () => {

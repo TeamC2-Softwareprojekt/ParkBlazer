@@ -8,7 +8,7 @@ import {
     IonButton,
     IonAlert
 } from "@ionic/react";
-import "./Registration.css";
+//import "./Registration.css";
 import axios from "axios";
 
 const Registration: React.FC = () => {
