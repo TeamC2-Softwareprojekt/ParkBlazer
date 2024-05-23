@@ -23,6 +23,7 @@ export default function Map() {
       zoom: zoom
     });
     getParkingSpots();
+    getUserLocation(); // get user location when the map is loaded
   }, [zoom]);
 
   // this function gets all parking spots from the server
@@ -61,6 +62,26 @@ export default function Map() {
         .setPopup(new maptilersdk.Popup().setHTML(popupContent))
         .addTo(map.current!);
     });
+  };
+
+  // This function gets the user's current location and displays it on the map
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        if (map.current) {
+          map.current.setCenter([longitude, latitude]);
+          new maptilersdk.Marker({ color: "#0000FF" }) // Blue marker for user's location
+            .setLngLat([longitude, latitude])
+            .setPopup(new maptilersdk.Popup().setHTML("<h3>Ihr Standort</h3>"))
+            .addTo(map.current);
+        }
+      }, (error) => {
+        console.error('Error getting user location', error);
+      });
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
   };
 
   return (
