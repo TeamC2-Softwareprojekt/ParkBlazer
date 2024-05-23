@@ -1,3 +1,4 @@
+import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -8,6 +9,7 @@ import Registration from './pages/Registration';
 
 
 import ViewMessage from './pages/ViewMessage';
+import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -73,6 +75,5 @@ const App: React.FC = () => (
     </IonReactRouter>
   </IonApp>
 );
-
 
 export default App;
