@@ -6,32 +6,32 @@ function MarkerMenu() {
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showModalCoordinates, setShowModalCoordinates] = useState(false);
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [availableSpaces, setAvailableSpaces] = useState('');
-  const [image, setImage] = useState('');
-  const [street, setStreet] = useState('');
-  const [houseNumber, setHouseNumber] = useState('');
-  const [zip, setZip] = useState('');
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
-  const [typeCar, setTypeCar] = useState(false);
-  const [typeBike, setTypeBike] = useState(false);
-  const [typeTruk, setTypeTruk] = useState(false);
+  const [latitude, setLatitude] = useState<string>('');
+  const [longitude, setLongitude] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [availableSpaces, setAvailableSpaces] = useState<string>('');
+  const [image, setImage] = useState<string>('');
+  const [street, setStreet] = useState<string>('');
+  const [houseNumber, setHouseNumber] = useState<string>('');
+  const [zip, setZip] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [country, setCountry] = useState<string>('');
+  const [typeCar, setTypeCar] = useState<boolean>(false);
+  const [typeBike, setTypeBike] = useState<boolean>(false);
+  const [typeTruk, setTypeTruk] = useState<boolean>(false);
 
-  const [errorLatitude, setErrorLatitude] = useState('');
-  const [errorLongitude, setErrorLongitude] = useState('');
-  const [errorTitle, setErrorTitle] = useState('');
-  const [errorDescription, setErrorDescription] = useState('');
-  const [errorAvailableSpaces, setErrorAvailableSpaces] = useState('');
-  const [errorImage, setErrorImage] = useState('');
-  const [errorStreet, setErrorStreet] = useState('');
-  const [errorHouseNumber, setErrorHouseNumber] = useState('');
-  const [errorZip, setErrorZip] = useState('');
-  const [errorCity, setErrorCity] = useState('');
-  const [errorCountry, setErrorCountry] = useState('');
+  const [errorLatitude, setErrorLatitude] = useState<string>('');
+  const [errorLongitude, setErrorLongitude] = useState<string>('');
+  const [errorTitle, setErrorTitle] = useState<string>('');
+  const [errorDescription, setErrorDescription] = useState<string>('');
+  const [errorAvailableSpaces, setErrorAvailableSpaces] = useState<string>('');
+  const [errorImage, setErrorImage] = useState<string>('');
+  const [errorStreet, setErrorStreet] = useState<string>('');
+  const [errorHouseNumber, setErrorHouseNumber] = useState<string>('');
+  const [errorZip, setErrorZip] = useState<string>('');
+  const [errorCity, setErrorCity] = useState<string>('');
+  const [errorCountry, setErrorCountry] = useState<string>('');
 
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
@@ -137,7 +137,6 @@ function MarkerMenu() {
 
     if (valid) {
       try {
-        // Check if spot already exists
         const existingSpotsResponse = await fetch('https://server-y2mz.onrender.com/api/get_parkingspots');
         const existingSpots = await existingSpotsResponse.json();
 
@@ -176,7 +175,6 @@ function MarkerMenu() {
           })
         });
 
-        // Check if response is ok
         if (response.ok) {
           const data = await response.json();
           setNotificationMessage('Parkplatz erfolgreich gespeichert.');
@@ -208,15 +206,24 @@ function MarkerMenu() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setLatitude(position.coords.latitude.toString()); // convert to string
-          setLongitude(position.coords.longitude.toString()); // convert to string
-          openModalCoordinates(); // open modal to enter additional information
+          if (position.coords.accuracy > 200) {
+            setNotificationMessage('Dein Standort ist zu ungenau: Probiere es erneut!');
+            setNotificationColor('danger');
+            setShowNotification(true);
+            return;
+          }
+          setLatitude(position.coords.latitude.toString()); 
+          setLongitude(position.coords.longitude.toString()); 
+          openModalCoordinates(); 
         },
         (error) => {
           console.error('Error getting location', error);
           setNotificationMessage('Fehler beim Abrufen der aktuellen Position.');
           setNotificationColor('danger');
           setShowNotification(true);
+        },
+        {
+          enableHighAccuracy: true
         }
       );
     } 
@@ -241,9 +248,6 @@ function MarkerMenu() {
     setZip('');
     setCity('');
     setCountry('');
-    setTypeCar(false);
-    setTypeBike(false);
-    setTypeTruk(false);
     setErrorLatitude('');
     setErrorLongitude('');
     setErrorTitle('');
@@ -256,212 +260,119 @@ function MarkerMenu() {
     setErrorCity('');
     setErrorCountry('');
   };
-  
+
   return (
     <>
-      <IonHeader>
-        <IonToolbar>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding">
-        <IonFab slot="fixed" vertical="bottom" horizontal="end">
-          <IonFabButton onClick={toggleMenu}>
-            <IonIcon icon={showMenu ? chevronUpCircle : add}></IonIcon>
+      <IonFab vertical="bottom" horizontal="end" slot="fixed">
+        <IonFabButton onClick={toggleMenu}>
+          <IonIcon icon={chevronUpCircle} />
+        </IonFabButton>
+        <IonFabList side="top" activated={showMenu}>
+          <IonFabButton onClick={openModal}>
+            <IonIcon icon={add} />
           </IonFabButton>
-          <IonFabList side="top" className={showMenu ? 'show-menu' : ''}>
-            <IonFabButton onClick={openModal}>
-              <IonIcon icon={add}></IonIcon>
-            </IonFabButton>
-          </IonFabList>
-        </IonFab>
-
-        <IonModal isOpen={showModal} onDidDismiss={closeModal}>
-          <IonContent>
-            <IonList>
-              <IonItem button onClick={handleUseCurrentLocation}>
-                Aktuellen Standort verwenden
-              </IonItem>
-              <IonItem button onClick={handleSelectLocationOnMap}>
-                Auf der Karte auswählen
-              </IonItem>
-              <IonItem button onClick={openModalCoordinates}>
-                Koordinaten eingeben
-              </IonItem>
-            </IonList>
-          </IonContent>
-        </IonModal>
-
-        <IonModal isOpen={showModalCoordinates} onDidDismiss={closeModalCoordinates}>
-          <IonContent>
-            <IonList>
-              <IonItem>
-                <IonInput
-                  type="number"
-                  placeholder="Latitude"
-                  value={latitude}
-                  onIonChange={e => setLatitude(e.detail.value ? e.detail.value.replace(',', '.') : '')} // Replace comma with dot
-                />
-              </IonItem>
-              {errorLatitude && (
-                <IonItem>
-                  <IonText color="danger">{errorLatitude}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="number"
-                  placeholder="Longitude"
-                  value={longitude}
-                  onIonChange={e => setLongitude(e.detail.value ? e.detail.value.replace(',', '.') : '')} 
-                />
-              </IonItem>
-              {errorLongitude && (
-                <IonItem>
-                  <IonText color="danger">{errorLongitude}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="text"
-                  placeholder="Titel"
-                  value={title}
-                  onIonChange={e => setTitle(e.detail.value!)} 
-                />
-              </IonItem>
-              {errorTitle && (
-                <IonItem>
-                  <IonText color="danger">{errorTitle}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="text"
-                  placeholder="Anzahl der Parkplätze"
-                  value={availableSpaces}
-                  onIonChange={e => setAvailableSpaces(e.detail.value!)} 
-                />
-              </IonItem>
-              {errorAvailableSpaces && (
-                <IonItem>
-                  <IonText color="danger">{errorAvailableSpaces}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="text"
-                  placeholder="Straße"
-                  value={street}
-                  onIonChange={e => setStreet(e.detail.value!)} 
-                />
-              </IonItem>
-              {errorStreet && (
-                <IonItem>
-                  <IonText color="danger">{errorStreet}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="text"
-                  placeholder="Hausnummer"
-                  value={houseNumber}
-                  onIonChange={e => setHouseNumber(e.detail.value!)} 
-                />
-              </IonItem>
-              {errorHouseNumber && (
-                <IonItem>
-                  <IonText color="danger">{errorHouseNumber}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="text"
-                  placeholder="Postleitzahl"
-                  value={zip}
-                  onIonChange={e => setZip(e.detail.value!)} 
-                />
-              </IonItem>
-              {errorZip && (
-                <IonItem>
-                  <IonText color="danger">{errorZip}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="text"
-                  placeholder="Stadt"
-                  value={city}
-                  onIonChange={e => setCity(e.detail.value!)} 
-                />
-              </IonItem>
-              {errorCity && (
-                <IonItem>
-                  <IonText color="danger">{errorCity}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="text"
-                  placeholder="Land"
-                  value={country}
-                  onIonChange={e => setCountry(e.detail.value!)} 
-                />
-              </IonItem>
-              {errorCountry && (
-                <IonItem>
-                  <IonText color="danger">{errorCountry}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="text"
-                  placeholder="Beschreibung"
-                  value={description}
-                  onIonChange={e => setDescription(e.detail.value!)} 
-                />
-              </IonItem>
-              {errorDescription && (
-                <IonItem>
-                  <IonText color="danger">{errorDescription}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonInput
-                  type="url"
-                  placeholder="Bild URL"
-                  value={image}
-                  onIonChange={e => setImage(e.detail.value!)} 
-                />
-              </IonItem>
-              {errorImage && (
-                <IonItem>
-                  <IonText color="danger">{errorImage}</IonText>
-                </IonItem>
-              )}
-              <IonItem>
-                <IonLabel>PKW Parkplatz</IonLabel>
-                <IonCheckbox checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
-              </IonItem>
-              <IonItem>
-                <IonLabel>Fahrrad Parkplatz</IonLabel>
-                <IonCheckbox checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
-              </IonItem>
-              <IonItem>
-                <IonLabel>LKW Parkplatz</IonLabel>
-                <IonCheckbox checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
-              </IonItem>
-              <IonButton onClick={handleSaveCoordinates}>Speichern</IonButton>
-            </IonList>
-          </IonContent>
-        </IonModal>
-        
-        <IonToast
-          isOpen={showNotification}
-          message={notificationMessage}
-          color={notificationColor}
-          duration={2000} 
-          onDidDismiss={() => setShowNotification(false)}
-        />
-      </IonContent>
+        </IonFabList>
+      </IonFab>
+      <IonModal isOpen={showModal} onDidDismiss={closeModal}>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>Neuen Parkplatz erstellen</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+          <IonButton expand="block" onClick={handleUseCurrentLocation}>
+            Aktuellen Standort verwenden
+          </IonButton>
+          <IonButton expand="block" onClick={handleSelectLocationOnMap}>
+            Auf der Karte auswählen
+          </IonButton>
+          <IonButton expand="block" onClick={openModalCoordinates}>
+            Koordinaten eingeben
+          </IonButton>
+          <IonButton expand="block" color="danger" onClick={closeModal}>
+            Abbrechen
+          </IonButton>
+        </IonContent>
+      </IonModal>
+      <IonModal isOpen={showModalCoordinates} onDidDismiss={closeModalCoordinates}>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>Parkplatz Details</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+          <IonList>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>Breite: </IonLabel>
+              <IonInput type="number" value={latitude} onIonChange={e => setLatitude(e.detail.value || '')} />
+              {errorLatitude && <IonText color="danger">{errorLatitude}</IonText>}
+            </IonItem>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>Länge: </IonLabel>
+              <IonInput type="number" value={longitude} onIonChange={e => setLongitude(e.detail.value || '')} />
+              {errorLongitude && <IonText color="danger">{errorLongitude}</IonText>}
+            </IonItem>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>Titel: </IonLabel>
+              <IonInput value={title} onIonChange={e => setTitle(e.detail.value || '')} />
+              {errorTitle && <IonText color="danger">{errorTitle}</IonText>}
+            </IonItem>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>Beschreibung: </IonLabel>
+              <IonInput value={description} onIonChange={e => setDescription(e.detail.value || '')} />
+              {errorDescription && <IonText color="danger">{errorDescription}</IonText>}
+            </IonItem>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>Anzahl Parkplätze: </IonLabel>
+              <IonInput value={availableSpaces} onIonChange={e => setAvailableSpaces(e.detail.value || '')} />
+              {errorAvailableSpaces && <IonText color="danger">{errorAvailableSpaces}</IonText>}
+            </IonItem>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>Straße: </IonLabel>
+              <IonInput value={street} onIonChange={e => setStreet(e.detail.value || '')} />
+              {errorStreet && <IonText color="danger">{errorStreet}</IonText>}
+            </IonItem>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>Hausnummer: </IonLabel>
+              <IonInput value={houseNumber} onIonChange={e => setHouseNumber(e.detail.value || '')} />
+              {errorHouseNumber && <IonText color="danger">{errorHouseNumber}</IonText>}
+            </IonItem>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>PLZ: </IonLabel>
+              <IonInput value={zip} onIonChange={e => setZip(e.detail.value || '')} />
+              {errorZip && <IonText color="danger">{errorZip}</IonText>}
+            </IonItem>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>Stadt: </IonLabel>
+              <IonInput value={city} onIonChange={e => setCity(e.detail.value || '')} />
+              {errorCity && <IonText color="danger">{errorCity}</IonText>}
+            </IonItem>
+            <IonItem>
+            <IonLabel style={{ marginRight: '10px' }}>Land: </IonLabel>
+              <IonInput value={country} onIonChange={e => setCountry(e.detail.value || '')} />
+              {errorCountry && <IonText color="danger">{errorCountry}</IonText>}
+            </IonItem>
+            <IonItem>
+              PKW<IonCheckbox  checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
+              Fahrrad<IonCheckbox checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
+              LKW<IonCheckbox checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
+            </IonItem>
+          </IonList>
+          <IonButton expand="block" onClick={handleSaveCoordinates}>
+            Speichern
+          </IonButton>
+          <IonButton expand="block" color="danger" onClick={closeModalCoordinates}>
+            Abbrechen
+          </IonButton>
+        </IonContent>
+      </IonModal>
+      <IonToast
+        isOpen={showNotification}
+        onDidDismiss={() => setShowNotification(false)}
+        message={notificationMessage}
+        color={notificationColor}
+        duration={2000}
+      />
     </>
   );
 }
