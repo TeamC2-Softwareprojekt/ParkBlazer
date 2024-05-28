@@ -28,7 +28,8 @@
 }
 
 .parking-space-list-radio {
-    --color: #4d8dff;
+    --color: #0054e9;
+    --color-checked: #0054e9;
 }
 
 .parking-space-list-item {
