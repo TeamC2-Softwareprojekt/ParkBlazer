@@ -8,8 +8,10 @@ import MarkerMenu from './MarkerMenu';
 export default function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
-  const [zoom] = useState<number>(6);
+  const [zoom] = useState<number>(14);
   const [parkingSpots, setParkingSpots] = useState<any[]>([]);
+  const [locationCheckInterval, setLocationCheckInterval] = useState<number | null>(null);
+  const [isLocationAccurate, setIsLocationAccurate] = useState<boolean>(false);
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT'; 
 
@@ -72,21 +74,54 @@ export default function Map() {
   const getUserLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        if (map.current) {
-          map.current.setCenter([longitude, latitude]);
-          new maptilersdk.Marker({ color: "#0000FF" }) // Blue marker for user's location
-            .setLngLat([longitude, latitude])
-            .setPopup(new maptilersdk.Popup().setHTML("<h3>Ihr Standort</h3>"))
-            .addTo(map.current);
+        const { latitude, longitude, accuracy } = position.coords;
+        // Check if the accuracy is acceptable
+        if (accuracy <= 200) { // Adjust the accuracy threshold as needed
+          setIsLocationAccurate(true);
+          if (map.current) {
+            map.current.setCenter([longitude, latitude]);
+            new maptilersdk.Marker({ color: "#0000FF" })
+              .setLngLat([longitude, latitude])
+              .setPopup(new maptilersdk.Popup().setHTML("<h3>Ihr Standort</h3>"))
+              .addTo(map.current);
+          }
+        } else {
+          setIsLocationAccurate(false);
+          console.error('The accuracy of the location is too low.');
         }
       }, (error) => {
         console.error('Error getting user location', error);
+      }, {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
       });
     } else {
       console.error('Geolocation is not supported by this browser.');
     }
   };
+
+  useEffect(() => {
+    if (isLocationAccurate) {
+      if (locationCheckInterval) {
+        clearInterval(locationCheckInterval);
+        setLocationCheckInterval(null);
+      }
+    } else {
+      if (!locationCheckInterval) {
+        const intervalId = window.setInterval(() => {
+          getUserLocation();
+        }, 10000); // Check location every 10 seconds
+        setLocationCheckInterval(intervalId);
+      }
+    }
+
+    return () => {
+      if (locationCheckInterval) {
+        clearInterval(locationCheckInterval);
+      }
+    };
+  }, [isLocationAccurate]);
 
   return (
     <div className="map-wrap">
