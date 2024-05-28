@@ -1,104 +1,60 @@
+import axios from 'axios';
+
 export interface parkingSpace {
-    id: number;
-    adress: string;
+    available_spaces: number;
     city: string;
-    type_bike: boolean;
-    type_car: boolean;
-    type_truck: boolean;
-    amount: number;
-    private: boolean;
-    price: number;
-    center: number[];
-  }
+    country: string;
+    description: string;
+    house_number: string;
+    image_url: string;
+    latitude: number;
+    longitude: number;
+    name: string;
+    parkingspot_id: number;
+    street: string;
+    type_bike: number;
+    type_car: number;
+    type_truck: number;
+    username: string;
+    zip: string;
+    distance?: number;
+}
+
+export let parkingspaces: parkingSpace[] = [];
   
-  const parkingSpaces: parkingSpace[] = [
-    {
-      id: 0,
-      adress: 'Artilleriestraße 9',
-      city: '42427 Minden',
-      type_bike: true,
-      type_car: false,
-      type_truck: false,
-      amount: 4,
-      private: false,
-      price: 0,
-      center: [8.904864, 52.296575]
-    },
-    {
-      id: 1,
-      adress: 'Königstraße 1',
-      city: '42427 Minden',
-      type_bike: true,
-      type_car: true,
-      type_truck: false,
-      amount: 2,
-      private: false,
-      price: 0,
-      center: [8.913536, 52.286253]
-    },
-    {
-      id: 2,
-      adress: 'Königstraße 2',
-      city: '42427 Minden',
-      type_bike: false,
-      type_car: true,
-      type_truck: true,
-      amount: 1,
-      private: true,
-      price: 5,
-      center: [8.913897, 52.286472]
-    },
-    {
-      id: 3,
-      adress: 'Königstraße 3',
-      city: '42427 Minden',
-      type_bike: true,
-      type_car: true,
-      type_truck: true,
-      amount: 1,
-      private: false,
-      price: 0,
-      center: [8.913394, 52.286253]
-    },
-    {
-      id: 4,
-      adress: 'Königstraße 4',
-      city: '42427 Minden',
-      type_bike: true,
-      type_car: false,
-      type_truck: true,
-      amount: 1,
-      private: true,
-      price: 3,
-      center: [8.91371, 52.286423]
-    },
-    {
-      id: 5,
-      adress: 'Königstraße 6',
-      city: '42427 Minden',
-      type_bike: false,
-      type_car: true,
-      type_truck: false,
-      amount: 5,
-      private: true,
-      price: 6,
-      center: [8.913582, 52.286431]
-    },
-    {
-      id: 6,
-      adress: 'Königstraße 7',
-      city: '42427 Minden',
-      type_bike: true,
-      type_car: false,
-      type_truck: false,
-      amount: 1,
-      private: false,
-      price: 0,
-      center: [8.912918, 52.286216]
+export async function initParkingSpaces() {
+    let response = undefined;
+    try {
+            response = await axios.get('https://server-y2mz.onrender.com/api/get_parkingspots');
+    } catch (error) {
+            console.error('Error getting all Parkingspots', error);
     }
-  ];
+    parkingspaces = response?.data;
+}
+
+export function getNearestParkingSpaces(center:number[], maxDistance: number): parkingSpace[] {
+    return parkingspaces.filter(p => {
+        let distance = getDistanceInKm(p.latitude, p.longitude, center[1], center[0]) 
+        p.distance = distance;
+        return distance <= maxDistance;
+    });
+}
+
+function getDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const R = 6371; 
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1); 
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+    ; 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    const d = R * c;
+    return d;
+}
   
-  export const getParkingSpaces = () => parkingSpaces;
-  
-  export const getParkingSpace = (id: number) => parkingSpaces.find(m => m.id === id);
+function deg2rad(deg: number) {
+    return deg * (Math.PI/180)
+}
   

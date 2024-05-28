@@ -23,6 +23,10 @@
     padding-right: 15px;
 }
 
+.parkingSpace-container {
+    padding-left: 8px;
+}
+
 ion-radio {
     --color: #4d8dff;
 }
@@ -31,6 +35,7 @@ ion-item {
     --color: black;
     --background: white;
     --min-height: 94.5px;
+    --padding-start: 0px;
 }
 
 ion-icon  {

@@ -10,7 +10,7 @@ import './map.css';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
-export default function Map() {
+export default function Map({onUpdateList}: {onUpdateList: any}) {
   const mapContainer = useRef<HTMLDivElement>(null);
   map = useRef<maptilersdk.Map | null>(null);
   const tokyo = { lng: 139.753, lat: 35.6844 };
@@ -27,13 +27,14 @@ export default function Map() {
       center: [8.9167, 52.2833],
       zoom: zoom
     });
-    
+
+    window.onload = () => map.current?.resize();
     setMapController(createMapLibreGlMapController(map.current, maplibregl));
   }, [tokyo.lng, tokyo.lat, zoom]);
 
 
   function handleSearch(event: any) {
-    console.log("search", event);
+    onUpdateList(event);
   };
 
   return (

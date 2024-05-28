@@ -5,7 +5,7 @@ ion-content {
     width: 16%;
     height: 70%;
     border: 1px solid black;
-    min-Width: 300px;
+    min-Width: 340px;
     scrollbar-color: gray white;
     --background: white;
 }
