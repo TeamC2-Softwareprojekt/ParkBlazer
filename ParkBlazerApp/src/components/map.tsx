@@ -12,6 +12,7 @@ export default function Map() {
   const [parkingSpots, setParkingSpots] = useState<any[]>([]);
   const [locationCheckInterval, setLocationCheckInterval] = useState<number | null>(null);
   const [isLocationAccurate, setIsLocationAccurate] = useState<boolean>(false);
+  const [initialLocationSet, setInitialLocationSet] = useState<boolean>(false);
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT'; 
 
@@ -78,8 +79,13 @@ export default function Map() {
         // Check if the accuracy is acceptable
         if (accuracy <= 200) { // Adjust the accuracy threshold as needed
           setIsLocationAccurate(true);
+          if (!initialLocationSet) {
+            setInitialLocationSet(true);
+            if (map.current) {
+              map.current.setCenter([longitude, latitude]);
+            }
+          }
           if (map.current) {
-            map.current.setCenter([longitude, latitude]);
             new maptilersdk.Marker({ color: "#0000FF" })
               .setLngLat([longitude, latitude])
               .setPopup(new maptilersdk.Popup().setHTML("<h3>Ihr Standort</h3>"))
@@ -103,12 +109,12 @@ export default function Map() {
 
   useEffect(() => {
     if (isLocationAccurate) {
-      if (locationCheckInterval) {
+      if (locationCheckInterval !== null) {
         clearInterval(locationCheckInterval);
         setLocationCheckInterval(null);
       }
     } else {
-      if (!locationCheckInterval) {
+      if (locationCheckInterval === null) {
         const intervalId = window.setInterval(() => {
           getUserLocation();
         }, 10000); // Check location every 10 seconds
@@ -117,7 +123,7 @@ export default function Map() {
     }
 
     return () => {
-      if (locationCheckInterval) {
+      if (locationCheckInterval !== null) {
         clearInterval(locationCheckInterval);
       }
     };
