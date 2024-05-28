@@ -13,7 +13,7 @@ export default function Map() {
   const [locationCheckInterval, setLocationCheckInterval] = useState<number | null>(null);
   const [isLocationAccurate, setIsLocationAccurate] = useState<boolean>(false);
   const [initialLocationSet, setInitialLocationSet] = useState<boolean>(false);
-  const [markerIsSet, setMarkerIsSet] = useState<boolean>(false); // Zustand für Marker
+  const [markerIsSet, setMarkerIsSet] = useState<boolean>(false);
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT'; 
 
@@ -30,7 +30,7 @@ export default function Map() {
     getUserLocation();
   }, [zoom]);
 
-  // Funktion zum Abrufen aller Parkplätze vom Server
+  // function to get all parking spots
   const getParkingSpots = async () => {
     try {
       const response = await axios.get('https://server-y2mz.onrender.com/api/get_parkingspots');
@@ -41,14 +41,14 @@ export default function Map() {
     }
   };
 
-  // Funktion zur Anzeige der Parkplätze auf der Karte
+  // function to display parking spots on the map
   const displayParkingSpotsOnMap = (parkingSpots: any[]) => {
     if (!map.current) return;
   
     parkingSpots.forEach((spot) => {
       const { longitude, latitude, type_car, type_bike, type_truk, name, description, available_spaces, image_url, street, house_number, zip, city, country, username } = spot;
   
-      // Funktion zum Hinzufügen eines Häkchen- oder Kreuzsymbols basierend auf der Verfügbarkeit
+      // function to get the availability icon
       const getAvailabilityIcon = (available: number) => available === 1 ? '✔' : '✖';
   
       const popupContent = `
@@ -72,18 +72,16 @@ export default function Map() {
     });
   };
 
-  // Funktion zum Abrufen und Anzeigen des aktuellen Standorts des Benutzers auf der Karte
+  // function to get the user's location
   const getUserLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude, accuracy } = position.coords;
-        // Überprüfen, ob die Genauigkeit akzeptabel ist
-        if (accuracy <= 200 && !markerIsSet) { // Genauigkeitsschwelle nach Bedarf anpassen
+        if (accuracy <= 200 && !markerIsSet) { 
           setIsLocationAccurate(true);
-          setMarkerIsSet(true); // Marker als gesetzt markieren
+          setMarkerIsSet(true);
           if (!initialLocationSet) {
             setInitialLocationSet(true);
-
           }
           if (map.current) {
             new maptilersdk.Marker({ color: "#0000FF" })
@@ -117,7 +115,7 @@ export default function Map() {
       if (locationCheckInterval === null) {
         const intervalId = window.setInterval(() => {
           getUserLocation();
-        }, 10000); // Standort alle 10 Sekunden überprüfen
+        }, 10000); // 10 seconds
         setLocationCheckInterval(intervalId);
       }
     }
