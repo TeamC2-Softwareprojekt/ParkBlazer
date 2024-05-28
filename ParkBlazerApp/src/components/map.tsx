@@ -8,7 +8,7 @@ import MarkerMenu from './MarkerMenu';
 export default function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
-  const [zoom] = useState<number>(14);
+  const [zoom] = useState<number>(6);
   const [parkingSpots, setParkingSpots] = useState<any[]>([]);
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT'; 
@@ -42,9 +42,11 @@ export default function Map() {
     if (!map.current) return;
   
     parkingSpots.forEach((spot) => {
-      const { longitude, latitude, name, description, available_spaces, image_url, street, house_number, zip, city, country, username } = spot;
+      const { longitude, latitude, type_car, type_bike, type_truk, name, description, available_spaces, image_url, street, house_number, zip, city, country, username } = spot;
   
-      // HTML for the popup
+      // Function to add a checkmark or cross icon based on availability 
+      const getAvailabilityIcon = (available: number) => available === 1 ? '✔' : '✖';
+  
       const popupContent = `
         <div>
           <h3>${name}</h3>
@@ -53,9 +55,12 @@ export default function Map() {
           <p>${image_url ? `<img src="${image_url}" alt="Parkplatzbild" style="max-width: 100px;">` : ''}</p>
           <p>Adresse: ${street} ${house_number}, ${zip} ${city}, ${country}</p>
           <p>Benutzer: ${username}</p>
+          <p>Auto: ${getAvailabilityIcon(type_car)}</p>
+          <p>Fahrrad: ${getAvailabilityIcon(type_bike)}</p>
+          <p>Lastwagen: ${getAvailabilityIcon(type_truk)}</p>
         </div>
       `;
-
+  
       new maptilersdk.Marker({ color: "#FF0000" })
         .setLngLat([parseFloat(longitude), parseFloat(latitude)])
         .setPopup(new maptilersdk.Popup().setHTML(popupContent))
