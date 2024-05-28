@@ -7,6 +7,8 @@ import "@maptiler/geocoding-control/style.css";
 import 'maplibre-gl/dist/maplibre-gl.css';
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import './map.css';
+import Marker from './MarkerMenu'; // Import der Marker-Komponente
+import MarkerMenu from './MarkerMenu';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
@@ -42,7 +44,10 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
       <div className="geocoding">
         <GeocodingControl apiKey={maptilersdk.config.apiKey} mapController={mapController} onPick={(e) => handleSearch(e)} />
       </div>
-        <div ref={mapContainer} className="map" />
+      <div ref={mapContainer} className="map" />
+      <div className="marker-container"> 
+        <MarkerMenu/> 
+      </div>
     </div>
   );
 }
