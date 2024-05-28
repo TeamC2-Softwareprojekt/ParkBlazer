@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast } from '@ionic/react';
+import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
 
 function MarkerMenu() {
@@ -10,13 +10,16 @@ function MarkerMenu() {
   const [longitude, setLongitude] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [available_spaces, setAvailbleSpaces] = useState('');
+  const [availableSpaces, setAvailableSpaces] = useState('');
   const [image, setImage] = useState('');
   const [street, setStreet] = useState('');
   const [houseNumber, setHouseNumber] = useState('');
   const [zip, setZip] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
+  const [typeCar, setTypeCar] = useState(false);
+  const [typeBike, setTypeBike] = useState(false);
+  const [typeTruk, setTypeTruk] = useState(false);
 
   const [errorLatitude, setErrorLatitude] = useState('');
   const [errorLongitude, setErrorLongitude] = useState('');
@@ -97,7 +100,7 @@ function MarkerMenu() {
       setErrorDescription('');
     }
 
-    if (available_spaces.trim().length === 0) {
+    if (availableSpaces.trim().length === 0) {
       setErrorAvailableSpaces('Bitte geben Sie die Anzahl der Parkplätze an.');
       valid = false;
     } else {
@@ -134,7 +137,7 @@ function MarkerMenu() {
 
     if (valid) {
       try {
-       // Check if spot already exists
+        // Check if spot already exists
         const existingSpotsResponse = await fetch('https://server-y2mz.onrender.com/api/get_parkingspots');
         const existingSpots = await existingSpotsResponse.json();
 
@@ -158,7 +161,7 @@ function MarkerMenu() {
             name: title,
             description: description,
             type: 'public',
-            available_spaces: available_spaces,
+            available_spaces: availableSpaces,
             image_url: image,
             latitude: latitude,
             longitude: longitude,
@@ -167,8 +170,12 @@ function MarkerMenu() {
             zip: zip,
             city: city,
             country: country,
+            type_car: typeCar ? '1' : '0',
+            type_bike: typeBike ? '1' : '0',
+            type_truk: typeTruk ? '1' : '0',
           })
         });
+
         // Check if response is ok
         if (response.ok) {
           const data = await response.json();
@@ -213,7 +220,6 @@ function MarkerMenu() {
         }
       );
     } 
-
   };
 
   const handleSelectLocationOnMap = () => {
@@ -228,13 +234,16 @@ function MarkerMenu() {
     setLongitude('');
     setTitle('');
     setDescription('');
-    setAvailbleSpaces('');
+    setAvailableSpaces('');
     setImage('');
     setStreet('');
     setHouseNumber('');
     setZip('');
     setCity('');
     setCountry('');
+    setTypeCar(false);
+    setTypeBike(false);
+    setTypeTruk(false);
     setErrorLatitude('');
     setErrorLongitude('');
     setErrorTitle('');
@@ -328,8 +337,8 @@ function MarkerMenu() {
                 <IonInput
                   type="text"
                   placeholder="Anzahl der Parkplätze"
-                  value={available_spaces}
-                  onIonChange={e => setAvailbleSpaces(e.detail.value!)} 
+                  value={availableSpaces}
+                  onIonChange={e => setAvailableSpaces(e.detail.value!)} 
                 />
               </IonItem>
               {errorAvailableSpaces && (
@@ -428,6 +437,18 @@ function MarkerMenu() {
                   <IonText color="danger">{errorImage}</IonText>
                 </IonItem>
               )}
+              <IonItem>
+                <IonLabel>PKW Parkplatz</IonLabel>
+                <IonCheckbox checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
+              </IonItem>
+              <IonItem>
+                <IonLabel>Fahrrad Parkplatz</IonLabel>
+                <IonCheckbox checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
+              </IonItem>
+              <IonItem>
+                <IonLabel>LKW Parkplatz</IonLabel>
+                <IonCheckbox checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
+              </IonItem>
               <IonButton onClick={handleSaveCoordinates}>Speichern</IonButton>
             </IonList>
           </IonContent>
