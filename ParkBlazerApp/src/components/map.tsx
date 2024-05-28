@@ -9,9 +9,9 @@ export default function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maptilersdk.Map | null>(null);
   const [zoom] = useState<number>(14);
-  const [parkingSpots, setParkingSpots] = useState<any[]>([]); // parking spots save in array
+  const [parkingSpots, setParkingSpots] = useState<any[]>([]);
 
-  maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT'; //  set API key
+  maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT'; 
 
   useEffect(() => {
     if (map.current) return;
@@ -23,15 +23,15 @@ export default function Map() {
       zoom: zoom
     });
     getParkingSpots();
-    getUserLocation(); // get user location when the map is loaded
+    getUserLocation();
   }, [zoom]);
 
   // this function gets all parking spots from the server
   const getParkingSpots = async () => {
     try {
       const response = await axios.get('https://server-y2mz.onrender.com/api/get_parkingspots');
-      setParkingSpots(response.data); // save parking spots in state
-      displayParkingSpotsOnMap(response.data); // display parkingspots on map
+      setParkingSpots(response.data);
+      displayParkingSpotsOnMap(response.data);
     } catch (error) {
       console.error('Error getting all Parkingspots', error);
     }
@@ -55,8 +55,7 @@ export default function Map() {
           <p>Benutzer: ${username}</p>
         </div>
       `;
-  
-      // add Marker to the map
+
       new maptilersdk.Marker({ color: "#FF0000" })
         .setLngLat([parseFloat(longitude), parseFloat(latitude)])
         .setPopup(new maptilersdk.Popup().setHTML(popupContent))
