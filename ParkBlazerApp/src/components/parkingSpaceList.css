@@ -1,0 +1,15 @@
+#parking-space-list-container {
+    position: absolute;
+    bottom: 40px;
+    left: 10px;
+    width: 16%;
+    height: 70%;
+    border: 1px solid black;
+    min-Width: 340px;
+    scrollbar-color: gray white;
+    --background: white;
+}
+
+#parking-space-list {
+    padding: 0px !important;
+}

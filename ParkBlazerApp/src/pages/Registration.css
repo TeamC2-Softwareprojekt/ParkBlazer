@@ -1,0 +1,30 @@
+/* Style Heading */
+.register-heading {
+	font-weight: bold;
+	text-align: center;
+}
+
+
+/* Space between inputs */
+.register-input {
+	margin-bottom: 1.5vh;
+}
+
+.md.ion-focusable.select-ltr {
+	margin-bottom: 1.5vh;
+}
+
+
+/* Show Error when email not valid 
+/* Show Error when email not valid */
+.register-input.has-value.ion-invalid .error-text.sc-ion-input-md {
+	display: block!important;
+}	
+
+
+.register-grid.md.grid-fixed {
+	overflow: auto;
+	overscroll-behavior: auto;
+	height: 100%;
+    width: 100%;
+}
