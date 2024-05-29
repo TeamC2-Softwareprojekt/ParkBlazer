@@ -59,81 +59,31 @@ function MarkerMenu() {
     setShowModalCoordinates(false);
   };
 
+  const validateField = (value: string): boolean => { return value.trim().length > 0; };
   const handleSaveCoordinates = async () => {
     const lat = parseFloat(latitude);
     const lng = parseFloat(longitude);
     let valid = true;
-
-    // Validation of input
-    if (isNaN(lat) || lat < -90 || lat > 90) {
-      setErrorLatitude('Bitte geben Sie eine gültige Breite zwischen -90 und 90 ein.');
-      valid = false;
-    } else {
-      setErrorLatitude('');
-    }
-
-    if (isNaN(lng) || lng < -180 || lng > 180) {
-      setErrorLongitude('Bitte geben Sie eine gültige Länge zwischen -180 und 180 ein.');
-      valid = false;
-    } else {
-      setErrorLongitude('');
-    }
-
-    if (title.trim().length === 0) {
-      setErrorTitle('Bitte geben Sie einen Titel ein.');
-      valid = false;
-    } else {
-      setErrorTitle('');
-    }
-
-    if (street.trim().length === 0) {
-      setErrorStreet('Bitte geben Sie eine Adresse ein.');
-      valid = false;
-    } else {
-      setErrorStreet('');
-    }
-
-    if (description.trim().length === 0) {
-      setErrorDescription('Bitte geben Sie eine Beschreibung ein.');
-      valid = false;
-    } else {
-      setErrorDescription('');
-    }
-
-    if (availableSpaces.trim().length === 0) {
-      setErrorAvailableSpaces('Bitte geben Sie die Anzahl der Parkplätze an.');
-      valid = false;
-    } else {
-      setErrorAvailableSpaces('');
-    }
-
-    if (houseNumber.trim().length === 0) {
-      setErrorHouseNumber('Bitte geben Sie eine Hausnummer ein.');
-      valid = false;
-    } else {
-      setErrorHouseNumber('');
-    }
-
-    if (zip.trim().length === 0) {
-      setErrorZip('Bitte geben Sie eine Postleitzahl ein.');
-      valid = false;
-    } else {
-      setErrorZip('');
-    }
-
-    if (city.trim().length === 0) {
-      setErrorCity('Bitte geben Sie eine Stadt ein.');
-      valid = false;
-    } else {
-      setErrorCity('');
-    }
-
-    if (country.trim().length === 0) {
-      setErrorCountry('Bitte geben Sie ein Land ein.');
-      valid = false;
-    } else {
-      setErrorCountry('');
-    }
+    const validations = [
+      { isValid: !isNaN(lat) && lat >= -90 && lat <= 90, message: 'Bitte geben Sie einen gültigen Breitengrad zwischen -90 und 90 ein.', setError: setErrorLatitude },
+      { isValid: !isNaN(lng) && lng >= -180 && lng <= 180, message: 'Bitte geben Sie einen gültigen Längengrad zwischen -180 und 180 ein.', setError: setErrorLongitude },
+      { isValid: validateField(title), message: 'Bitte geben Sie einen Titel ein.', setError: setErrorTitle },
+      { isValid: validateField(street), message: 'Bitte geben Sie eine Adresse ein.', setError: setErrorStreet },
+      { isValid: validateField(description), message: 'Bitte geben Sie eine Beschreibung ein.', setError: setErrorDescription },
+      { isValid: validateField(availableSpaces), message: 'Bitte geben Sie die Anzahl der Parkplätze an.', setError: setErrorAvailableSpaces },
+      { isValid: validateField(houseNumber), message: 'Bitte geben Sie eine Hausnummer ein.', setError: setErrorHouseNumber },
+      { isValid: validateField(zip), message: 'Bitte geben Sie eine Postleitzahl ein.', setError: setErrorZip },
+      { isValid: validateField(city), message: 'Bitte geben Sie eine Stadt ein.', setError: setErrorCity },
+      { isValid: validateField(country), message: 'Bitte geben Sie ein Land ein.', setError: setErrorCountry },
+    ];
+    validations.forEach(({ isValid, message, setError }) => {
+      if (!isValid) {
+        setError(message);
+        valid = false;
+      } else {
+        setError('');
+      }
+    });
 
     if (valid) {
       try {
@@ -203,30 +153,30 @@ function MarkerMenu() {
 
   // this function is for handling the current location to create a new parking spot
   const handleUseCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          if (position.coords.accuracy > 200) {
-            setNotificationMessage('Dein Standort ist zu ungenau: Probiere es erneut!');
-            setNotificationColor('danger');
-            setShowNotification(true);
-            return;
-          }
-          setLatitude(position.coords.latitude.toString()); 
-          setLongitude(position.coords.longitude.toString()); 
-          openModalCoordinates(); 
-        },
-        (error) => {
-          console.error('Error getting location', error);
-          setNotificationMessage('Fehler beim Abrufen der aktuellen Position.');
+    if (!navigator.geolocation) return;
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (position.coords.accuracy > 200) {
+          setNotificationMessage('Dein Standort ist zu ungenau: Probiere es erneut!');
           setNotificationColor('danger');
           setShowNotification(true);
-        },
-        {
-          enableHighAccuracy: true
+          return;
         }
-      );
-    } 
+        setLatitude(position.coords.latitude.toString()); 
+        setLongitude(position.coords.longitude.toString()); 
+        openModalCoordinates(); 
+      },
+      (error) => {
+        console.error('Error getting location', error);
+        setNotificationMessage('Fehler beim Abrufen der aktuellen Position.');
+        setNotificationColor('danger');
+        setShowNotification(true);
+      },
+      {
+        enableHighAccuracy: true
+      }
+    );
   };
 
   const handleSelectLocationOnMap = () => {
@@ -235,7 +185,6 @@ function MarkerMenu() {
     closeModal();
   };
 
-  // reset all attributes
   const resetAttributes = () => {
     setLatitude('');
     setLongitude('');
@@ -303,12 +252,12 @@ function MarkerMenu() {
         <IonContent className="ion-padding">
           <IonList>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Breite: </IonLabel>
+            <IonLabel style={{ marginRight: '10px' }}>Breitengrad: </IonLabel>
               <IonInput type="number" value={latitude} onIonChange={e => setLatitude(e.detail.value || '')} />
               {errorLatitude && <IonText color="danger">{errorLatitude}</IonText>}
             </IonItem>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Länge: </IonLabel>
+            <IonLabel style={{ marginRight: '10px' }}>Längengrad: </IonLabel>
               <IonInput type="number" value={longitude} onIonChange={e => setLongitude(e.detail.value || '')} />
               {errorLongitude && <IonText color="danger">{errorLongitude}</IonText>}
             </IonItem>
