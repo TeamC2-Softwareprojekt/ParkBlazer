@@ -23,6 +23,8 @@ export interface parkingSpace {
 export let parkingspaces: parkingSpace[] = [];
   
 export async function initParkingSpaces() {
+    if (parkingspaces.length > 0) return;
+        
     let response = undefined;
     try {
             response = await axios.get('https://server-y2mz.onrender.com/api/get_parkingspots');
