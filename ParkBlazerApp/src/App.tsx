@@ -5,9 +5,6 @@ import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Registration from './pages/Registration';
-
-
-
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 
@@ -41,6 +38,8 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 import AuthService from './AuthService';
+import Userprofil from './pages/Userprofil';
+
 
 setupIonicReact();
 
@@ -69,6 +68,13 @@ const App: React.FC = () => (
             <Redirect to="/home" />
           ) : (
             <Registration />
+          )}
+        </Route>
+        <Route path="/userprofil">
+          {AuthService.isLoggedIn() ? (
+            <Redirect to="/home" />
+          ) : (
+            <Userprofil/>
           )}
         </Route>
       </IonRouterOutlet>
