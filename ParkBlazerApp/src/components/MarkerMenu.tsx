@@ -211,7 +211,7 @@ function MarkerMenu() {
   };
 
   return (
-    <>
+    <div id='marker-menu'>
       <IonFab vertical="bottom" horizontal="end" slot="fixed">
         <IonFabButton onClick={toggleMenu}>
           <IonIcon icon={chevronUpCircle} />
@@ -322,7 +322,7 @@ function MarkerMenu() {
         color={notificationColor}
         duration={2000}
       />
-    </>
+    </div>
   );
 }
 
