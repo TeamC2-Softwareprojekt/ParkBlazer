@@ -3,6 +3,7 @@ import Map from '../components/map';
 import Navbar from '../components/navbar';
 import './Home.css';
 import ParkingSpaceList from '../components/parkingSpaceList';
+import Filter from '../components/filter';
 import { parkingSpace, initParkingSpaces, getNearestParkingSpaces, parkingspaces } from '../data/parkingSpaces';
 
 function Home() {
@@ -36,6 +37,7 @@ function Home() {
       <Navbar/>
       <Map onUpdateList={updateList}/>
       <ParkingSpaceList list={listparkingSpaces}/>
+      <Filter/>
     </div>
   )
 }
