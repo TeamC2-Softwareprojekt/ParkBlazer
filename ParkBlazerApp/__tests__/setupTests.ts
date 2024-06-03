@@ -40,6 +40,16 @@ beforeAll(() => {
     };
     mockSvgRequests();
     mockAxios();
+    let varToSupressWarnings: any;
+    varToSupressWarnings = vi.fn();
+    global.ImageData = varToSupressWarnings;
+    global.window = Object.create(window);
+    Object.defineProperty(window, 'location', {
+      value: {
+        reload: vi.fn(),
+      },
+    });
+
 });
 
 function mockSvgRequests() {

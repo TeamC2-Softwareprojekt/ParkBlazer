@@ -24,7 +24,7 @@ function Navbar() {
                 <IonTitle>ParkBlazer</IonTitle>
                 <IonButtons slot="end">
                     {loggedIn ? (
-                        <IonButton onClick={handleLogout}>Logout</IonButton>
+                        <IonButton id="logout-button" onClick={handleLogout}>Logout</IonButton>
                     ) : (
                         <>
                         <IonButton id="login-button" routerLink="/login">Login</IonButton>
