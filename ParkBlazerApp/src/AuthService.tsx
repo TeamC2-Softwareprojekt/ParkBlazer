@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const TOKEN_KEY = 'jwtToken';
+const TOKEN_KEY = 'token';
 
 const AuthService = {
   // Handle a user login
