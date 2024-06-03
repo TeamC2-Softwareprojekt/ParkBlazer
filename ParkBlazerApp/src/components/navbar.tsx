@@ -27,8 +27,8 @@ function Navbar() {
                         <IonButton onClick={handleLogout}>Logout</IonButton>
                     ) : (
                         <>
-                        <IonButton routerLink="/login">Login</IonButton>
-                        <IonButton routerLink="/registration">Registration</IonButton>
+                        <IonButton id="login-button" routerLink="/login">Login</IonButton>
+                        <IonButton id="registration-button" routerLink="/registration">Registration</IonButton>
                         </>
                         
                     )}

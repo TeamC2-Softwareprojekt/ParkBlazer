@@ -67,24 +67,63 @@ function mockAxios() {
       return {
           default: {
         get: vi.fn(() => Promise.resolve({ data: [{
-          available_spaces: 1,
-          city: 'Berlin',
+          available_spaces: 12,
+          city: 'Minden',
           country: 'Germany',
-          description: 'Parkplatz in Berlin',
-          house_number: '1',
+          description: 'Hier können Sie an der FH in Minden parken!',
+          house_number: '9',
           image_url: 'url',
-          latitude: 52.5200,
-          longitude: 13.4050,
-          name: 'Parkplatz Berlin',
+          latitude: 52.296695709228516,
+          longitude: 8.906824111938477,
+          name: 'Parkplatz FH Minden',
           parkingspot_id: 1,
-          street: 'Street',
-          type_bike: 1,
+          street: 'Artilleriestraße',
+          type_bike: 0,
           type_car: 1,
-          type_truck: 1,
-          username: 'User',
-          zip: '12345',
+          type_truck: 0,
+          username: 'TestUser',
+          zip: '32427',
           distance: undefined
-        }] }))
-      }};
-    });
+        },
+        {
+            available_spaces: 30,
+            city: 'Löhne',
+            country: 'Germany',
+            description: 'Parkmöglichkeit in der Nähe der Bünder Straße 7',
+            house_number: '7',
+            image_url: 'url',
+            latitude: 52.200668,
+            longitude: 8.666920,
+            name: 'Löhner Bahnhof Parkplatz',
+            parkingspot_id: 2,
+            street: 'Bünder Straße',
+            type_bike: 0,
+            type_car: 1,
+            type_truck: 1,
+            username: 'TestUser',
+            zip: '32584',
+            distance: undefined
+        },
+        {
+            available_spaces: 25,
+            city: 'Gütersloh',
+            country: 'Germany',
+            description: 'parkplatz',
+            house_number: '58',
+            image_url: '',
+            latitude: 50.89696772909674, 
+            longitude: 5.377943299375099,
+            name: 'Versteckter Parkplatz an der Stadt Gütersloh',
+            parkingspot_id: 3,
+            street: 'Neuenkirchener Straße',
+            type_bike: 1,
+            type_car: 1,
+            type_truck: 0,
+            username: 'TestUser',
+            zip: '32049',
+            distance: undefined
+          }] 
+        })),
+        post: vi.fn(() => Promise.resolve({ data : { token: 'token' }}))    
+    }};});
 }
