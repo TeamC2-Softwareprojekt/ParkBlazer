@@ -186,6 +186,7 @@ const Userprofile: React.FC = () => {
           />
         </div>
         {/* Bewertungskomponente */}
+        
         <IonRow>
             <IonCol offsetLg='6'>
               <Rating
@@ -198,6 +199,7 @@ const Userprofile: React.FC = () => {
               />
             </IonCol>
           </IonRow>
+       
         <IonRow>
         <IonCol size="2" size-md="5" offset-md="2">
         <IonList >
