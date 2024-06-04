@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { IonButton, IonToolbar, IonTitle, IonButtons, IonHeader } from '@ionic/react';
 import AuthService from '../AuthService';
 import { useHistory } from 'react-router-dom';
-import Userprofil from '../pages/Userprofil';
+
 
 function Navbar() {
     const [loggedIn, setLoggedIn] = useState(AuthService.isLoggedIn());
@@ -25,8 +25,9 @@ function Navbar() {
                 <IonTitle>ParkBlazer</IonTitle>
                 <IonButtons slot="end">
                     {loggedIn ? (
-                        <><IonButton onClick={handleLogout}>Logout</IonButton>
-                        <IonButton routerLink="/userprofil">Userprofil</IonButton>
+                        <>
+                        <IonButton onClick={handleLogout}>Logout</IonButton>
+                        <IonButton routerLink="/userprofile">Userprofile</IonButton>
                         </>
                     ) : (
                         <>
