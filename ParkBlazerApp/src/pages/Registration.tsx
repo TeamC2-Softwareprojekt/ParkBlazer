@@ -111,7 +111,6 @@ const Registration: React.FC = () => {
 
     };
 
-
     return (
         <IonGrid fixed className="register-grid">
             <IonRow className="ion-justify-content-center ion-align-items-center full-height" overflow-scroll="true">

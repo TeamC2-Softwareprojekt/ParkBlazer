@@ -32,8 +32,6 @@ function Navbar() {
                         <>
                         <IonButton routerLink="/login">Login</IonButton>       
                         <IonButton routerLink="/registration">Registration</IonButton>
-                        
-                        
                         </>
                         
                     )}
