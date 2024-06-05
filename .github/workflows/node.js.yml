@@ -22,6 +22,8 @@ jobs:
       working-directory: ./ParkBlazerApp
     - run: npm ci
       working-directory: ./ParkBlazerApp
+    - run: npm rebuild gl
+      working-directory: ./ParkBlazerApp
       # https://github.com/descriptinc/headless-gl
     - run: xvfb-run -s "-ac -screen 0 1280x1024x24" npm run test.unit
       working-directory: ./ParkBlazerApp
