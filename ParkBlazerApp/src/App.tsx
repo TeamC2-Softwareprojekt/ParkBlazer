@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Registration from './pages/Registration';
 import Userprofile from './pages/Userprofile';
+import Userprofile2 from './pages/Userprofile_2';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 
@@ -53,6 +54,9 @@ const App: React.FC = () => (
         </Route>
         <Route path="/home" exact={true}>
           <Home />
+        </Route>
+        <Route path="/userprofile2" exact={true}>
+          <Userprofile2 />
         </Route>
         <Route path="/message/:id">
           <ViewMessage />
