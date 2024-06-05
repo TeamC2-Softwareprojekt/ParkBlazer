@@ -16,13 +16,13 @@ jobs:
     - name: Test and build
       uses: actions/setup-node@v3
       with:
-        node-version: '20.x'
+        node-version: '20.12.2'
         cache: 'npm'
     - run: sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev pkg-config libgl1-mesa-dev xvfb
       working-directory: ./ParkBlazerApp
     - run: npm ci
       working-directory: ./ParkBlazerApp
-    - run: npm rebuild gl
+    - run: npm rebuild
       working-directory: ./ParkBlazerApp
       # https://github.com/descriptinc/headless-gl
     - run: xvfb-run -s "-ac -screen 0 1280x1024x24" npm run test.unit
