@@ -13,12 +13,23 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Test and build
+    - name: Use Node.js 20.x
       uses: actions/setup-node@v3
       with:
         node-version: '20.x'
         cache: 'npm'
-    - run: npm ci
+    # https://github.com/descriptinc/headless-gl
+    - run: sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev pkg-config libgl1-mesa-dev xvfb
       working-directory: ./ParkBlazerApp
-    - run: npm run test.unit
+    - run: npm i
+      working-directory: ./ParkBlazerApp
+    - run: npm rebuild
+      working-directory: ./ParkBlazerApp
+    - run: xvfb-run -s "-ac -screen 0 1280x1024x24" npx vitest __tests__/App.test.tsx
+      working-directory: ./ParkBlazerApp
+    - run: xvfb-run -s "-ac -screen 0 1280x1024x24" npx vitest __tests__/Marker.test.tsx
+      working-directory: ./ParkBlazerApp
+    - run: xvfb-run -s "-ac -screen 0 1280x1024x24" npx vitest __tests__/List.test.tsx
+      working-directory: ./ParkBlazerApp
+    - run: xvfb-run -s "-ac -screen 0 1280x1024x24" npx vitest __tests__/LoginRegister.test.tsx
       working-directory: ./ParkBlazerApp
