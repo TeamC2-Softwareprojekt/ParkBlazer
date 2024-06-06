@@ -22,6 +22,7 @@ import {
 import axios from "axios";
 import "./Userprofile_2.css";
 import AuthService from "../AuthService";
+import Navbar from "../components/navbar";
 
 const UserProfile_2: React.FC = () => {
     const initialUserData = {
@@ -165,6 +166,8 @@ const UserProfile_2: React.FC = () => {
     };
 
     return (
+        <>
+        <Navbar/>
         <IonGrid fixed className="profile-grid">
             <IonRow className="ion-justify-content-center ion-align-items-center full-height">
                 <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
@@ -321,6 +324,7 @@ const UserProfile_2: React.FC = () => {
                                         </IonThumbnail>
                                         <IonLabel>{spot.name}</IonLabel>
                                         <IonLabel>{spot.description}</IonLabel>
+                                        <IonLabel>{spot.available_spaces}</IonLabel>
                                     </IonItem>
                                 ))}
                             </IonList>
@@ -329,6 +333,7 @@ const UserProfile_2: React.FC = () => {
                 </IonCol>
             </IonRow>
         </IonGrid>
+        </>
     );
 };
 

@@ -14,6 +14,7 @@ import {
 } from "@ionic/react";
 import "./Registration.css";
 import axios from "axios";
+import Navbar from "../components/navbar";
 
 const Registration: React.FC = () => {
     const [username, setUsername] = useState<string>("");
@@ -112,6 +113,8 @@ const Registration: React.FC = () => {
     };
 
     return (
+        <>
+        <Navbar/>
         <IonGrid fixed className="register-grid">
             <IonRow className="ion-justify-content-center ion-align-items-center full-height" overflow-scroll="true">
                 <IonCol className="register-col" size="12" size-sm="8" size-md="8" overflow-scroll="true">
@@ -230,6 +233,7 @@ const Registration: React.FC = () => {
                 </IonCol>
             </IonRow>
         </IonGrid>
+        </>
     );
 };
 

@@ -11,6 +11,7 @@ import {
 } from "@ionic/react";
 import AuthService from "../AuthService";
 import "./Login.css";
+import Navbar from "../components/navbar";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -54,6 +55,8 @@ const Login: React.FC = () => {
   };
 
   return (
+    <>
+    <Navbar/>
     <IonGrid fixed className="login-grid">
       <IonRow className="ion-justify-content-center ion-align-items-center full-height">
         <IonCol size="12" size-sm="8" size-md="8">
@@ -93,6 +96,7 @@ const Login: React.FC = () => {
         </IonCol>
       </IonRow>
     </IonGrid>
+    </>
   );
 };
 

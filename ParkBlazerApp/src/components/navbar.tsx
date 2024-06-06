@@ -16,6 +16,10 @@ function Navbar() {
         history.push('/home');
     };
 
+    const handleLogoClick = () => {
+        history.push('/home');
+    };
+
     const handleUserMenu = async () => {
         const token = AuthService.getToken();
         try {
@@ -42,7 +46,7 @@ function Navbar() {
     return (
         <IonHeader color="light">
             <IonToolbar color="light">
-                <IonTitle>ParkBlazer</IonTitle>
+                <IonTitle onClick={handleLogoClick}>ParkBlazer</IonTitle>
 
                 <IonButton
                     id="popover-button"
