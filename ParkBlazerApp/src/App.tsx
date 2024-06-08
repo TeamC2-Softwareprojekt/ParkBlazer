@@ -5,8 +5,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Registration from './pages/Registration';
-import Userprofile from './pages/Userprofile';
-import Userprofile2 from './pages/Userprofile_2';
+import UserProfile from './pages/Userprofile';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 
@@ -55,9 +54,6 @@ const App: React.FC = () => (
         <Route path="/home" exact={true}>
           <Home />
         </Route>
-        <Route path="/userprofile2" exact={true}>
-          <Userprofile2 />
-        </Route>
         <Route path="/message/:id">
           <ViewMessage />
         </Route>
@@ -77,7 +73,7 @@ const App: React.FC = () => (
         </Route>
         <Route path="/userprofile">
           {AuthService.isLoggedIn() ? (
-            <Userprofile/>
+            <UserProfile/>
           ) : (
             <Redirect to="/home" />
           )}

@@ -1,338 +1,337 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
+import { useHistory } from "react-router-dom";
 import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonAvatar,
-  IonButton,
-  IonInput,
-  IonIcon,
-  IonImg,
-  IonFab,
-  IonFabButton,
-  IonModal,
-  IonRange,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCol,
-  IonRow,
-  IonThumbnail
-} from '@ionic/react';
-import { camera } from 'ionicons/icons';
-// @ts-ignore
-import Rating from 'react-rating-stars-component';
+    IonInput,
+    IonCol,
+    IonGrid,
+    IonRow,
+    IonButton,
+    IonAlert,
+    IonText,
+    IonSelect,
+    IonSelectOption,
+    IonThumbnail,
+    IonCard,
+    IonCardContent,
+    IonCardHeader,
+    IonCardTitle,
+    IonItem,
+    IonLabel,
+    IonList
+} from "@ionic/react";
+import axios from "axios";
+import "./UserProfile.css";
+import AuthService from "../AuthService";
+import Navbar from "../components/navbar";
 
-const Userprofile: React.FC = () => {
-  // States for user profile details
-  const [isEditing, setIsEditing] = useState(false); // Toggle editing mode
-  const [name, setName] = useState('John Doe'); // User's name
-  const [email, setEmail] = useState('john.doe@example.com'); // User's email
-  const [phoneNumber, setPhoneNumber] = useState(''); // User's phone number
-  const [firstName, setFirstName] = useState(''); // User's first name
-  const [lastName, setLastName] = useState(''); // User's last name
-  const [address, setAddress] = useState(''); // User's address
-  const [profileImage, setProfileImage] = useState<string | null>(null); // User's profile image URL
-  const [showEditButton, setShowEditButton] = useState(false); // Toggle edit button visibility
-  const [showModal, setShowModal] = useState(false); // Toggle modal visibility for image scaling
-  const [scaledImage, setScaledImage] = useState<string | null>(null); // Scaled profile image
-  const [scale, setScale] = useState(1); // Scale factor for the image
-  const [rating, setRating] = useState(0);
+const UserProfile: React.FC = () => {
+    const initialUserData = {
+        username: "",
+        email: "",
+        password: "",
+        firstname: "",
+        lastname: "",
+        birthdate: "",
+        street: "",
+        house_number: "",
+        zip: "",
+        city: "",
+        country: ""
+    };
 
-  // Reference to file input element
-  const imageInputRef = useRef<HTMLInputElement>(null);
+    const [userData, setUserData] = useState(initialUserData);
+    const [originalUserData, setOriginalUserData] = useState(initialUserData);
+    const [editMode, setEditMode] = useState(false);
+    const [passwordValid, setPasswordValid] = useState<boolean>(true);
+    const [cityValid, setCityValid] = useState<boolean>(true);
+    const [streetValid, setStreetValid] = useState<boolean>(true);
+    const [zipValid, setZipValid] = useState<boolean>(true);
+    const [houseNumberValid, setHouseNumberValid] = useState<boolean>(true);
+    const [error, setError] = useState<string>("");
+    const [parkingSpots, setParkingSpots] = useState<any[]>([]);
 
-  // Toggle editing mode
-  const toggleEdit = () => {
-    setIsEditing(!isEditing);
-  };
+    const history = useHistory();
 
-  // Handle save action
-  const handleSave = () => {
-    // Save logic can be added here
-    console.log('Saving profile...', { name, email, phoneNumber, firstName, lastName, address, profileImage });
-    toggleEdit();
-  };
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const token = AuthService.getToken();
+            try {
+                const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_details', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                const userDetails = response.data;
+                setUserData(userDetails.userDetails[0]);
+                setOriginalUserData(userDetails.userDetails[0]);
+                fetchParkingSpots(userDetails.userDetails[0].username);
+            } catch (error: any) {
+                if (error.response && error.response.data && error.response.data.message) {
+                    setError(error.response.data.message);
+                } else {
+                    setError("An unexpected error occurred. Please try again later!");
+                }
+            }
+        };
 
-  // Handle file input change (selecting a new profile image)
-  const handleFileInputChange = (files: FileList | null) => {
-    if (files && files.length > 0) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setProfileImage(e.target.result.toString());
-          setScaledImage(e.target.result.toString());
+        fetchUserData();
+    }, []);
+
+    const fetchParkingSpots = async (username: string) => {
+        try {
+            const response = await axios.post('https://server-y2mz.onrender.com/api/get_parkingspots_created_by_user', {
+                username: username
+            });
+
+            setParkingSpots(response.data);
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message);
+            } else {
+                setError("An unexpected error occurred while fetching parking spots. Please try again later!");
+            }
         }
-      };
-      reader.readAsDataURL(files[0]);
-    }
-  };
+    };
 
-  // Handle click on profile image (to trigger file input click)
-  const handleImageClick = () => {
-    if (imageInputRef.current) {
-      imageInputRef.current.click();
-    }
-  };
+    const validatePassword = useCallback((password: string) => {
+        return password.length > 10;
+    }, []);
 
-  // Handle save action in the modal for image scaling
-  const handleModalSave = () => {
-    setProfileImage(scaledImage);
-    setShowModal(false);
-  };
+    const validateCity = useCallback((city: string) => {
+        return city.trim().length > 0;
+    }, []);
 
-  // Handle scale change in the modal for image scaling
-  const handleScaleChange = (e: CustomEvent) => {
-    const value = e.detail.value as number;
-    setScale(value);
-    if (scaledImage) {
-      const img = new Image();
-      img.src = scaledImage;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          canvas.width = img.width * value;
-          canvas.height = img.height * value;
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          setScaledImage(canvas.toDataURL('image/jpeg'));
+    const validateStreet = useCallback((street: string) => {
+        return street.trim().length > 0;
+    }, []);
+
+    const validateZip = useCallback((zip: string) => {
+        return zip.trim().length > 0;
+    }, []);
+
+    const validateHouseNumber = useCallback((houseNumber: string) => {
+        return houseNumber.trim().length > 0;
+    }, []);
+
+    const handleInputChange = (field: string) => (event: CustomEvent) => {
+        const value = event.detail.value!;
+        setUserData((prevState) => ({ ...prevState, [field]: value }));
+
+        if (field === "password") {
+            setPasswordValid(validatePassword(value));
+        } else if (field === "city") {
+            setCityValid(validateCity(value));
+        } else if (field === "street") {
+            setStreetValid(validateStreet(value));
+        } else if (field === "zip") {
+            setZipValid(validateZip(value));
+        } else if (field === "house_number") {
+            setHouseNumberValid(validateHouseNumber(value));
         }
-      };
-    }
-  };
+    };
 
-  // Handle closing the image scaling modal
-  const handleModalClose = () => {
-    setScaledImage(profileImage); // Reset to original image
-    setScale(1); // Reset scale factor
-    setShowModal(false); // Close modal
-  };
+    const handleUpdateProfile = async () => {
+        try {
+            setError("");
+            const token = AuthService.getToken();
+            const response = await axios.post('https://server-y2mz.onrender.com/api/update_user', userData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setError(response.data.message);
+            history.push("/profile");
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message);
+            } else {
+                setError("An unexpected error occurred. Please try again later!");
+            }
+        }
+    };
 
-  return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>User Profile</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen>
-        <div
-          style={{
-            textAlign: 'center',
-            marginBottom: '20px',
-            position: 'relative',
-            cursor: 'pointer'
-          }}
-          onMouseEnter={() => setShowEditButton(true)}
-          onMouseLeave={() => setShowEditButton(false)}
-        >
-          <IonAvatar
-            style={{
-              width: '150px',
-              height: '150px',
-              margin: '0 auto',
-              position: 'relative',
-              overflow: 'hidden',
-              borderRadius: '50%',
-              filter: showEditButton ? 'grayscale(90%)' : 'none'
-            }}
-            onClick={handleImageClick}
-          >
-            {profileImage ? (
-              <IonImg src={profileImage} alt="Profile Avatar" />
-            ) : (
-              <img
-                src="https://ionicframework.com/docs/img/demos/avatar.svg"
-                alt="User Avatar"
-              />
-            )}
-            {showEditButton && (
-              <IonFab
-                vertical="bottom"
-                horizontal="end"
-                slot="end"
-                style={{
-                  zIndex: 100,
-                  position: 'absolute',
-                  transform: 'translate(50%, 50%)',
-                  borderRadius: '50%',
-                  background: 'rgba(0, 0, 0, 0.4)'
-                }}
-              >
-                <IonFabButton
-                  onClick={handleImageClick}
-                  style={{ borderRadius: '50%' }}
-                >
-                  <IonIcon icon={camera} />
-                </IonFabButton>
-              </IonFab>
-            )}
-          </IonAvatar>
-          <h2>{name}</h2>
-          <p>{email}</p>
-          <input
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            ref={imageInputRef}
-            onChange={(e) => handleFileInputChange(e.target.files)}
-          />
-        </div>
-        {/* Bewertungskomponente */}
-        
-        <IonRow>
-            <IonCol offsetLg='6'>
-              <Rating
-                count={5}
-                size={30}
-                activeColor="#ffd700"
-                isHalf={false}
-                value={rating}
-                onChange={(newValue: React.SetStateAction<number>) => setRating(newValue)}
-              />
-            </IonCol>
-          </IonRow>
-       
-        <IonRow>
-        <IonCol size="2" size-md="5" offset-md="2">
-        <IonList >
-          <IonItem>
-            <IonLabel position="stacked">Name</IonLabel>
-            <IonInput
-              value={name}
-              readonly={!isEditing}
-              onIonChange={(e) => setName(e.detail.value!)}
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="stacked">Email</IonLabel>
-            <IonInput
-              value={email}
-              readonly={!isEditing}
-              onIonChange={(e) => setEmail(e.detail.value!)}
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="stacked">Phone Number</IonLabel>
-            <IonInput
-              value={phoneNumber}
-              readonly={!isEditing}
-              onIonChange={(e) => setPhoneNumber(e.detail.value!)}
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="stacked">First Name</IonLabel>
-            <IonInput
-              value={firstName}
-              readonly={!isEditing}
-              onIonChange={(e) => setFirstName(e.detail.value!)}
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="stacked">Last Name</IonLabel>
-            <IonInput
-              value={lastName}
-              readonly={!isEditing}
-              onIonChange={(e) => setLastName(e.detail.value!)}
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="stacked">Address</IonLabel>
-            <IonInput
-              value={address}
-              readonly={!isEditing}
-              onIonChange={(e) => setAddress(e.detail.value!)}
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonButton onClick={toggleEdit}>
-              {isEditing ? 'Cancel' : 'Edit'}
-            </IonButton>
-          </IonItem>
-          {isEditing && (
-            <IonButton expand="full" onClick={handleSave}>
-              Save
-            </IonButton>
-          )}
-        </IonList>
-        </IonCol>
-        </IonRow>
-        <IonRow>
-            <IonCol size="8" size-md="5" offset-md="7">
-              <IonCard>
-                <IonCardHeader>
-                  <IonCardTitle>Liste der angelegten Parkplätze</IonCardTitle>
-                  <IonCardSubtitle>John Doe</IonCardSubtitle>
-                </IonCardHeader>
-                <IonCardContent>
-                  <IonList>
-                    <IonItem>
-                      <IonThumbnail slot="start">
-                        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-                      </IonThumbnail>
-                      <IonLabel>Parkplatz 1</IonLabel>
-                    </IonItem>
-                    <IonItem>
-                      <IonThumbnail slot="start">
-                        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-                      </IonThumbnail>
-                      <IonLabel>Parkplatz 2</IonLabel>
-                    </IonItem>
-                    <IonItem>
-                      <IonThumbnail slot="start">
-                        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-                      </IonThumbnail>
-                      <IonLabel>Parkplatz 3</IonLabel>
-                    </IonItem>
-                    <IonItem lines="none">
-                      <IonThumbnail slot="start">
-                        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-                      </IonThumbnail>
-                      <IonLabel>Parkplatz 4</IonLabel>
-                    </IonItem>
-                  </IonList>
-                </IonCardContent>
-              </IonCard>
-            </IonCol>
-          </IonRow>
-        {/* Modal for image scaling */}
-        <IonModal isOpen={showModal}>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Scale Image</IonTitle>
-              <IonButton slot="end" onClick={handleModalClose}>
-                Close
-              </IonButton>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent>
-            <IonImg
-              src={scaledImage || ''}
-              style={{ maxWidth: '100%', margin: '20px 0' }}
-            />
-            <IonRange
-              min={1}
-              max={3}
-              step={0.1}
-              snaps={true}
-              value={scale}
-              onIonChange={handleScaleChange}
-            />
-            <IonButton expand="full" onClick={handleModalSave}>
-              Save
-            </IonButton>
-          </IonContent>
-        </IonModal>
-      </IonContent>
-    </IonPage>
-  );
+
+    const toggleEditMode = () => {
+        setEditMode(!editMode);
+        if (!editMode) {
+            setOriginalUserData(userData);
+        } else {
+            setUserData(originalUserData);
+        }
+    };
+
+
+    return (
+        <>
+            <Navbar />
+            <IonGrid fixed className="profile-grid">
+                <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+                    <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
+                        <div className="profile-container">
+                            <IonText color="primary" className="profile-title">
+                                <h1 className="profile-heading">User Profile</h1>
+                            </IonText>
+                            <IonInput
+                                className="profile-input"
+                                type="text"
+                                fill="solid"
+                                label="Username"
+                                labelPlacement="floating"
+                                value={userData.username}
+                                disabled
+                            />
+                            <IonInput
+                                className="profile-input"
+                                type="text"
+                                fill="solid"
+                                label="First Name"
+                                labelPlacement="floating"
+                                value={userData.firstname}
+                                disabled
+                            />
+                            <IonInput
+                                className="profile-input"
+                                type="text"
+                                fill="solid"
+                                label="Last Name"
+                                labelPlacement="floating"
+                                value={userData.lastname}
+                                disabled
+                            />
+                            <IonInput
+                                className={"profile-input"}
+                                type="email"
+                                fill="solid"
+                                label="Email"
+                                labelPlacement="floating"
+                                value={userData.email}
+                                disabled
+                            />
+                            <IonInput
+                                className={`profile-input ${!passwordValid ? "ion-invalid" : ""}`}
+                                type="password"
+                                fill="solid"
+                                label="Password"
+                                labelPlacement="floating"
+                                value={userData.password}
+                                disabled={!editMode}
+                                onIonInput={handleInputChange("password")}
+                                errorText={!passwordValid ? "Password must be longer than 10 characters!" : ""}
+                            />
+                            <IonInput
+                                className="profile-input"
+                                type="text"
+                                fill="solid"
+                                label="Birth Date"
+                                labelPlacement="floating"
+                                value={userData.birthdate}
+                                disabled
+                            />
+                            <IonInput
+                                className={`profile-input ${!cityValid ? "ion-invalid" : ""}`}
+                                type="text"
+                                fill="solid"
+                                label="City"
+                                labelPlacement="floating"
+                                value={userData.city}
+                                disabled={!editMode}
+                                onIonInput={handleInputChange("city")}
+                                errorText={!cityValid ? "City is required!" : ""}
+                            />
+                            <IonInput
+                                className={`profile-input ${!streetValid ? "ion-invalid" : ""}`}
+                                type="text"
+                                fill="solid"
+                                label="Street"
+                                labelPlacement="floating"
+                                value={userData.street}
+                                disabled={!editMode}
+                                onIonInput={handleInputChange("street")}
+                                errorText={!streetValid ? "Street is required!" : ""}
+                            />
+                            <IonInput
+                                className={`profile-input ${!zipValid ? "ion-invalid" : ""}`}
+                                type="text"
+                                fill="solid"
+                                label="Zip"
+                                labelPlacement="floating"
+                                value={userData.zip}
+                                disabled={!editMode}
+                                onIonInput={handleInputChange("zip")}
+                                errorText={!zipValid ? "Zip code is required!" : ""}
+                            />
+                            <IonInput
+                                className={`profile-input ${!houseNumberValid ? "ion-invalid" : ""}`}
+                                type="text"
+                                fill="solid"
+                                label="House Number"
+                                labelPlacement="floating"
+                                value={userData.house_number}
+                                disabled={!editMode}
+                                onIonInput={handleInputChange("house_number")}
+                                errorText={!houseNumberValid ? "House number is required!" : ""}
+                            />
+                            <IonSelect
+                                aria-label="Country"
+                                label="Select Country"
+                                labelPlacement="floating"
+                                fill="solid"
+                                value={userData.country}
+                                disabled={!editMode}
+                                onIonChange={(e) => setUserData((prevState) => ({ ...prevState, country: e.detail.value! }))}
+                            >
+                                <IonSelectOption value="Germany">Germany</IonSelectOption>
+                                <IonSelectOption value="Austria">Austria</IonSelectOption>
+                                <IonSelectOption value="Netherlands">Netherlands</IonSelectOption>
+                            </IonSelect>
+                            <IonButton
+                                expand="block"
+                                onClick={toggleEditMode}
+                                className="profile-button"
+                            >
+                                {editMode ? "Cancel" : "Edit Profile"}
+                            </IonButton>
+                            {editMode && (
+                                <IonButton
+                                    expand="block"
+                                    onClick={handleUpdateProfile}
+                                    className="profile-button"
+                                    disabled={!passwordValid || !cityValid || !streetValid || !zipValid || !houseNumberValid}
+                                >
+                                    Save Changes
+                                </IonButton>
+                            )}
+                            {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
+                        </div>
+                    </IonCol>
+                </IonRow>
+                <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+                    <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
+                        <IonCard>
+                            <IonCardHeader>
+                                <IonCardTitle>Deine angelegten Parkplätze</IonCardTitle>
+                            </IonCardHeader>
+                            <IonCardContent>
+                                <IonList>
+                                    {parkingSpots && parkingSpots.map((spot, index) => (
+                                        <IonItem key={index}>
+                                            <IonThumbnail slot="start">
+                                                <img alt={`Thumbnail of ${spot.name}`} src={spot.thumbnailUrl || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
+                                            </IonThumbnail>
+                                            <IonLabel>{spot.name}</IonLabel>
+                                            <IonLabel>{spot.description}</IonLabel>
+                                            <IonLabel>{spot.available_spaces}</IonLabel>
+                                        </IonItem>
+                                    ))}
+                                </IonList>
+                            </IonCardContent>
+                        </IonCard>
+                    </IonCol>
+                </IonRow>
+            </IonGrid>
+        </>
+    );
 };
 
-export default Userprofile;
+export default UserProfile;
+

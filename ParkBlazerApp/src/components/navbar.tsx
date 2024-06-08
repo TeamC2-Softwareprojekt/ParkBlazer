@@ -65,7 +65,7 @@ function Navbar() {
                                     <IonItem id='user-name'>
                                         {username && (<IonText>Hallo, {username}</IonText>)}
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/userprofile2">
+                                    <IonItem button={true} detail={false} routerLink="/userprofile">
                                         Profil
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
