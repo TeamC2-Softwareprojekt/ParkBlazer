@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel } from '@ionic/react';
+import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonPopover } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
+import './MarkerMenu.css';
 
 function MarkerMenu() {
   const [showMenu, setShowMenu] = useState(false);
@@ -20,6 +21,9 @@ function MarkerMenu() {
   const [typeCar, setTypeCar] = useState<boolean>(false);
   const [typeBike, setTypeBike] = useState<boolean>(false);
   const [typeTruk, setTypeTruk] = useState<boolean>(false);
+  const [privateSpot, setPrivateSpot] = useState<boolean>(false);
+  const [pricePerHour, setPricePerHour] = useState<number>();
+  const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
 
   const [errorLatitude, setErrorLatitude] = useState<string>('');
   const [errorLongitude, setErrorLongitude] = useState<string>('');
@@ -32,10 +36,16 @@ function MarkerMenu() {
   const [errorZip, setErrorZip] = useState<string>('');
   const [errorCity, setErrorCity] = useState<string>('');
   const [errorCountry, setErrorCountry] = useState<string>('');
+  const [errorPricePerHour, setErrorPricePerHour] = useState<string>('');
+  const [errorDocument, setErrorDocument] = useState<string>('');
 
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationColor, setNotificationColor] = useState('success');
+
+    function openDocumentDiaglog() {
+        document.getElementById('document-input')?.click();
+    }
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -75,6 +85,8 @@ function MarkerMenu() {
       { isValid: validateField(zip), message: 'Bitte geben Sie eine Postleitzahl ein.', setError: setErrorZip },
       { isValid: validateField(city), message: 'Bitte geben Sie eine Stadt ein.', setError: setErrorCity },
       { isValid: validateField(country), message: 'Bitte geben Sie ein Land ein.', setError: setErrorCountry },
+      { isValid: !privateSpot || pricePerHour !== undefined, message: 'Bitte geben Sie einen Preis pro Stunde ein.', setError: setErrorPricePerHour },
+      { isValid: !privateSpot || selectedDocument !== null, message: 'Bitte laden Sie ein Dokument hoch.', setError: setErrorDocument },
     ];
     validations.forEach(({ isValid, message, setError }) => {
       if (!isValid) {
@@ -101,6 +113,8 @@ function MarkerMenu() {
           return;
         }
         // Send spot to server
+        if (privateSpot) {console.log("private spot"); return;} // TODO
+        return;
         const response = await fetch('https://server-y2mz.onrender.com/api/create_parkingspot', {
           method: 'POST',
           headers: {
@@ -197,6 +211,8 @@ function MarkerMenu() {
     setZip('');
     setCity('');
     setCountry('');
+    setPricePerHour(undefined);
+    setSelectedDocument(null);
     setErrorLatitude('');
     setErrorLongitude('');
     setErrorTitle('');
@@ -208,6 +224,8 @@ function MarkerMenu() {
     setErrorZip('');
     setErrorCity('');
     setErrorCountry('');
+    setErrorPricePerHour('');
+    setErrorDocument('');
   };
 
   return (
@@ -302,9 +320,26 @@ function MarkerMenu() {
               {errorCountry && <IonText id='error-country-input' color="danger">{errorCountry}</IonText>}
             </IonItem>
             <IonItem>
-              PKW<IonCheckbox checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
-              Fahrrad<IonCheckbox checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
-              LKW<IonCheckbox checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
+              PKW<IonCheckbox class="marker-menu-checkbox" checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
+              Fahrrad<IonCheckbox class="marker-menu-checkbox" checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
+              LKW<IonCheckbox class="marker-menu-checkbox" checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
+            </IonItem>
+            <IonItem>
+                Privat<IonCheckbox class="marker-menu-checkbox" checked={privateSpot} onIonChange={e => setPrivateSpot(e.detail.checked)}/>
+            </IonItem>
+            <IonItem style={{display: privateSpot ? "" : "none"}}>
+                    <IonInput onInput={e => {setPricePerHour(Number((e.target as HTMLInputElement).value)); setErrorPricePerHour('')}} value={pricePerHour} class="price-input" label="Preis pro Stunde" type="number" placeholder="0€" labelPlacement="stacked" inputMode="numeric" min={0}/>
+                    {errorPricePerHour && <IonText id='error-price-per-hour-input' color="danger">{errorPricePerHour}</IonText>}
+            </IonItem>
+            <IonItem style={{display: privateSpot ? "" : "none"}}>
+                    <input type="file" id="document-input" style={{display: "none"}} onChange={e => setSelectedDocument(e.target.value)} />
+                    <IonButton onClick={() => {openDocumentDiaglog(); setErrorDocument('')}}>Dokument hochladen</IonButton>
+                    {errorDocument && <IonText id='error-document-input' color="danger">{errorDocument}</IonText>}
+                    <label>{selectedDocument?.split('\\')[2]}</label>
+                    <IonButton id="document-information"> 
+                        <IonIcon src="src\icons\information-circle-outline.svg" id='document-information-icon' ></IonIcon>
+                        <IonPopover trigger="document-information" id="document-explanation">Ein Dokument, das beweist, dass Sie diesen Parkplatz besitzen und vermieten können.</IonPopover>
+                    </IonButton>
             </IonItem>
           </IonList>
           <IonButton expand="block" id='marker-submit' onClick={handleSaveCoordinates}>
