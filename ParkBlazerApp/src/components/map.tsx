@@ -46,14 +46,15 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
     getUserLocation();
     fetchParkingSpaces();
 
-    // Füge den Klick-Handler hinzu
     map.current.on('click', (e) => {
-      if (selectingLocation) {
+      console.log('Klick-Koordinaten:');
+      if (selectingLocation) { 
         const coords = e.lngLat;
         setLatitude(coords.lat.toString());
         setLongitude(coords.lng.toString());
-        setSelectingLocation(false); // Deaktivieren Sie den Auswahlmodus
+        setSelectingLocation(false); 
       }
+      console.log('Klick-Koordinaten: ' + e.lngLat.toString());
     });
   }, []);
 
@@ -106,6 +107,12 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
     });
   };
 
+  const handleSelectLocationOnMap = () => { // #TODO: Funktioniert nicht
+    setSelectingLocation(true); // das wird nicht auseführt??
+    console.log('Die SelectionLocation AUF DER MAP: '+selectingLocation);
+
+  };
+
   const getUserLocation = () => {
     if (!navigator.geolocation) {
         console.error('Geolocation is not supported by this browser.');
@@ -144,8 +151,11 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
         updateLatitude={setLatitude} 
         updateLongitude={setLongitude} 
         setSelectingLocation={setSelectingLocation} 
+        onSelectLocationOnMap={handleSelectLocationOnMap}
       />
       </div>
     </div>
   );
 }
+
+export {map};

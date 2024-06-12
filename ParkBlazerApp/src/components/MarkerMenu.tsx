@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
 
@@ -6,9 +6,11 @@ interface MarkerMenuProps {
   updateLatitude: (lat: string) => void;
   updateLongitude: (lng: string) => void;
   setSelectingLocation: (value: boolean) => void;
+  onSelectLocationOnMap: () => void; 
 }
 
-const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLongitude }) => {
+
+export const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLongitude, setSelectingLocation, onSelectLocationOnMap }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showModalCoordinates, setShowModalCoordinates] = useState(false);
@@ -42,7 +44,9 @@ const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLongitude
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationColor, setNotificationColor] = useState('success');
-  const [selectingLocation, setSelectingLocation] = useState<boolean>(false);
+  const [selectingLocation, setSelectingLocationState] = useState<boolean>(true); // true, because on false the modal is opened first 
+
+  
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -152,7 +156,7 @@ const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLongitude
         setNotificationMessage('Fehler beim Speichern.');
         setNotificationColor('danger');
         setShowNotification(true);
-        console.error('Fehler beim Speichern:', error        );
+        console.error('Fehler beim Speichern:', error);
       }
 
       closeModalCoordinates();
@@ -188,12 +192,29 @@ const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLongitude
   };
 
   const handleSelectLocationOnMap = () => {
-    closeModalCoordinates();
+    console.log('Die SelectionLocation vorher: '+selectingLocation);
+    closeModal();
     setNotificationMessage('Bitte wählen Sie einen Punkt auf der Karte aus.');
     setNotificationColor('success');
     setShowNotification(true);
-  
     setSelectingLocation(true);
+    onSelectLocationOnMap();
+    console.log('Die SelectionLocation: '+selectingLocation);
+  };
+
+  useEffect(() => {
+    if (!selectingLocation) {
+      handleSelectLocationOnMapAfterClicking();
+    }
+  }, [selectingLocation]);
+
+  const handleSelectLocationOnMapAfterClicking = () => { 
+    console.log('AFter Clicking');
+    if(updateLatitude && updateLongitude) { 
+      setLatitude(updateLatitude.toString()); 
+      setLongitude(updateLongitude.toString()); 
+    }
+    openModalCoordinates();
   };
 
   const resetAttributes = () => {
