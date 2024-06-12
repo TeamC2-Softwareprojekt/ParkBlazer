@@ -82,7 +82,7 @@ export default function Filter({onFilterApply}: {onFilterApply: any}) {
                 <IonIcon src="src/icons/filter.svg"/>
             </IonButton>
             <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
-                <div>
+                <div id="filter-modal">
                     <IonHeader id="filter-header">
                             <IonTitle>Filter</IonTitle>
                             <IonButton id="filter-button-close" fill="clear" color="danger" onClick={() => setShowModal(false)}>
