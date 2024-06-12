@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
 
-function MarkerMenu() {
+interface MarkerMenuProps {
+  updateLatitude: (lat: string) => void;
+  updateLongitude: (lng: string) => void;
+  setSelectingLocation: (value: boolean) => void;
+}
+
+const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLongitude }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showModalCoordinates, setShowModalCoordinates] = useState(false);
@@ -36,6 +42,7 @@ function MarkerMenu() {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationColor, setNotificationColor] = useState('success');
+  const [selectingLocation, setSelectingLocation] = useState<boolean>(false);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -60,6 +67,7 @@ function MarkerMenu() {
   };
 
   const validateField = (value: string): boolean => { return value.trim().length > 0; };
+  
   const handleSaveCoordinates = async () => {
     const lat = parseFloat(latitude);
     const lng = parseFloat(longitude);
@@ -144,14 +152,14 @@ function MarkerMenu() {
         setNotificationMessage('Fehler beim Speichern.');
         setNotificationColor('danger');
         setShowNotification(true);
-        console.error('Fehler beim Speichern:', error);
+        console.error('Fehler beim Speichern:', error        );
       }
 
       closeModalCoordinates();
     }
   };
 
-  // this function is for handling the current location to create a new parking spot
+  // Diese Funktion ist für die Behandlung des aktuellen Standorts zur Erstellung eines neuen Parkplatzes
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) return;
     
@@ -168,7 +176,7 @@ function MarkerMenu() {
         openModalCoordinates(); 
       },
       (error) => {
-        console.error('Error getting location', error);
+        console.error('Fehler beim Abrufen der Position', error);
         setNotificationMessage('Fehler beim Abrufen der aktuellen Position.');
         setNotificationColor('danger');
         setShowNotification(true);
@@ -180,9 +188,12 @@ function MarkerMenu() {
   };
 
   const handleSelectLocationOnMap = () => {
-    // #TODO: Logic to select location on map
-    console.log('Auf der Karte auswählen');
-    closeModal();
+    closeModalCoordinates();
+    setNotificationMessage('Bitte wählen Sie einen Punkt auf der Karte aus.');
+    setNotificationColor('success');
+    setShowNotification(true);
+  
+    setSelectingLocation(true);
   };
 
   const resetAttributes = () => {
@@ -306,6 +317,11 @@ function MarkerMenu() {
               Fahrrad<IonCheckbox checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
               LKW<IonCheckbox checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
             </IonItem>
+            <IonItem>
+              <IonLabel style={{ marginRight: '10px' }}>Bild-URL: </IonLabel>
+              <IonInput value={image} onIonChange={e => setImage(e.detail.value || '')} />
+              {errorImage && <IonText color="danger">{errorImage}</IonText>}
+            </IonItem>
           </IonList>
           <IonButton expand="block" onClick={handleSaveCoordinates}>
             Speichern
@@ -324,6 +340,8 @@ function MarkerMenu() {
       />
     </>
   );
-}
+};
 
 export default MarkerMenu;
+
+
