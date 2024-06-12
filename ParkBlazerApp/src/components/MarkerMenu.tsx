@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
-
-interface MarkerMenuProps {
-  updateLatitude: (lat: string) => void;
-  updateLongitude: (lng: string) => void;
-  setSelectingLocation: (value: boolean) => void;
-  onSelectLocationOnMap: () => void; 
-}
+import { globalSelectingLocation, setGlobalSelectingLocation, globalLatitude, globalLongitude } from './map';
 
 
-export const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLongitude, setSelectingLocation, onSelectLocationOnMap }) => {
+export const MarkerMenu: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showModalCoordinates, setShowModalCoordinates] = useState(false);
@@ -44,9 +38,8 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLo
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationColor, setNotificationColor] = useState('success');
-  const [selectingLocation, setSelectingLocationState] = useState<boolean>(true); // true, because on false the modal is opened first 
+  const [firstopenSelectionMap, setFirstopenSelectionMap] = useState(false);
 
-  
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -163,7 +156,6 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLo
     }
   };
 
-  // Diese Funktion ist für die Behandlung des aktuellen Standorts zur Erstellung eines neuen Parkplatzes
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) return;
     
@@ -192,27 +184,28 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ updateLatitude, updateLo
   };
 
   const handleSelectLocationOnMap = () => {
-    console.log('Die SelectionLocation vorher: '+selectingLocation);
+    console.log('Die SelectionLocation vorher: '+globalSelectingLocation);
     closeModal();
     setNotificationMessage('Bitte wählen Sie einen Punkt auf der Karte aus.');
     setNotificationColor('success');
     setShowNotification(true);
-    setSelectingLocation(true);
-    onSelectLocationOnMap();
-    console.log('Die SelectionLocation: '+selectingLocation);
+    setGlobalSelectingLocation(true);
+    console.log('Die SelectionLocation: '+globalSelectingLocation);
   };
 
-  useEffect(() => {
-    if (!selectingLocation) {
-      handleSelectLocationOnMapAfterClicking();
+  useEffect(() => { 
+    if (!globalSelectingLocation) {
+      if(firstopenSelectionMap == true){
+        handleSelectLocationOnMapAfterClicking();
+      }
+      setFirstopenSelectionMap(true);
     }
-  }, [selectingLocation]);
+  }, [globalSelectingLocation]);
 
   const handleSelectLocationOnMapAfterClicking = () => { 
-    console.log('AFter Clicking');
-    if(updateLatitude && updateLongitude) { 
-      setLatitude(updateLatitude.toString()); 
-      setLongitude(updateLongitude.toString()); 
+    if(globalLatitude && globalLongitude) { 
+      setLatitude(globalLatitude.toString()); 
+      setLongitude(globalLongitude.toString()); 
     }
     openModalCoordinates();
   };

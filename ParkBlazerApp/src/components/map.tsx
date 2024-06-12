@@ -11,6 +11,13 @@ import MarkerMenu from './MarkerMenu';
 import { initParkingSpaces, parkingspaces } from '../data/parkingSpaces';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
+export let globalSelectingLocation: boolean = false;
+export let globalLatitude: string = '';
+export let globalLongitude: string = '';
+
+export function setGlobalSelectingLocation(value: boolean) {
+  globalSelectingLocation = value;
+}
 
 export default function Map({onUpdateList}: {onUpdateList: any}) {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -19,7 +26,6 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
   const [mapController, setMapController] = useState<any>();
   const [locationCheckInterval, setLocationCheckInterval] = useState<number | null>(null);
   const [markerIsSet, setMarkerIsSet] = useState<boolean>(false);
-  const [selectingLocation, setSelectingLocation] = useState<boolean>(false);
   const [latitude, setLatitude] = useState<string>('');
   const [longitude, setLongitude] = useState<string>('');
 
@@ -48,11 +54,11 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
 
     map.current.on('click', (e) => {
       console.log('Klick-Koordinaten:');
-      if (selectingLocation) { 
+      if (globalSelectingLocation) { 
         const coords = e.lngLat;
-        setLatitude(coords.lat.toString());
-        setLongitude(coords.lng.toString());
-        setSelectingLocation(false); 
+        globalLatitude = coords.lat.toString();
+        globalLongitude = coords.lng.toString();
+        setGlobalSelectingLocationChange();
       }
       console.log('Klick-Koordinaten: ' + e.lngLat.toString());
     });
@@ -107,11 +113,10 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
     });
   };
 
-  const handleSelectLocationOnMap = () => { // #TODO: Funktioniert nicht
-    setSelectingLocation(true); // das wird nicht auseführt??
-    console.log('Die SelectionLocation AUF DER MAP: '+selectingLocation);
-
+  const setGlobalSelectingLocationChange = () => { 
+    globalSelectingLocation = !globalSelectingLocation;
   };
+
 
   const getUserLocation = () => {
     if (!navigator.geolocation) {
@@ -147,12 +152,7 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
       </div>
       <div ref={mapContainer} className="map" />
       <div className="marker-container"> 
-      <MarkerMenu 
-        updateLatitude={setLatitude} 
-        updateLongitude={setLongitude} 
-        setSelectingLocation={setSelectingLocation} 
-        onSelectLocationOnMap={handleSelectLocationOnMap}
-      />
+      <MarkerMenu/>
       </div>
     </div>
   );
