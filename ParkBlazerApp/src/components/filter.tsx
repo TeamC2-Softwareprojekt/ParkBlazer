@@ -5,6 +5,7 @@ import "./filter.css";
 
 export interface FilterParams {
     [key: string]: any;
+    currentSearchCenter?: number[];
     category?: SegmentValue;
     mode?: { mode: string, value: string };
     type_bike?: number;
@@ -14,6 +15,18 @@ export interface FilterParams {
     minAvailableSpaces?: number;
     sort?: { by: string, order: string };
 }
+
+export const defaultFilterParams: FilterParams = {
+    currentSearchCenter: [],
+    category: 'all',
+    mode: { mode: 'radius', value: '' },
+    type_bike: 0,
+    type_car: 0,
+    type_truck: 0,
+    price: { min: 0, max: 0 },
+    minAvailableSpaces: 0,
+    sort: { by: '', order: '' }
+};
 
 export default function Filter({onFilterApply}: {onFilterApply: any}) {
     const segment = useRef<HTMLIonSegmentElement>(null);
@@ -59,10 +72,11 @@ export default function Filter({onFilterApply}: {onFilterApply: any}) {
 
         if (selectSortBy.current) selectSortBy.current.value = "";
         if (selectSortOrder.current) selectSortOrder.current.value = "";
+        applyFilter();
     }
 
     function applyFilter() {
-        let filterParams: FilterParams = {};
+        let filterParams: FilterParams = {...defaultFilterParams};        
 
         filterParams.category = segment.current?.value;
         filterParams.type_bike = checkboxes.checkboxBike.current?.checked ? 1 : 0;
@@ -73,7 +87,7 @@ export default function Filter({onFilterApply}: {onFilterApply: any}) {
         filterParams.minAvailableSpaces = parseInt(inputs.inputSpaces.current?.value as string);
         filterParams.sort = { by: selectSortBy.current?.value as string, order: selectSortOrder.current?.value as string };
 
-        onFilterApply(filterParams);
+        onFilterApply(filterParams);     
     }
 
     return (
@@ -114,8 +128,8 @@ export default function Filter({onFilterApply}: {onFilterApply: any}) {
                         <IonInput ref={inputs.inputSpaces} class="filter-content-section" label="Anzahl an Parkplätzen" type="number" placeholder="0" labelPlacement="stacked" fill="outline" clearOnEdit={true} inputMode="numeric" min={0}/>
                         <div id="filter-mode" className="filter-content-section">
                             <IonSelect id="filter-select-mode" className="filter-select" label="Filtern nach" placeholder={searchMode.component.props.label} interface="popover" fill="outline" labelPlacement="stacked" onIonChange={(event) => switchSearchMode(event)}>
-                              <IonSelectOption value="radius">Radius</IonSelectOption>
-                              <IonSelectOption value="city">Stadt</IonSelectOption>
+                                <IonSelectOption value="radius">Radius</IonSelectOption>
+                                <IonSelectOption value="city">Stadt</IonSelectOption>
                             </IonSelect>
                             {searchMode.component}
                         </div>

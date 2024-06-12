@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { FilterParams } from '../components/filter';
+import { getUserLocation } from './userLocation';
 
 export interface parkingSpace {
     available_spaces: number;
@@ -22,7 +23,7 @@ export interface parkingSpace {
 }
 
 export let parkingspaces: parkingSpace[] = [];
-  
+
 export async function initParkingSpaces() {
     if (parkingspaces.length > 0) return;
 
@@ -35,24 +36,34 @@ export async function initParkingSpaces() {
     parkingspaces = response?.data;
 }
 
+export function setDistancesToPoint(center: number[]) {
+    parkingspaces.forEach(p => {
+        p.distance = getDistanceInKm(p.latitude, p.longitude, center[0], center[1]);
+    });
+}
+
 export function getNearestParkingSpaces(center:number[], maxDistance: number): parkingSpace[] {
     return parkingspaces.filter(p => {
-        let distance = getDistanceInKm(p.latitude, p.longitude, center[1], center[0])
+        let distance = getDistanceInKm(p.latitude, p.longitude, center[0], center[1])
         p.distance = distance;
         return distance <= maxDistance;
     });
 }
 
 export function getFilteredParkingSpaces(filterParams: FilterParams): parkingSpace[] {
-    return parkingspaces
+    let list = parkingspaces;
+    if (filterParams.currentSearchCenter?.length) list = getNearestParkingSpaces(filterParams.currentSearchCenter, 50);
+    
+    return list
         // TODO: parking space category (private, public, all) and price
         .filter(p => {
             if (!filterParams.mode?.value) return true;
             if (filterParams.mode?.mode === "city") {
                 return p.city.toLowerCase().includes(filterParams.mode.value.toLowerCase());
             } else {
-                return true;
-                // TODO: implement getNearestParkingSpaces with user position
+                const userLocation = getUserLocation();
+                if (!userLocation.latitude || !userLocation.longitude) return true;
+                return getDistanceInKm(p.latitude, p.longitude, userLocation.latitude, userLocation.longitude) <= parseInt(filterParams.mode.value);
             }
         })
         .filter(p => {
@@ -84,4 +95,3 @@ function getDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: number)
 function deg2rad(deg: number) {
     return deg * (Math.PI/180)
 }
-  

@@ -13,7 +13,7 @@ import { getUserLocation } from '../data/userLocation';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
-export default function Map({onUpdateList}: {onUpdateList: any}) {
+export default function Map({onUpdateList, onLocationMarkerUpdate}: any) {
   const mapContainer = useRef<HTMLDivElement>(null);
   map = useRef<maptilersdk.Map | null>(null);
   const [zoom] = useState<number>(14);
@@ -43,7 +43,7 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
     fetchParkingSpaces();
 
     return () => stopLocationMarkerUpdate();
-    }, []);
+  }, []);
 
   function startLocationMarkerUpdate() {
     if (!markUserLocationInterval.current) markUserLocationInterval.current = setInterval(markUserLocation, 10000);
@@ -54,6 +54,8 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
   }
 
   function handleSearch(event: any) {
+    if (event) stopLocationMarkerUpdate();
+    else startLocationMarkerUpdate();
     onUpdateList(event);
   };
   
@@ -95,6 +97,7 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
       locationMarker.current?.setLngLat([location.longitude, location.latitude]);
       locationMarker.current?.setPopup(new maptilersdk.Popup().setHTML("<h3>Ihr Standort</h3>"));
       locationMarker.current?.addTo(map.current);
+      onLocationMarkerUpdate();
   };
 
   return (
