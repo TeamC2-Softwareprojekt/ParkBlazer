@@ -5,9 +5,12 @@ import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Registration from './pages/Registration';
-import UserProfile from './pages/Userprofile';
+import UserProfile from './pages/UserProfile';
+import UploadImagePage from './pages/UploadImagePage';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
+import ParkingspotDetails from './pages/ParkinspotDetails';
+
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -56,6 +59,12 @@ const App: React.FC = () => (
         </Route>
         <Route path="/message/:id">
           <ViewMessage />
+        </Route>
+        <Route path="/image" exact={true}>
+          <UploadImagePage />
+        </Route>
+        <Route path="/parkingspot_details/:id">
+          <ParkingspotDetails />
         </Route>
         <Route path="/login">
           {AuthService.isLoggedIn() ? (

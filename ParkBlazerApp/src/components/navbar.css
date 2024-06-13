@@ -19,7 +19,13 @@ white;
 }
 
 #popover-button {
-  margin-right: 20px;
+  margin-right: 5vw;
+}
+
+#navbar-title {
+	padding: 0;
+	margin-left: 5vw;
+	padding-inline: 0;
 }
 
 .md.header-md.header-collapse-none {
@@ -29,3 +35,4 @@ white;
 #user-name .md {
   font-weight: bold;
 }
+
