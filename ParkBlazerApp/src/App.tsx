@@ -6,7 +6,6 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Registration from './pages/Registration';
 import UserProfile from './pages/UserProfile';
-import UploadImagePage from './pages/UploadImagePage';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 import ParkingspotDetails from './pages/ParkinspotDetails';
@@ -44,7 +43,6 @@ import './theme/variables.css';
 import AuthService from './AuthService';
 
 
-
 setupIonicReact();
 
 const App: React.FC = () => (
@@ -59,9 +57,6 @@ const App: React.FC = () => (
         </Route>
         <Route path="/message/:id">
           <ViewMessage />
-        </Route>
-        <Route path="/image" exact={true}>
-          <UploadImagePage />
         </Route>
         <Route path="/parkingspot_details/:id">
           <ParkingspotDetails />
