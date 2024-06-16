@@ -9,7 +9,7 @@ import {
   IonAlert,
   IonText
 } from "@ionic/react";
-import AuthService from "../AuthService";
+import AuthService from "../utils/AuthService";
 import "./Login.css";
 import Navbar from "../components/navbar";
 

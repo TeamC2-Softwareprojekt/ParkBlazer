@@ -21,11 +21,13 @@ import {
 } from "@ionic/react";
 import "./ParkingspotDetails.css";
 import Navbar from "../components/navbar";
+import ImageUploader from "../components/ImageUploader";
 import axios from "axios";
 import { bicycle, bus, car } from "ionicons/icons";
-import AuthService from "../AuthService";
+import AuthService from "../utils/AuthService";
 import StarRating from "../components/StarRating";
 import { formatDate } from "../utils/formatDate";
+
 
 const ParkingspotDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Extracts the parkingspot ID from the URL
@@ -105,19 +107,19 @@ const ParkingspotDetails: React.FC = () => {
 
   const calculateAverageRating = (reviews: any[]) => {
     if (!reviews || reviews.length === 0) return "No reviews yet";
-  
+
     const totalRating = reviews.reduce((acc, curr) => acc + curr.rating, 0);
     const averageRatingNumber = totalRating / reviews.length;
     const averageRating = Math.round((totalRating / reviews.length) * 2) / 2;
-  
+
     return (
       <>
-        <StarRating rating={averageRating} /> 
+        <StarRating rating={averageRating} />
         <strong>{averageRatingNumber}</strong>
       </>
     );
   };
-  
+
 
 
   return (
@@ -204,32 +206,32 @@ const ParkingspotDetails: React.FC = () => {
           </IonCard>
 
           {AuthService.isLoggedIn() && (
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle>Rate the parkingspot:</IonCardTitle>
-            </IonCardHeader>
-            <IonCardContent id="rate-parkingspot">
-              <IonGrid>
-                <IonRow>
-                  <IonCol>
-                    <IonText>Rating (1-5):</IonText>
-                    <StarRating rating={rating} onRatingChange={setRating} /> {/* Use the StarRating component */}
-                  </IonCol>
-                </IonRow>
-                <IonRow>
-                  <IonCol>
-                    <IonText>Comment:</IonText>
-                    <IonInput value={comment} onIonChange={e => setComment(e.detail.value!)}></IonInput>
-                  </IonCol>
-                </IonRow>
-                <IonRow>
-                  <IonCol>
-                    <IonButton onClick={handleRatingSubmit}>Save</IonButton>
-                  </IonCol>
-                </IonRow>
-              </IonGrid>
-            </IonCardContent>
-          </IonCard>
+            <IonCard>
+              <IonCardHeader>
+                <IonCardTitle>Rate the parkingspot:</IonCardTitle>
+              </IonCardHeader>
+              <IonCardContent id="rate-parkingspot">
+                <IonGrid>
+                  <IonRow>
+                    <IonCol>
+                      <IonText>Rating (1-5):</IonText>
+                      <StarRating rating={rating} onRatingChange={setRating} /> {/* Use the StarRating component */}
+                    </IonCol>
+                  </IonRow>
+                  <IonRow>
+                    <IonCol>
+                      <IonText>Comment:</IonText>
+                      <IonInput value={comment} onIonChange={e => setComment(e.detail.value!)}></IonInput>
+                    </IonCol>
+                  </IonRow>
+                  <IonRow>
+                    <IonCol>
+                      <IonButton onClick={handleRatingSubmit}>Save</IonButton>
+                    </IonCol>
+                  </IonRow>
+                </IonGrid>
+              </IonCardContent>
+            </IonCard>
           )}
 
           <IonAlert
@@ -247,6 +249,8 @@ const ParkingspotDetails: React.FC = () => {
           </IonModal>
         </IonContent>
       )}
+
+      <ImageUploader />
     </IonPage>
   );
 };

@@ -40,7 +40,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import AuthService from './AuthService';
+import AuthService from './utils/AuthService';
 
 
 setupIonicReact();

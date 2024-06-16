@@ -21,7 +21,7 @@ import {
 } from "@ionic/react";
 import axios from "axios";
 import "./UserProfile.css";
-import AuthService from "../AuthService";
+import AuthService from "../utils/AuthService";
 import Navbar from "../components/navbar";
 
 const UserProfile: React.FC = () => {
