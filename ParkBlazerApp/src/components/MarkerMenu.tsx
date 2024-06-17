@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
 import { globalSelectingLocation, setGlobalSelectingLocation, globalLatitude, globalLongitude } from './map';
+import AuthService from '../AuthService';
 
 
 export const MarkerMenu: React.FC = () => {
@@ -39,6 +40,8 @@ export const MarkerMenu: React.FC = () => {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationColor, setNotificationColor] = useState('success');
   const [firstopenSelectionMap, setFirstopenSelectionMap] = useState(false);
+
+  const token = AuthService.getToken();
 
 
   const toggleMenu = () => {
@@ -109,7 +112,8 @@ export const MarkerMenu: React.FC = () => {
         const response = await fetch('https://server-y2mz.onrender.com/api/create_parkingspot', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
             name: title,
