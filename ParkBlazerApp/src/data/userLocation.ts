@@ -10,7 +10,7 @@ function setUserLocation(latitude: number, longitude: number) {
     userLocation.longitude = longitude;
 }
 
-function findUserLocation() {    
+function findUserLocation() {
     if (!navigator.geolocation) {
         console.error('Geolocation is not supported by this browser.');
         return;
@@ -20,7 +20,7 @@ function findUserLocation() {
         if (position.coords.accuracy > 200) {
             console.error('The accuracy of the location is too low.');
             return;
-        }        
+        }
         setUserLocation(position.coords.latitude, position.coords.longitude);
     }, (error) => {
         console.error('Error getting user location', error);
