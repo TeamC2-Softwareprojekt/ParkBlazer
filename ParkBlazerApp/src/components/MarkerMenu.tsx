@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel } from '@ionic/react';
+import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
 import { globalSelectingLocation, setGlobalSelectingLocation, globalLatitude, globalLongitude } from './map';
 import AuthService from '../AuthService';
@@ -23,6 +23,8 @@ export const MarkerMenu: React.FC = () => {
   const [typeCar, setTypeCar] = useState<boolean>(false);
   const [typeBike, setTypeBike] = useState<boolean>(false);
   const [typeTruk, setTypeTruk] = useState<boolean>(false);
+  const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
   const [errorLatitude, setErrorLatitude] = useState<string>('');
   const [errorLongitude, setErrorLongitude] = useState<string>('');
@@ -67,6 +69,39 @@ export const MarkerMenu: React.FC = () => {
   };
 
   const validateField = (value: string): boolean => { return value.trim().length > 0; };
+
+  const fetchAddress = async (lat: string, lng: string) => {
+    const apiKey = '0vf8x75eZh1xvgkTcJfy_yIomOKw5ww0YIuJanRkzmU';
+    try {
+      const response = await fetch(`https://revgeocode.search.hereapi.com/v1/revgeocode?at=${lat},${lng}&lang=en-US&apikey=${apiKey}`);
+      const data = await response.json();
+  
+      if (data.items && data.items.length > 0) {
+        const address = data.items[0].address;
+        setStreet(address.street || '');
+        setHouseNumber(address.houseNumber || '');
+        setZip(address.postalCode || '');
+        setCity(address.city || '');
+        setCountry(address.countryName || '');
+  
+        // Set country select to the found country
+        const countryOption = countries.find(country => country.label === address.countryName);
+        if (countryOption) {
+          setSelectedCountry(countryOption.value);
+          setCountry(countryOption.value); 
+        }
+      } else {
+        setNotificationMessage('Keine Adresse gefunden.');
+        setNotificationColor('danger');
+        setShowNotification(true);
+      }
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Adresse:', error);
+      setNotificationMessage('Fehler beim Abrufen der Adresse.');
+      setNotificationColor('danger');
+      setShowNotification(true);
+    }
+  };
   
   const handleSaveCoordinates = async () => {
     const lat = parseFloat(latitude);
@@ -173,6 +208,7 @@ export const MarkerMenu: React.FC = () => {
         }
         setLatitude(position.coords.latitude.toString()); 
         setLongitude(position.coords.longitude.toString()); 
+        fetchAddress(position.coords.latitude.toString(), position.coords.longitude.toString());
         openModalCoordinates(); 
       },
       (error) => {
@@ -205,11 +241,46 @@ export const MarkerMenu: React.FC = () => {
       setFirstopenSelectionMap(true);
     }
   }, [globalSelectingLocation]);
+  
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch('https://restcountries.com/v3.1/all');
+        if (!response.ok) {
+          throw new Error('Netzwerkantwort war nicht okay');
+        }
+        const data = await response.json();
+        const countryOptions = data.map((country: any) => ({
+          value: country.cca2,
+          label: country.name.common
+        }));
+
+        const preferredCountries = ['DE', 'US', 'FR'].map(code => 
+          countryOptions.find((country: { value: string; }) => country.value === code)
+        ).filter(Boolean);
+
+        const otherCountries = countryOptions.filter((country: any) => !preferredCountries.includes(country))
+          .sort((a: { label: string; }, b: { label: any; }) => a.label.localeCompare(b.label));
+
+        const sortedCountryOptions = [
+          ...preferredCountries,
+          ...otherCountries
+        ];
+
+        setCountries(sortedCountryOptions);
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Länder:', error);
+      }
+    };
+
+    fetchCountries();
+  }, []);
 
   const handleSelectLocationOnMapAfterClicking = () => { 
     if(globalLatitude && globalLongitude) { 
       setLatitude(globalLatitude.toString()); 
       setLongitude(globalLongitude.toString()); 
+      fetchAddress(globalLatitude.toString(), globalLongitude.toString());
     }
     openModalCoordinates();
   };
@@ -263,9 +334,6 @@ export const MarkerMenu: React.FC = () => {
           </IonButton>
           <IonButton expand="block" onClick={handleSelectLocationOnMap}>
             Auf der Karte auswählen
-          </IonButton>
-          <IonButton expand="block" onClick={openModalCoordinates}>
-            Koordinaten eingeben
           </IonButton>
           <IonButton expand="block" color="danger" onClick={closeModal}>
             Abbrechen
@@ -327,7 +395,20 @@ export const MarkerMenu: React.FC = () => {
             </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Land: </IonLabel>
-              <IonInput value={country} onIonChange={e => setCountry(e.detail.value || '')} />
+              <IonSelect
+                value={selectedCountry}
+                placeholder="Wählen Sie ein Land"
+                onIonChange={e => {
+                  setSelectedCountry(e.detail.value);
+                  setCountry(e.detail.value);
+                }}
+              >
+                {countries.map(country => (
+                  <IonSelectOption key={country.value} value={country.value}>
+                    {country.label}
+                  </IonSelectOption>
+                ))}
+              </IonSelect>
               {errorCountry && <IonText color="danger">{errorCountry}</IonText>}
             </IonItem>
             <IonItem>
