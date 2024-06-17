@@ -26,8 +26,6 @@ export const MarkerMenu: React.FC = () => {
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
-  const [errorLatitude, setErrorLatitude] = useState<string>('');
-  const [errorLongitude, setErrorLongitude] = useState<string>('');
   const [errorTitle, setErrorTitle] = useState<string>('');
   const [errorDescription, setErrorDescription] = useState<string>('');
   const [errorAvailableSpaces, setErrorAvailableSpaces] = useState<string>('');
@@ -44,7 +42,6 @@ export const MarkerMenu: React.FC = () => {
   const [firstopenSelectionMap, setFirstopenSelectionMap] = useState(false);
 
   const token = AuthService.getToken();
-
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -108,8 +105,6 @@ export const MarkerMenu: React.FC = () => {
     const lng = parseFloat(longitude);
     let valid = true;
     const validations = [
-      { isValid: !isNaN(lat) && lat >= -90 && lat <= 90, message: 'Bitte geben Sie einen gültigen Breitengrad zwischen -90 und 90 ein.', setError: setErrorLatitude },
-      { isValid: !isNaN(lng) && lng >= -180 && lng <= 180, message: 'Bitte geben Sie einen gültigen Längengrad zwischen -180 und 180 ein.', setError: setErrorLongitude },
       { isValid: validateField(title), message: 'Bitte geben Sie einen Titel ein.', setError: setErrorTitle },
       { isValid: validateField(street), message: 'Bitte geben Sie eine Adresse ein.', setError: setErrorStreet },
       { isValid: validateField(description), message: 'Bitte geben Sie eine Beschreibung ein.', setError: setErrorDescription },
@@ -297,8 +292,6 @@ export const MarkerMenu: React.FC = () => {
     setZip('');
     setCity('');
     setCountry('');
-    setErrorLatitude('');
-    setErrorLongitude('');
     setErrorTitle('');
     setErrorDescription('');
     setErrorAvailableSpaces('');
@@ -348,16 +341,6 @@ export const MarkerMenu: React.FC = () => {
         </IonHeader>
         <IonContent className="ion-padding">
           <IonList>
-            <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Breitengrad: </IonLabel>
-              <IonInput type="number" value={latitude} onIonChange={e => setLatitude(e.detail.value || '')} />
-              {errorLatitude && <IonText color="danger">{errorLatitude}</IonText>}
-            </IonItem>
-            <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Längengrad: </IonLabel>
-              <IonInput type="number" value={longitude} onIonChange={e => setLongitude(e.detail.value || '')} />
-              {errorLongitude && <IonText color="danger">{errorLongitude}</IonText>}
-            </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Titel: </IonLabel>
               <IonInput value={title} onIonChange={e => setTitle(e.detail.value || '')} />
