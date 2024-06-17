@@ -10,15 +10,14 @@ import {
   IonText
 } from "@ionic/react";
 import AuthService from "../AuthService";
-import "./Login.css";
 import Navbar from "../components/navbar";
 
-const Login: React.FC = () => {
+const ResetPassword: React.FC = () => {
   const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const [emailValid, setEmailValid] = useState<boolean>(false);
   const [isEmailTouched, setIsEmailTouched] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const history = useHistory();
 
   // Validate the email of the input
@@ -38,25 +37,15 @@ const Login: React.FC = () => {
     }
   };
 
-  // Handle every password change
-  const handlePasswordChange = (event: CustomEvent) => {
-    setPassword(event.detail.value!);
-  };
-
-  // Handle the user login
-  const handleLogin = async () => {
+  // Handle the password reset request
+  const handleResetPassword = async () => {
     setError("");
+    setSuccess("");
     try {
-      await AuthService.login(email, password);
-      history.push("/home");
+      setSuccess("Eine E-Mail zum Zurücksetzen des Passworts wurde gesendet.");
     } catch (error: any) {
       setError(error.message);
     }
-  };
-
-  const handleResetPassword = () => {
-    // Navigate to reset password page
-    window.location.href = 'http://localhost:8100/reset-password';
   };
 
   return (
@@ -67,7 +56,7 @@ const Login: React.FC = () => {
         <IonCol size="12" size-sm="8" size-md="8">
           <div className="login-container">
             <IonText color="primary" className="login-title">
-              <h1 className="login-heading">LOGIN</h1>
+              <h1 className="login-heading">PASSWORT ZURÜCKSETZEN</h1>
             </IonText>
             <IonInput
               className={`login-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
@@ -79,31 +68,16 @@ const Login: React.FC = () => {
               onIonInput={handleEmailChange}
               value={email}
             />
-            <IonInput
-              className="login-input"
-              type="password"
-              fill="solid"
-              label="Password"
-              labelPlacement="floating"
-              onIonInput={handlePasswordChange}
-              value={password}
-            />
             <IonButton
               expand="block"
-              onClick={handleLogin}
+              onClick={handleResetPassword}
               className="login-button"
-              disabled={!email || !password || !emailValid}
+              disabled={!email || !emailValid}
             >
-              Login
+              Passwort zurücksetzen
             </IonButton>
-            <IonButton
-                expand="block"
-                onClick={handleResetPassword}
-                className="reset-password-button"
-              >
-                Passwort zurücksetzen
-              </IonButton>
             {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
+            {success && <IonAlert isOpen={!!success} message={success} buttons={["OK"]} />}
           </div>
         </IonCol>
       </IonRow>
@@ -112,4 +86,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;

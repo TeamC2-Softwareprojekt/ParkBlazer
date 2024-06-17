@@ -23,6 +23,7 @@ const AuthService = {
     }
   },
 
+
   // Logut the current user
   logout: () => {
     localStorage.removeItem(TOKEN_KEY);

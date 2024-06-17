@@ -8,6 +8,7 @@ import Registration from './pages/Registration';
 import UserProfile from './pages/Userprofile';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
+import ResetPassword from './pages/ResetPassword';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -73,9 +74,16 @@ const App: React.FC = () => (
         </Route>
         <Route path="/userprofile">
           {AuthService.isLoggedIn() ? (
-            <UserProfile/>
+            <UserProfile />
           ) : (
             <Redirect to="/home" />
+          )}
+        </Route>
+        <Route path="/reset-password" exact={true}>
+          {AuthService.isLoggedIn() ? (
+            <Redirect to="/home" />
+          ) : (
+            <ResetPassword />
           )}
         </Route>
         <Route>
@@ -85,5 +93,6 @@ const App: React.FC = () => (
     </IonReactRouter>
   </IonApp>
 );
+
 
 export default App;
