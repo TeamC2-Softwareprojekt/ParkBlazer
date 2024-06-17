@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption } from '@ionic/react';
+import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
 import { globalSelectingLocation, setGlobalSelectingLocation, globalLatitude, globalLongitude } from './map';
 import AuthService from '../AuthService';
@@ -40,6 +40,7 @@ export const MarkerMenu: React.FC = () => {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationColor, setNotificationColor] = useState('success');
   const [firstopenSelectionMap, setFirstopenSelectionMap] = useState(false);
+  const [alert, setAlert] = useState(false);
 
   const token = AuthService.getToken();
 
@@ -169,6 +170,7 @@ export const MarkerMenu: React.FC = () => {
           setNotificationMessage('Parkplatz erfolgreich gespeichert.');
           setNotificationColor('success');
           setShowNotification(true);
+          setAlert(true);
           console.log('Erfolgreich gespeichert:', data);
           resetAttributes();
         } else {
@@ -419,6 +421,16 @@ export const MarkerMenu: React.FC = () => {
         message={notificationMessage}
         color={notificationColor}
         duration={2000}
+      />
+      <IonAlert
+        isOpen={alert}
+        onDidDismiss={() => {
+          setAlert(false);
+          window.location.reload(); // Seite neu laden
+        }}
+        header={"Successful"}
+        message={"Parkplatz erfolgreich erstellt."}
+        buttons={["OK"]}
       />
     </>
   );
