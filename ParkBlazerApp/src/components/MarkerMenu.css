@@ -25,3 +25,20 @@
 #document-explanation div {
     padding: 10px;
 }
+
+#availability-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#date-container {
+    display: flex;
+    flex-direction: row;
+}
+
+#date-container ion-datetime {
+    margin: 5px;
+    min-width: 230px;
+}

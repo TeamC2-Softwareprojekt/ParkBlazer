@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonPopover } from '@ionic/react';
+import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonPopover, IonDatetime } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
 import './MarkerMenu.css';
+import AuthService from '../AuthService';
 
 function MarkerMenu() {
   const [showMenu, setShowMenu] = useState(false);
@@ -24,6 +25,8 @@ function MarkerMenu() {
   const [privateSpot, setPrivateSpot] = useState<boolean>(false);
   const [pricePerHour, setPricePerHour] = useState<number>();
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(new Date());
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(new Date());
 
   const [errorLatitude, setErrorLatitude] = useState<string>('');
   const [errorLongitude, setErrorLongitude] = useState<string>('');
@@ -38,6 +41,7 @@ function MarkerMenu() {
   const [errorCountry, setErrorCountry] = useState<string>('');
   const [errorPricePerHour, setErrorPricePerHour] = useState<string>('');
   const [errorDocument, setErrorDocument] = useState<string>('');
+  const [errorDate, setErrorDate] = useState<string>('');
 
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
@@ -87,6 +91,7 @@ function MarkerMenu() {
       { isValid: validateField(country), message: 'Bitte geben Sie ein Land ein.', setError: setErrorCountry },
       { isValid: !privateSpot || pricePerHour !== undefined, message: 'Bitte geben Sie einen Preis pro Stunde ein.', setError: setErrorPricePerHour },
       { isValid: !privateSpot || selectedDocument !== null, message: 'Bitte laden Sie ein Dokument hoch.', setError: setErrorDocument },
+      { isValid: !privateSpot || selectedStartDate! < selectedEndDate! && valid, message: 'Der Startzeitpunkt muss vor dem Endzeitpunkt liegen.', setError: setErrorDate}
     ];
     validations.forEach(({ isValid, message, setError }) => {
       if (!isValid) {
@@ -112,15 +117,8 @@ function MarkerMenu() {
           setShowNotification(true);
           return;
         }
-        // Send spot to server
-        if (privateSpot) {console.log("private spot"); return;} // TODO
-        return;
-        const response = await fetch('https://server-y2mz.onrender.com/api/create_parkingspot', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
+
+        let data = JSON.stringify({
             name: title,
             description: description,
             type: 'public',
@@ -136,7 +134,22 @@ function MarkerMenu() {
             type_car: typeCar ? '1' : '0',
             type_bike: typeBike ? '1' : '0',
             type_truk: typeTruk ? '1' : '0',
-          })
+            price_per_hour: privateSpot ? pricePerHour : undefined,
+            availability_start_date: privateSpot ? selectedStartDate?.toISOString() : undefined,
+            availability_end_date: privateSpot ? selectedEndDate?.toISOString() : undefined,
+            document: privateSpot ? selectedDocument : undefined
+        });
+
+        let url = 'https://server-y2mz.onrender.com/api/create_parkingspot';
+        if (privateSpot) url = 'https://server-y2mz.onrender.com/api/create_privateparkingspot';
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${AuthService.getToken()}`
+            },
+            body: data
         });
 
         if (response.ok) {
@@ -340,6 +353,18 @@ function MarkerMenu() {
                         <IonIcon src="src\icons\information-circle-outline.svg" id='document-information-icon' ></IonIcon>
                         <IonPopover trigger="document-information" id="document-explanation">Ein Dokument, das beweist, dass Sie diesen Parkplatz besitzen und vermieten können.</IonPopover>
                     </IonButton>
+            </IonItem>
+            <IonItem style={{display: privateSpot ? "" : "none"}}>
+                <div id="availability-container">
+                    <div>
+                        <IonLabel>Verfügbarkeitszeitraum</IonLabel>
+                        {errorDate && <IonText id='error-document-input' color="danger">{errorDate}</IonText>}
+                    </div>
+                    <div id="date-container">
+                    <IonDatetime onIonChange={e => {setSelectedStartDate(new Date(String(e.detail.value))); setErrorDate('');}} id="start-date"/>
+                    <IonDatetime onIonChange={e => {setSelectedEndDate(new Date(String(e.detail.value))); setErrorDate('');}} id="end-date"/>
+                    </div>
+                </div>
             </IonItem>
           </IonList>
           <IonButton expand="block" id='marker-submit' onClick={handleSaveCoordinates}>
