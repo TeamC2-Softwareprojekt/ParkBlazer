@@ -13,11 +13,11 @@ function Navbar() {
     const handleLogout = () => {
         AuthService.logout();
         setLoggedIn(false);
-        history.push('/home');
+        window.open('/home',"_self");
     };
 
     const handleLogoClick = () => {
-        history.push('/home');
+        window.open('/home',"_self");
     };
 
     const handleUserMenu = async () => {
@@ -39,9 +39,6 @@ function Navbar() {
         }
     };
 
-    useEffect(() => {
-        setLoggedIn(AuthService.isLoggedIn());
-    }, []);
 
     return (
         <IonHeader color="light">
@@ -50,7 +47,7 @@ function Navbar() {
                 <IonButton
                     id="popover-button"
                     slot="end"
-                    onClick={loggedIn ? handleUserMenu : undefined}
+                    onClick={AuthService.isLoggedIn() ? handleUserMenu : undefined}
                 >
                     <IonAvatar id='nav-avatar' aria-hidden="true">
                         <img alt="Avatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
@@ -59,7 +56,7 @@ function Navbar() {
                 <IonPopover trigger="popover-button" dismissOnSelect={true}>
                     <IonContent>
                         <IonList>
-                            {loggedIn ? (
+                            {AuthService.isLoggedIn() ? (
                                 <>
                                     <IonItem id='user-name'>
                                         {username && (<IonText>Hallo, {username}</IonText>)}

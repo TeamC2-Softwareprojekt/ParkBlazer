@@ -69,7 +69,7 @@ export default function Map({onUpdateList, onLocationMarkerUpdate}: any) {
 
       const popupContent = `
         <div style="color: black">
-          <h3>${spot.name}</h3>
+          <h3 cursor="pointer" onclick="window.location.href='http://localhost:8100/parkingspot_details/${spot.parkingspot_id}'">${spot.name}</h3>
           <p>${spot.description}</p>
           <p>Verfügbare Plätze: ${spot.available_spaces}</p>
           <p>${spot.image_url ? `<img src="${spot.image_url}" alt="Parkplatzbild" style="max-width: 100px;">` : ''}</p>
