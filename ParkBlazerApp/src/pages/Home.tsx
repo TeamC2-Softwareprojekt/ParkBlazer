@@ -34,13 +34,11 @@ function Home() {
 
     if (!event) {
       currentFilterParams = { ...currentFilterParams, currentSearchCenter: [] };
-      currentFilterParamsRef.current = currentFilterParams;
       updateDistancesToUserLocation(currentFilterParams);
-      applyFilter(currentFilterParams);
-      return;
+    } else {
+        currentFilterParams = { ...currentFilterParams, currentSearchCenter: [event.center[1], event.center[0]] };
     }
-
-    currentFilterParams = { ...currentFilterParams, currentSearchCenter: [event.center[1], event.center[0]] };
+    
     currentFilterParamsRef.current = currentFilterParams;
     applyFilter(currentFilterParams);
   }
