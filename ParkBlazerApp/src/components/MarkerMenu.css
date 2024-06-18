@@ -22,7 +22,7 @@
     padding: 10px;
 }
 
-#document-explanation div {
+#document-explanation > div {
     padding: 10px;
 }
 
