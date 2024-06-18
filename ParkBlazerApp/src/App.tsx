@@ -5,11 +5,11 @@ import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Registration from './pages/Registration';
-
-
-
+import UserProfile from './pages/UserProfile';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
+import ParkingspotDetails from './pages/ParkinspotDetails';
+
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -40,7 +40,8 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import AuthService from './AuthService';
+import AuthService from './utils/AuthService';
+
 
 setupIonicReact();
 
@@ -57,6 +58,9 @@ const App: React.FC = () => (
         <Route path="/message/:id">
           <ViewMessage />
         </Route>
+        <Route path="/parkingspot_details/:id">
+          <ParkingspotDetails />
+        </Route>
         <Route path="/login">
           {AuthService.isLoggedIn() ? (
             <Redirect to="/home" />
@@ -70,6 +74,16 @@ const App: React.FC = () => (
           ) : (
             <Registration />
           )}
+        </Route>
+        <Route path="/userprofile">
+          {AuthService.isLoggedIn() ? (
+            <UserProfile/>
+          ) : (
+            <Redirect to="/home" />
+          )}
+        </Route>
+        <Route>
+          <Redirect to="/home" />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

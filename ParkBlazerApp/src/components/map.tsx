@@ -31,16 +31,18 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
       center: [8.9167, 52.2833],
       zoom: zoom
     });
+
     window.onload = () => map.current?.resize();
 
     const fetchParkingSpaces = async () => {
         await initParkingSpaces();
         displayParkingSpotsOnMap();
     }
+
     setMapController(createMapLibreGlMapController(map.current, maplibregl));
     getUserLocation();
     fetchParkingSpaces();
-    }, []);
+  }, []);
 
   useEffect(() => {
     if (markerIsSet && locationCheckInterval !== null) {
@@ -60,17 +62,16 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
     };
   }, [markerIsSet]);
 
-
   function handleSearch(event: any) {
     onUpdateList(event);
-  };
+  }
   
   const displayParkingSpotsOnMap = () => {
     if (!map.current) return;
-  
+
     parkingspaces?.forEach((spot) => {
       const getAvailabilityIcon = (available: number) => available === 1 ? '✔' : '✖';
-  
+
       const popupContent = `
         <div style="color: black">
           <h3>${spot.name}</h3>
@@ -84,7 +85,7 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
           <p>Lastwagen: ${getAvailabilityIcon(spot.type_truck)}</p>
         </div>
       `;
-  
+
       new maptilersdk.Marker({ color: "#FF0000" })
         .setLngLat([spot.longitude, spot.latitude])
         .setPopup(new maptilersdk.Popup().setHTML(popupContent))
@@ -126,7 +127,7 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
       </div>
       <div ref={mapContainer} className="map" />
       <div className="marker-container"> 
-        <MarkerMenu/> 
+      <MarkerMenu/>
       </div>
     </div>
   );
