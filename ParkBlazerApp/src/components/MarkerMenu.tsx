@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert } from '@ionic/react';
+import React, { useEffect, useRef, useState } from 'react';
+import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert, IonPopover, IonDatetime  } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
+import './MarkerMenu.css';
 import { map } from './map';
-import AuthService from '../AuthService';
-
+import AuthService from '../utils/AuthService';
+import { parkingspaces } from '../data/parkingSpaces';
 
 export const MarkerMenu: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -23,6 +24,11 @@ export const MarkerMenu: React.FC = () => {
   const [typeCar, setTypeCar] = useState<boolean>(false);
   const [typeBike, setTypeBike] = useState<boolean>(false);
   const [typeTruk, setTypeTruk] = useState<boolean>(false);
+  const [privateSpot, setPrivateSpot] = useState<boolean>(false);
+  const [pricePerHour, setPricePerHour] = useState<number>();
+  const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(new Date());
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(new Date());
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
@@ -35,6 +41,9 @@ export const MarkerMenu: React.FC = () => {
   const [errorZip, setErrorZip] = useState<string>('');
   const [errorCity, setErrorCity] = useState<string>('');
   const [errorCountry, setErrorCountry] = useState<string>('');
+  const [errorPricePerHour, setErrorPricePerHour] = useState<string>('');
+  const [errorDocument, setErrorDocument] = useState<string>('');
+  const [errorDate, setErrorDate] = useState<string>('');
 
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
@@ -52,13 +61,15 @@ export const MarkerMenu: React.FC = () => {
     map.current?.off('click', handleMapClick);
   }
 
+  const documentInputRef = useRef<HTMLInputElement>(null);
+
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
 
   const openModal = () => {
     setShowModal(true);
-    setShowMenu(false); 
+    setShowMenu(false);
   };
 
   const openModalCoordinates = () => {
@@ -122,6 +133,9 @@ export const MarkerMenu: React.FC = () => {
       { isValid: validateField(zip), message: 'Bitte geben Sie eine Postleitzahl ein.', setError: setErrorZip },
       { isValid: validateField(city), message: 'Bitte geben Sie eine Stadt ein.', setError: setErrorCity },
       { isValid: validateField(country), message: 'Bitte geben Sie ein Land ein.', setError: setErrorCountry },
+      { isValid: !privateSpot || pricePerHour, message: 'Bitte geben Sie einen Preis pro Stunde ein.', setError: setErrorPricePerHour },
+      { isValid: !privateSpot || selectedDocument, message: 'Bitte laden Sie ein Dokument hoch.', setError: setErrorDocument },
+      { isValid: !privateSpot || selectedStartDate! < selectedEndDate! && valid, message: 'Der Startzeitpunkt muss vor dem Endzeitpunkt liegen.', setError: setErrorDate }
     ];
     validations.forEach(({ isValid, message, setError }) => {
       if (!isValid) {
@@ -132,77 +146,79 @@ export const MarkerMenu: React.FC = () => {
       }
     });
 
-    if (valid) {
-      try {
-        const existingSpotsResponse = await fetch('https://server-y2mz.onrender.com/api/get_parkingspots');
-        const existingSpots = await existingSpotsResponse.json();
+    if (!valid) return;
 
-        const spotExists = existingSpots.some((spot: { latitude: number; longitude: number; name: string; }) => 
-          (spot.latitude === lat && spot.longitude === lng) || spot.name === title
-        );
+    const spotExists = parkingspaces.some((spot: { latitude: number; longitude: number; name: string; }) =>
+      (spot.latitude === lat && spot.longitude === lng) || spot.name === title
+    );
 
-        if (spotExists) {
-          setNotificationMessage('Parkplatz existiert bereits.');
-          setNotificationColor('danger');
-          setShowNotification(true);
-          return;
-        }
-        // Send spot to server
-        const response = await fetch('https://server-y2mz.onrender.com/api/create_parkingspot', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            name: title,
-            description: description,
-            type: 'public',
-            available_spaces: availableSpaces,
-            image_url: image,
-            latitude: latitude,
-            longitude: longitude,
-            street: street,
-            house_number: houseNumber,
-            zip: zip,
-            city: city,
-            country: country,
-            type_car: typeCar ? '1' : '0',
-            type_bike: typeBike ? '1' : '0',
-            type_truk: typeTruk ? '1' : '0',
-          })
-        });
+    if (spotExists) {
+      setNotificationMessage('Parkplatz existiert bereits.');
+      setNotificationColor('danger');
+      setShowNotification(true);
+      return;
+    }
 
-        if (response.ok) {
-          const data = await response.json();
-          setNotificationMessage('Parkplatz erfolgreich gespeichert.');
-          setNotificationColor('success');
-          setShowNotification(true);
-          setAlert(true);
-          console.log('Erfolgreich gespeichert:', data);
-          resetAttributes();
-        } else {
-          const errorData = await response.json();
-          setNotificationMessage(errorData.message || 'Error saving spot.');
-          setNotificationColor('danger');
-          setShowNotification(true);
-          console.error('Error savin spot:', errorData);
-        }
-      } catch (error) {
-        console.error('Error savin spot:', error);
-        setNotificationMessage('Error savin spot');
+    let data = JSON.stringify({
+      name: title,
+      description: description,
+      type: 'public',
+      available_spaces: availableSpaces,
+      image_url: image,
+      latitude: latitude,
+      longitude: longitude,
+      street: street,
+      house_number: houseNumber,
+      zip: zip,
+      city: city,
+      country: country,
+      type_car: typeCar ? '1' : '0',
+      type_bike: typeBike ? '1' : '0',
+      type_truk: typeTruk ? '1' : '0',
+      price_per_hour: privateSpot ? pricePerHour : undefined,
+      availability_start_date: privateSpot ? selectedStartDate?.toISOString() : undefined,
+      availability_end_date: privateSpot ? selectedEndDate?.toISOString() : undefined,
+      document: privateSpot ? selectedDocument : undefined
+    });
+
+    let url = 'https://server-y2mz.onrender.com/api/create_parkingspot';
+    if (privateSpot) url = 'https://server-y2mz.onrender.com/api/create_privateparkingspot';
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${AuthService.getToken()}`
+        },
+        body: data
+      });
+
+      if (response.ok) {
+        setNotificationMessage('Parkingspace saved successfully.');
+        setNotificationColor('success');
+        setShowNotification(true);
+        resetAttributes();
+      } else {
+        const errorData = await response.json();
+        setNotificationMessage(errorData.message || 'Error while saving.');
         setNotificationColor('danger');
         setShowNotification(true);
-        console.error('Error savin spot:', error);
+        console.error('Error while saving:', errorData);
       }
-
-      closeModalCoordinates();
+    } catch (error) {
+      console.error('Fehler beim Speichern:', error);
+      setNotificationMessage('Fehler beim Speichern.');
+      setNotificationColor('danger');
+      setShowNotification(true);
+      console.error('Fehler beim Speichern:', error);
     }
+    closeModalCoordinates();
   };
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) return;
-    
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         if (position.coords.accuracy > 200) {
@@ -215,8 +231,8 @@ export const MarkerMenu: React.FC = () => {
         setLongitude(position.coords.longitude.toString()); 
         fetchAddress(position.coords.latitude.toString(), position.coords.longitude.toString());
         openModalCoordinates(); 
-      },
-      (error) => {
+
+    }, (error) => {
         console.error('Error catching location:', error);
         setNotificationMessage('Error catching current location.');
         setNotificationColor('danger');
@@ -282,6 +298,8 @@ export const MarkerMenu: React.FC = () => {
     setZip('');
     setCity('');
     setCountry('');
+    setPricePerHour(undefined);
+    setSelectedDocument(null);
     setErrorTitle('');
     setErrorDescription('');
     setErrorAvailableSpaces('');
@@ -291,6 +309,8 @@ export const MarkerMenu: React.FC = () => {
     setErrorZip('');
     setErrorCity('');
     setErrorCountry('');
+    setErrorPricePerHour('');
+    setErrorDocument('');
   };
 
   return (
@@ -337,32 +357,32 @@ export const MarkerMenu: React.FC = () => {
               {errorTitle && <IonText id='error-title-input' color="danger">{errorTitle}</IonText>}
             </IonItem>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Beschreibung: </IonLabel>
+              <IonLabel style={{ marginRight: '10px' }}>Beschreibung: </IonLabel>
               <IonInput id='description-input' value={description} onIonChange={e => setDescription(e.detail.value || '')} />
               {errorDescription && <IonText id='error-description-input' color="danger">{errorDescription}</IonText>}
             </IonItem>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Anzahl Parkplätze: </IonLabel>
+              <IonLabel style={{ marginRight: '10px' }}>Anzahl Parkplätze: </IonLabel>
               <IonInput id='available-spaces-input' value={availableSpaces} onIonChange={e => setAvailableSpaces(e.detail.value || '')} />
               {errorAvailableSpaces && <IonText id='error-available-spaces-input' color="danger">{errorAvailableSpaces}</IonText>}
             </IonItem>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Straße: </IonLabel>
+              <IonLabel style={{ marginRight: '10px' }}>Straße: </IonLabel>
               <IonInput id='street-input' value={street} onIonChange={e => setStreet(e.detail.value || '')} />
               {errorStreet && <IonText id='error-street-input' color="danger">{errorStreet}</IonText>}
             </IonItem>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Hausnummer: </IonLabel>
+              <IonLabel style={{ marginRight: '10px' }}>Hausnummer: </IonLabel>
               <IonInput id='house-number-input' value={houseNumber} onIonChange={e => setHouseNumber(e.detail.value || '')} />
               {errorHouseNumber && <IonText id='error-house-number-input' color="danger">{errorHouseNumber}</IonText>}
             </IonItem>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>PLZ: </IonLabel>
+              <IonLabel style={{ marginRight: '10px' }}>PLZ: </IonLabel>
               <IonInput id='zip-input' value={zip} onIonChange={e => setZip(e.detail.value || '')} />
               {errorZip && <IonText id='error-zip-input' color="danger">{errorZip}</IonText>}
             </IonItem>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Stadt: </IonLabel>
+              <IonLabel style={{ marginRight: '10px' }}>Stadt: </IonLabel>
               <IonInput id='city-input' value={city} onIonChange={e => setCity(e.detail.value || '')} />
               {errorCity && <IonText id='error-city-input' color="danger">{errorCity}</IonText>}
             </IonItem>
@@ -385,15 +405,46 @@ export const MarkerMenu: React.FC = () => {
               {errorCountry && <IonText color="danger">{errorCountry}</IonText>}
             </IonItem>
             <IonItem>
-              PKW<IonCheckbox checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
-              Fahrrad<IonCheckbox checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
-              LKW<IonCheckbox checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
+              PKW<IonCheckbox class="marker-menu-checkbox" checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
+              Fahrrad<IonCheckbox class="marker-menu-checkbox" checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
+              LKW<IonCheckbox class="marker-menu-checkbox" checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
             </IonItem>
             <IonItem>
               <IonLabel style={{ marginRight: '10px' }}>Bild-URL: </IonLabel>
               <IonInput value={image} onIonChange={e => setImage(e.detail.value || '')} />
               {errorImage && <IonText color="danger">{errorImage}</IonText>}
             </IonItem>
+            <IonItem>
+              Privat<IonCheckbox class="marker-menu-checkbox" checked={privateSpot} onIonChange={e => setPrivateSpot(e.detail.checked)} />
+            </IonItem>
+            <div style={{ display: privateSpot ? "" : "none" }}>
+              <IonItem>
+                <IonInput onInput={e => { setPricePerHour(Number((e.target as HTMLInputElement).value)); setErrorPricePerHour('') }} value={pricePerHour} class="price-input" label="Preis pro Stunde" type="number" placeholder="0€" labelPlacement="stacked" inputMode="numeric" min={0} />
+                {errorPricePerHour && <IonText id='error-price-per-hour-input' color="danger">{errorPricePerHour}</IonText>}
+              </IonItem>
+              <IonItem>
+                <input type="file" ref={documentInputRef} style={{ display: "none" }} onChange={e => setSelectedDocument(e.target.value)} />
+                <IonButton onClick={() => { documentInputRef.current?.click(); setErrorDocument('') }}>Dokument hochladen</IonButton>
+                {errorDocument && <IonText color="danger">{errorDocument}</IonText>}
+                <label>{selectedDocument?.split('\\')[2]}</label>
+                <IonButton id="document-information">
+                  <IonIcon src="src\icons\information-circle-outline.svg" id='document-information-icon' />
+                  <IonPopover trigger="document-information" id="document-explanation">Ein Dokument, das beweist, dass Sie diesen Parkplatz besitzen und vermieten können.</IonPopover>
+                </IonButton>
+              </IonItem>
+              <IonItem>
+                <div id="availability-container">
+                  <div>
+                    <IonLabel>Verfügbarkeitszeitraum</IonLabel>
+                    {errorDate && <IonText color="danger">{errorDate}</IonText>}
+                  </div>
+                  <div id="date-container">
+                    <IonDatetime onIonChange={e => { setSelectedStartDate(new Date(String(e.detail.value))); setErrorDate(''); }} />
+                    <IonDatetime onIonChange={e => { setSelectedEndDate(new Date(String(e.detail.value))); setErrorDate(''); }} />
+                  </div>
+                </div>
+              </IonItem>
+            </div>
           </IonList>
           <IonButton expand="block" id='marker-submit' onClick={handleSaveCoordinates}>
             Speichern
