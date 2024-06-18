@@ -1,0 +1,59 @@
+ion-content.parkingspotdetails-content {
+	--padding-bottom: 1vh !important;
+	--padding-end: 5vw !important;
+	--padding-start: 5vw !important;
+	--padding-top: 1vh !important;
+}
+  
+.parkingspotdetails-content img {
+	max-width: 100%;
+	max-height: 50vh;
+	width: 100%;
+	object-fit: cover;
+}
+
+.parkingspotdetails-content .card-title.ion-inherit-color.md {
+	font-weight: bolder;
+	font-size: 1.5rem;
+}
+
+.parkingspotdetails-content #text-title {
+	font-weight: bold;
+	font-size: 1rem;
+}
+
+.parkingspotdetails-content ion-card {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.parkingspotdetails-content ion-grid.reviews {
+	padding: 0;
+}
+
+.parkingspotdetails-content ion-grid.reviews ion-col {
+	padding: 0;
+	margin-bottom: 5vh;
+}
+
+.parkingspotdetails-content ion-card-title {
+	font-size: 1.1rem;
+	font-weight: bold;
+	padding-bottom: 1vh;
+}
+
+#rate-parkingspot ion-grid, #rate-parkingspot ion-col {
+	padding: 0;
+}
+
+.star-rating {
+	padding: 0.8vh 0;
+}
+
+#average-rating .star-rating {
+	padding: 0;
+}
+
+#rate-parkingspot ion-button {
+	margin-top: 2vh;
+}

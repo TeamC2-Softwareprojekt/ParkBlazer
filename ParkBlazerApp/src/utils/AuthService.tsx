@@ -8,9 +8,9 @@ const AuthService = {
     try {
       // Send request to server
       const response = await axios.post('https://server-y2mz.onrender.com/api/login_user', {
-         email: email,
-         password: password
-        });
+        email: email,
+        password: password
+      });
       const token = response.data.token;
       localStorage.setItem(TOKEN_KEY, token);
       return token;

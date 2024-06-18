@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { IonButton, IonToolbar, IonTitle, IonHeader, IonAvatar, IonPopover, IonList, IonContent, IonItem, IonText } from '@ionic/react';
-import AuthService from '../AuthService';
+import AuthService from '../utils/AuthService';
 import { useHistory } from 'react-router-dom';
 import './navbar.css';
 import axios from 'axios';
@@ -16,6 +16,10 @@ function Navbar() {
         history.push('/home');
     };
 
+    const handleLogoClick = () => {
+        history.push('/home');
+    };
+
     const handleUserMenu = async () => {
         const token = AuthService.getToken();
         try {
@@ -25,7 +29,7 @@ function Navbar() {
                 }
             });
             const userDetails = response.data;
-            setUsername(userDetails.username);
+            setUsername(userDetails.userDetails[0].username);
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
                 throw new Error(error.response.data.message);
@@ -42,7 +46,7 @@ function Navbar() {
     return (
         <IonHeader color="light">
             <IonToolbar color="light">
-                <IonTitle>ParkBlazer</IonTitle>
+                <IonTitle id="navbar-title" onClick={handleLogoClick}>ParkBlazer</IonTitle>
                 <IonButton
                     id="popover-button"
                     slot="end"
@@ -60,7 +64,7 @@ function Navbar() {
                                     <IonItem id='user-name'>
                                         {username && (<IonText>Hallo, {username}</IonText>)}
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/user-profile">
+                                    <IonItem button={true} detail={false} routerLink="/userprofile">
                                         Profil
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
