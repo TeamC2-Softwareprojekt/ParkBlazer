@@ -24,11 +24,11 @@ function Navbar() {
                 <IonTitle>ParkBlazer</IonTitle>
                 <IonButtons slot="end">
                     {loggedIn ? (
-                        <IonButton onClick={handleLogout}>Logout</IonButton>
+                        <IonButton id="logout-button" onClick={handleLogout}>Logout</IonButton>
                     ) : (
                         <>
-                        <IonButton routerLink="/login">Login</IonButton>
-                        <IonButton routerLink="/registration">Registration</IonButton>
+                        <IonButton id="login-button" routerLink="/login">Login</IonButton>
+                        <IonButton id="registration-button" routerLink="/registration">Registration</IonButton>
                         </>
                         
                     )}
