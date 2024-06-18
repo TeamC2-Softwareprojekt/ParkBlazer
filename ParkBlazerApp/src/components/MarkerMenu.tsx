@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
-import { globalSelectingLocation, setGlobalSelectingLocation, globalLatitude, globalLongitude } from './map';
+import { map } from './map';
 import AuthService from '../AuthService';
 
 
@@ -39,12 +39,18 @@ export const MarkerMenu: React.FC = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationColor, setNotificationColor] = useState('success');
-  const [firstopenSelectionMap, setFirstopenSelectionMap] = useState(false);
   const [alert, setAlert] = useState(false);
 
   const token = AuthService.getToken();
 
-  
+  function handleMapClick(e: any) {
+    const coords = e.lngLat;
+    setLatitude(coords.lat.toString()); 
+    setLongitude(coords.lng.toString()); 
+    fetchAddress(coords.lat.toString(), coords.lng.toString());
+    openModalCoordinates();
+    map.current?.off('click', handleMapClick);
+  }
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -226,17 +232,8 @@ export const MarkerMenu: React.FC = () => {
     setNotificationMessage('Bitte wählen Sie einen Punkt auf der Karte aus.');
     setNotificationColor('success');
     setShowNotification(true);
-    setGlobalSelectingLocation(true);
+    map.current?.on('click', handleMapClick);
   };
-
-  useEffect(() => { 
-    if (!globalSelectingLocation) {
-      if(firstopenSelectionMap == true){
-        handleSelectLocationOnMapAfterClicking();
-      }
-      setFirstopenSelectionMap(true);
-    }
-  }, [globalSelectingLocation]);
   
   useEffect(() => {
     const fetchCountries = async () => {
@@ -271,15 +268,6 @@ export const MarkerMenu: React.FC = () => {
 
     fetchCountries();
   }, []);
-
-  const handleSelectLocationOnMapAfterClicking = () => { 
-    if(globalLatitude && globalLongitude) { 
-      setLatitude(globalLatitude.toString()); 
-      setLongitude(globalLongitude.toString()); 
-      fetchAddress(globalLatitude.toString(), globalLongitude.toString());
-    }
-    openModalCoordinates();
-  };
 
   const resetAttributes = () => {
     setLatitude('');

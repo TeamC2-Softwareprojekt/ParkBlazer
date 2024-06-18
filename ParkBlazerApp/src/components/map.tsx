@@ -11,13 +11,6 @@ import MarkerMenu from './MarkerMenu';
 import { initParkingSpaces, parkingspaces } from '../data/parkingSpaces';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
-export let globalSelectingLocation: boolean = false;
-export let globalLatitude: string = '';
-export let globalLongitude: string = '';
-
-export function setGlobalSelectingLocation(value: boolean) {
-  globalSelectingLocation = value;
-}
 
 export default function Map({onUpdateList}: {onUpdateList: any}) {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -49,17 +42,6 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
     setMapController(createMapLibreGlMapController(map.current, maplibregl));
     getUserLocation();
     fetchParkingSpaces();
-
-    map.current.on('click', (e) => {
-      console.log('Klick-Koordinaten:');
-      if (globalSelectingLocation) { 
-        const coords = e.lngLat;
-        globalLatitude = coords.lat.toString();
-        globalLongitude = coords.lng.toString();
-        setGlobalSelectingLocationChange();
-      }
-      console.log('Klick-Koordinaten: ' + e.lngLat.toString());
-    });
   }, []);
 
   useEffect(() => {
@@ -110,11 +92,6 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
         .addTo(map.current!);
     });
   };
-
-  const setGlobalSelectingLocationChange = () => { 
-    globalSelectingLocation = !globalSelectingLocation;
-  };
-
 
   const getUserLocation = () => {
     if (!navigator.geolocation) {
