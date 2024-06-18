@@ -8,7 +8,7 @@ import Registration from './pages/Registration';
 import UserProfile from './pages/UserProfile';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
-import ParkingspotDetails from './pages/ParkinspotDetails';
+import ParkingspotDetails from './pages/ParkingspotDetails';
 
 
 /* Core CSS required for Ionic components to work properly */

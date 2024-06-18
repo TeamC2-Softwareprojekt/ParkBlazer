@@ -9,16 +9,17 @@ import "@maptiler/sdk/dist/maptiler-sdk.css";
 import './map.css';
 import MarkerMenu from './MarkerMenu';
 import { initParkingSpaces, parkingspaces } from '../data/parkingSpaces';
+import { getUserLocation } from '../data/userLocation';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
-export default function Map({onUpdateList}: {onUpdateList: any}) {
+export default function Map({onUpdateList, onLocationMarkerUpdate}: any) {
   const mapContainer = useRef<HTMLDivElement>(null);
   map = useRef<maptilersdk.Map | null>(null);
   const [zoom] = useState<number>(14);
   const [mapController, setMapController] = useState<any>();
-  const [locationCheckInterval, setLocationCheckInterval] = useState<number | null>(null);
-  const [markerIsSet, setMarkerIsSet] = useState<boolean>(false);
+  const markUserLocationInterval = useRef<NodeJS.Timeout>();
+  const locationMarker = useRef<maptilersdk.Marker>();
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT';
 
@@ -40,29 +41,23 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
     }
 
     setMapController(createMapLibreGlMapController(map.current, maplibregl));
-    getUserLocation();
+    startLocationMarkerUpdate();
     fetchParkingSpaces();
+
+    return () => stopLocationMarkerUpdate();
   }, []);
 
-  useEffect(() => {
-    if (markerIsSet && locationCheckInterval !== null) {
-      clearInterval(locationCheckInterval);
-      setLocationCheckInterval(null);
-    } else if (locationCheckInterval === null) {
-      const intervalId = window.setInterval(() => {
-        getUserLocation();
-      }, 10000); // 10 seconds
-      setLocationCheckInterval(intervalId);
-    }
+  function startLocationMarkerUpdate() {
+    if (!markUserLocationInterval.current) markUserLocationInterval.current = setInterval(markUserLocation, 10000);
+  }
 
-    return () => {
-      if (locationCheckInterval !== null) {
-        clearInterval(locationCheckInterval);
-      }
-    };
-  }, [markerIsSet]);
+  function stopLocationMarkerUpdate() {
+    if (markUserLocationInterval.current) clearInterval(markUserLocationInterval.current);
+  }
 
   function handleSearch(event: any) {
+    if (event) stopLocationMarkerUpdate();
+    else startLocationMarkerUpdate();
     onUpdateList(event);
   }
   
@@ -93,31 +88,18 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
     });
   };
 
-  const getUserLocation = () => {
-    if (!navigator.geolocation) {
-        console.error('Geolocation is not supported by this browser.');
-        return;
-    }
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { latitude, longitude, accuracy } = position.coords;
-      if (markerIsSet || accuracy > 200) {
-        console.error('The accuracy of the location is too low.');
-        return;
-      }
-      setMarkerIsSet(true);
-      if (map.current) {
-        new maptilersdk.Marker({ color: "#0000FF" })
-          .setLngLat([longitude, latitude])
-          .setPopup(new maptilersdk.Popup().setHTML("<h3>Ihr Standort</h3>"))
-          .addTo(map.current);
-      }
-    }, (error) => {
-      console.error('Error getting user location', error);
-    }, {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0
-    });
+  const markUserLocation = () => {
+      const location = getUserLocation();      
+
+      if (!location.latitude || !location.longitude || !map.current) return;
+      
+      if (locationMarker) locationMarker.current?.remove();
+      
+      locationMarker.current = new maptilersdk.Marker({ color: "#0000FF" });
+      locationMarker.current?.setLngLat([location.longitude, location.latitude]);
+      locationMarker.current?.setPopup(new maptilersdk.Popup().setHTML("<h3>Ihr Standort</h3>"));
+      locationMarker.current?.addTo(map.current);
+      onLocationMarkerUpdate();
   };
 
   return (

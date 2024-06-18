@@ -1,0 +1,92 @@
+#filter-button-open {
+    position: absolute;
+    top: 58px;
+    left: 290px;
+    width: 40px;
+    --padding-bottom: 0px;
+    --padding-end: 0px;
+    --padding-start: 0px;
+    --padding-top: 0px;
+    --background: white;
+    ion-icon { font-size: 28px; }
+}
+
+#filter-modal {
+    height: 100%;
+    overflow: scroll;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#filter-header {
+    display: flex;
+    flex-direction: row;
+    #filter-button-close { font-size: large; }
+}
+
+#filter-segment {
+    --background: rgba(77,141,255,0.07);
+}
+
+#filter-content-container {
+    flex: 1;
+    margin: 0px 10px 0px 10px;
+}
+
+.filter-content-section {
+    margin-top: 20px;
+    font-size: 22px;
+}
+
+#filter-checkbox-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    ion-checkbox { --size: 25px; }
+}
+
+#filter-price-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#filter-price-container > ion-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 25px;
+    margin: 0px 20px 7px 20px;
+    font-weight: bolder;
+}
+
+.filter-select {
+    margin-bottom: 0px !important;
+}
+
+#filter-mode {
+    display: flex;
+    flex-direction: row;
+}
+
+#filter-select-mode {
+    width: 200px;
+    margin-right: 20px;
+}
+
+#filter-sort {
+    display: flex;
+    flex-direction: row;
+}
+
+#filter-select-order {
+    width: 350px;
+    margin-left: 20px;
+}
+
+#filter-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px;
+}
