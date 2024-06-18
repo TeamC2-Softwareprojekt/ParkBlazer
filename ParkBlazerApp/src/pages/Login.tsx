@@ -66,6 +66,7 @@ const Login: React.FC = () => {
             </IonText>
             <IonInput
               className={`login-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
+              id="email-input"
               type="email"
               fill="solid"
               label="Email"
@@ -76,6 +77,7 @@ const Login: React.FC = () => {
             />
             <IonInput
               className="login-input"
+              id="password-input"
               type="password"
               fill="solid"
               label="Password"
@@ -86,7 +88,7 @@ const Login: React.FC = () => {
             <IonButton
               expand="block"
               onClick={handleLogin}
-              className="login-button"
+              id="login-submit"
               disabled={!email || !password || !emailValid}
             >
               Login

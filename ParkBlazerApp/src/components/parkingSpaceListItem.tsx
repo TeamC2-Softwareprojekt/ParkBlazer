@@ -7,19 +7,10 @@ import {
     IonItem,
     IonIcon
 } from '@ionic/react';
-import * as maptilersdk from '@maptiler/sdk';
 import { map } from './map';
-
-let marker: maptilersdk.Marker;
 
 function onItemClick(parkingSpace: any) {
     map.current?.flyTo({center: [parkingSpace.longitude, parkingSpace.latitude], zoom: 18});
-
-    if(marker) marker.remove();
-
-    marker = new maptilersdk.Marker()
-      .setLngLat([parkingSpace.longitude, parkingSpace.latitude])
-      .addTo(map.current!);
 }
 
 export default function ParkingSpaceListItem({parkingSpace}: any) {

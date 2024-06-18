@@ -47,7 +47,6 @@ function Navbar() {
         <IonHeader color="light">
             <IonToolbar color="light">
                 <IonTitle id="navbar-title" onClick={handleLogoClick}>ParkBlazer</IonTitle>
-
                 <IonButton
                     id="popover-button"
                     slot="end"
