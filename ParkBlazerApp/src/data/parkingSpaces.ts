@@ -20,20 +20,33 @@ export interface parkingSpace {
     username: string;
     zip: string;
     distance?: number;
+    price_per_hour?: number;
+    availability_start_date?: string;
+    availability_end_date?: string;
 }
 
 export let parkingspaces: parkingSpace[] = [];
 
 export async function initParkingSpaces() {
     if (parkingspaces?.length > 0) return;
-        
-    let response = undefined;
+
+    let parkingspacesData = undefined;
+    let private_parkingspaces = undefined;
     try {
-        response = await axios.get('https://server-y2mz.onrender.com/api/get_parkingspots');
+        parkingspacesData = await axios.get('https://server-y2mz.onrender.com/api/get_parkingspots');
+        private_parkingspaces = await axios.get('https://server-y2mz.onrender.com/api/get_privateparkingspots');
     } catch (error) {
         console.error('Error getting all Parkingspots', error);
     }
-    parkingspaces = response?.data;
+
+    parkingspacesData?.data.forEach((publicSpace: any) => {
+        const privateSpace = private_parkingspaces?.data.find((p: any) => p.parkingspot_id === publicSpace.parkingspot_id);
+        if (privateSpace) {
+            Object.assign(publicSpace, privateSpace);
+        }
+    });
+
+    parkingspaces = parkingspacesData?.data;
 }
 
 export function setDistancesToPoint(center: number[]) {

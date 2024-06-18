@@ -5,6 +5,7 @@ import './MarkerMenu.css';
 import { map } from './map';
 import AuthService from '../utils/AuthService';
 import { parkingspaces } from '../data/parkingSpaces';
+import { getUserLocation } from '../data/userLocation';
 
 export const MarkerMenu: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -217,31 +218,19 @@ export const MarkerMenu: React.FC = () => {
   };
 
   const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) return;
+    const userLocation = getUserLocation();
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        if (position.coords.accuracy > 200) {
-          setNotificationMessage('Dein Standort ist zu ungenau: Probiere es erneut!');
-          setNotificationColor('danger');
-          setShowNotification(true);
-          return;
-        }
-        setLatitude(position.coords.latitude.toString()); 
-        setLongitude(position.coords.longitude.toString()); 
-        fetchAddress(position.coords.latitude.toString(), position.coords.longitude.toString());
-        openModalCoordinates(); 
+    if (!userLocation.latitude || !userLocation.longitude) {
+      setNotificationMessage('Dein Standort ist zu ungenau: Probiere es erneut!');
+      setNotificationColor('danger');
+      setShowNotification(true);
+      return;
+    }
 
-    }, (error) => {
-        console.error('Error catching location:', error);
-        setNotificationMessage('Error catching current location.');
-        setNotificationColor('danger');
-        setShowNotification(true);
-      },
-      {
-        enableHighAccuracy: true
-      }
-    );
+    setLatitude(userLocation.latitude.toString()); 
+    setLongitude(userLocation.longitude.toString()); 
+    fetchAddress(userLocation.latitude.toString(), userLocation.longitude.toString());
+    openModalCoordinates(); 
   };
 
   const handleSelectLocationOnMap = () => {

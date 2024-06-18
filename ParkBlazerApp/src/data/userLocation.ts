@@ -18,6 +18,7 @@ function findUserLocation() {
 
     navigator.geolocation.getCurrentPosition((position) => {
         if (position.coords.accuracy > 200) {
+            setUserLocation(0, 0);
             console.error('The accuracy of the location is too low.');
             return;
         }
