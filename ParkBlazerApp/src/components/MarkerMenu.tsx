@@ -3,6 +3,7 @@ import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTi
 import { chevronUpCircle, add } from 'ionicons/icons';
 import './MarkerMenu.css';
 import AuthService from '../AuthService';
+import { parkingspaces } from '../data/parkingSpaces';
 
 function MarkerMenu() {
   const [showMenu, setShowMenu] = useState(false);
@@ -100,80 +101,74 @@ function MarkerMenu() {
       }
     });
 
-    if (valid) {
-      try {
-        const existingSpotsResponse = await fetch('https://server-y2mz.onrender.com/api/get_parkingspots');
-        const existingSpots = await existingSpotsResponse.json();
+    if (!valid) return;
 
-        const spotExists = existingSpots.some((spot: { latitude: number; longitude: number; name: string; }) =>
-          (spot.latitude === lat && spot.longitude === lng) || spot.name === title
-        );
+    const spotExists = parkingspaces.some((spot: { latitude: number; longitude: number; name: string; }) =>
+      (spot.latitude === lat && spot.longitude === lng) || spot.name === title
+    );
 
-        if (spotExists) {
-          setNotificationMessage('Parkplatz existiert bereits.');
-          setNotificationColor('danger');
-          setShowNotification(true);
-          return;
-        }
+    if (spotExists) {
+      setNotificationMessage('Parkplatz existiert bereits.');
+      setNotificationColor('danger');
+      setShowNotification(true);
+      return;
+    }
 
-        let data = JSON.stringify({
-          name: title,
-          description: description,
-          type: 'public',
-          available_spaces: availableSpaces,
-          image_url: image,
-          latitude: latitude,
-          longitude: longitude,
-          street: street,
-          house_number: houseNumber,
-          zip: zip,
-          city: city,
-          country: country,
-          type_car: typeCar ? '1' : '0',
-          type_bike: typeBike ? '1' : '0',
-          type_truk: typeTruk ? '1' : '0',
-          price_per_hour: privateSpot ? pricePerHour : undefined,
-          availability_start_date: privateSpot ? selectedStartDate?.toISOString() : undefined,
-          availability_end_date: privateSpot ? selectedEndDate?.toISOString() : undefined,
-          document: privateSpot ? selectedDocument : undefined
-        });
+    let data = JSON.stringify({
+      name: title,
+      description: description,
+      type: 'public',
+      available_spaces: availableSpaces,
+      image_url: image,
+      latitude: latitude,
+      longitude: longitude,
+      street: street,
+      house_number: houseNumber,
+      zip: zip,
+      city: city,
+      country: country,
+      type_car: typeCar ? '1' : '0',
+      type_bike: typeBike ? '1' : '0',
+      type_truk: typeTruk ? '1' : '0',
+      price_per_hour: privateSpot ? pricePerHour : undefined,
+      availability_start_date: privateSpot ? selectedStartDate?.toISOString() : undefined,
+      availability_end_date: privateSpot ? selectedEndDate?.toISOString() : undefined,
+      document: privateSpot ? selectedDocument : undefined
+    });
 
-        let url = 'https://server-y2mz.onrender.com/api/create_parkingspot';
-        if (privateSpot) url = 'https://server-y2mz.onrender.com/api/create_privateparkingspot';
+    let url = 'https://server-y2mz.onrender.com/api/create_parkingspot';
+    if (privateSpot) url = 'https://server-y2mz.onrender.com/api/create_privateparkingspot';
 
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${AuthService.getToken()}`
-          },
-          body: data
-        });
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${AuthService.getToken()}`
+        },
+        body: data
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          setNotificationMessage('Parkplatz erfolgreich gespeichert.');
-          setNotificationColor('success');
-          setShowNotification(true);
-          console.log('Erfolgreich gespeichert:', data);
-          resetAttributes();
-        } else {
-          const errorData = await response.json();
-          setNotificationMessage(errorData.message || 'Fehler beim Speichern.');
-          setNotificationColor('danger');
-          setShowNotification(true);
-          console.error('Fehler beim Speichern:', errorData);
-        }
-      } catch (error) {
-        console.error('Fehler beim Speichern:', error);
-        setNotificationMessage('Fehler beim Speichern.');
+      if (response.ok) {
+        setNotificationMessage('Parkplatz erfolgreich gespeichert.');
+        setNotificationColor('success');
+        setShowNotification(true);
+        resetAttributes();
+      } else {
+        const errorData = await response.json();
+        setNotificationMessage(errorData.message || 'Fehler beim Speichern.');
         setNotificationColor('danger');
         setShowNotification(true);
-        console.error('Fehler beim Speichern:', error);
+        console.error('Fehler beim Speichern:', errorData);
       }
-
-      closeModalCoordinates();
+    } catch (error) {
+      console.error('Fehler beim Speichern:', error);
+      setNotificationMessage('Fehler beim Speichern.');
+      setNotificationColor('danger');
+      setShowNotification(true);
+      console.error('Fehler beim Speichern:', error);
     }
+    closeModalCoordinates();
   };
 
   // this function is for handling the current location to create a new parking spot
