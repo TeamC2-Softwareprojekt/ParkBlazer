@@ -26,13 +26,13 @@ import axios from "axios";
 import { bicycle, bus, car } from "ionicons/icons";
 import AuthService from "../utils/AuthService";
 import StarRating from "../components/StarRating";
-import { formatDate } from "../utils/formatDate";
-
+import { format, formatDistanceToNow } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 
 const ParkingspotDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Extracts the parkingspot ID from the URL
-  const [parkingspot, setParkingspot] = useState<any>(null); // State for the loaded parking spot
-  const [reviews, setReviews] = useState<any>(null); // State for the loaded parking spot
+  const { id } = useParams<{ id: string }>();
+  const [parkingspot, setParkingspot] = useState<any>(null);
+  const [reviews, setReviews] = useState<any>(null);
   const [error, setError] = useState<string>("");
   const [rating, setRating] = useState<number>(1);
   const [comment, setComment] = useState<string>("");
@@ -41,7 +41,6 @@ const ParkingspotDetails: React.FC = () => {
   const [modalImage, setModalImage] = useState<string>("");
 
   useEffect(() => {
-    // Function to load parking spot details with the ID
     const fetchParkingspotDetails = async () => {
       try {
         const response = await axios.post('https://server-y2mz.onrender.com/api/get_parkingspot_details', {
@@ -120,8 +119,6 @@ const ParkingspotDetails: React.FC = () => {
     );
   };
 
-
-
   return (
     <IonPage>
       <Navbar />
@@ -192,12 +189,9 @@ const ParkingspotDetails: React.FC = () => {
                 {reviews.map((review: any, index: any) => (
                   <IonRow key={index}>
                     <IonCol>
-                      <IonText><strong>{review.username} ({formatDate(review.created_date)})</strong></IonText>
+                      <IonText><strong>{review.username} ({formatDistanceToNow(review.created_date, { addSuffix: true, locale: enUS })})</strong></IonText>
                       <StarRating rating={review.rating} />
                       <IonText>{review.comment}</IonText>
-
-
-
                     </IonCol>
                   </IonRow>
                 ))}
@@ -215,7 +209,7 @@ const ParkingspotDetails: React.FC = () => {
                   <IonRow>
                     <IonCol>
                       <IonText>Rating (1-5):</IonText>
-                      <StarRating rating={rating} onRatingChange={setRating} /> {/* Use the StarRating component */}
+                      <StarRating rating={rating} onRatingChange={setRating} /> { }
                     </IonCol>
                   </IonRow>
                   <IonRow>
