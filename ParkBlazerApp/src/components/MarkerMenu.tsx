@@ -83,22 +83,23 @@ export const MarkerMenu: React.FC = () => {
       const data = await response.json();
   
       if (!(data.items && data.items.length > 0)) {
-        setNotificationMessage('Keine Adresse gefunden.');
+        setNotificationMessage('No address found.');
         setNotificationColor('danger');
         setShowNotification(true);
-      } else {
-        const address = data.items[0].address;
-        setStreet(address.street || '');
-        setHouseNumber(address.houseNumber || '');
-        setZip(address.postalCode || '');
-        setCity(address.city || '');
-        setCountry(address.countryName || '');
+        return;
+      }
+      const address = data.items[0].address;
+      setStreet(address.street || '');
+      setHouseNumber(address.houseNumber || '');
+      setZip(address.postalCode || '');
+      setCity(address.city || '');
+      setCountry(address.countryName || '');
       
-        const countryOption = countries.find(country => country.label === address.countryName);
-        if (countryOption) {
-          setSelectedCountry(countryOption.value);
-          setCountry(countryOption.value);
-        }
+      // Set country select to the found country
+      const countryOption = countries.find(country => country.label === address.countryName);
+      if (countryOption) {
+        setSelectedCountry(countryOption.value);
+        setCountry(countryOption.value);
       }
     } catch (error) {
       console.error('Error fetching address:', error); 
@@ -182,17 +183,17 @@ export const MarkerMenu: React.FC = () => {
           resetAttributes();
         } else {
           const errorData = await response.json();
-          setNotificationMessage(errorData.message || 'Fehler beim Speichern.');
+          setNotificationMessage(errorData.message || 'Error saving spot.');
           setNotificationColor('danger');
           setShowNotification(true);
-          console.error('Fehler beim Speichern:', errorData);
+          console.error('Error savin spot:', errorData);
         }
       } catch (error) {
-        console.error('Fehler beim Speichern:', error);
-        setNotificationMessage('Fehler beim Speichern.');
+        console.error('Error savin spot:', error);
+        setNotificationMessage('Error savin spot');
         setNotificationColor('danger');
         setShowNotification(true);
-        console.error('Fehler beim Speichern:', error);
+        console.error('Error savin spot:', error);
       }
 
       closeModalCoordinates();
@@ -216,8 +217,8 @@ export const MarkerMenu: React.FC = () => {
         openModalCoordinates(); 
       },
       (error) => {
-        console.error('Fehler beim Abrufen der Position', error);
-        setNotificationMessage('Fehler beim Abrufen der aktuellen Position.');
+        console.error('Error catching location:', error);
+        setNotificationMessage('Error catching current location.');
         setNotificationColor('danger');
         setShowNotification(true);
       },
@@ -262,7 +263,7 @@ export const MarkerMenu: React.FC = () => {
 
         setCountries(sortedCountryOptions);
       } catch (error) {
-        console.error('Fehler beim Abrufen der Länder:', error);
+        console.error('Error catching countries', error);
       }
     };
 
@@ -293,13 +294,13 @@ export const MarkerMenu: React.FC = () => {
   };
 
   return (
-    <>
+    <div id='marker-menu'>
       <IonFab vertical="bottom" horizontal="end" slot="fixed">
         <IonFabButton onClick={toggleMenu}>
           <IonIcon icon={chevronUpCircle} />
         </IonFabButton>
         <IonFabList side="top" activated={showMenu}>
-          <IonFabButton onClick={openModal}>
+          <IonFabButton id='create-marker-modal-button' onClick={openModal}>
             <IonIcon icon={add} />
           </IonFabButton>
         </IonFabList>
@@ -332,38 +333,38 @@ export const MarkerMenu: React.FC = () => {
           <IonList>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Titel: </IonLabel>
-              <IonInput value={title} onIonChange={e => setTitle(e.detail.value || '')} />
-              {errorTitle && <IonText color="danger">{errorTitle}</IonText>}
+              <IonInput id='title-input' value={title} onIonChange={e => setTitle(e.detail.value || '')} />
+              {errorTitle && <IonText id='error-title-input' color="danger">{errorTitle}</IonText>}
             </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Beschreibung: </IonLabel>
-              <IonInput value={description} onIonChange={e => setDescription(e.detail.value || '')} />
-              {errorDescription && <IonText color="danger">{errorDescription}</IonText>}
+              <IonInput id='description-input' value={description} onIonChange={e => setDescription(e.detail.value || '')} />
+              {errorDescription && <IonText id='error-description-input' color="danger">{errorDescription}</IonText>}
             </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Anzahl Parkplätze: </IonLabel>
-              <IonInput value={availableSpaces} onIonChange={e => setAvailableSpaces(e.detail.value || '')} />
-              {errorAvailableSpaces && <IonText color="danger">{errorAvailableSpaces}</IonText>}
+              <IonInput id='available-spaces-input' value={availableSpaces} onIonChange={e => setAvailableSpaces(e.detail.value || '')} />
+              {errorAvailableSpaces && <IonText id='error-available-spaces-input' color="danger">{errorAvailableSpaces}</IonText>}
             </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Straße: </IonLabel>
-              <IonInput value={street} onIonChange={e => setStreet(e.detail.value || '')} />
-              {errorStreet && <IonText color="danger">{errorStreet}</IonText>}
+              <IonInput id='street-input' value={street} onIonChange={e => setStreet(e.detail.value || '')} />
+              {errorStreet && <IonText id='error-street-input' color="danger">{errorStreet}</IonText>}
             </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Hausnummer: </IonLabel>
-              <IonInput value={houseNumber} onIonChange={e => setHouseNumber(e.detail.value || '')} />
-              {errorHouseNumber && <IonText color="danger">{errorHouseNumber}</IonText>}
+              <IonInput id='house-number-input' value={houseNumber} onIonChange={e => setHouseNumber(e.detail.value || '')} />
+              {errorHouseNumber && <IonText id='error-house-number-input' color="danger">{errorHouseNumber}</IonText>}
             </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>PLZ: </IonLabel>
-              <IonInput value={zip} onIonChange={e => setZip(e.detail.value || '')} />
-              {errorZip && <IonText color="danger">{errorZip}</IonText>}
+              <IonInput id='zip-input' value={zip} onIonChange={e => setZip(e.detail.value || '')} />
+              {errorZip && <IonText id='error-zip-input' color="danger">{errorZip}</IonText>}
             </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Stadt: </IonLabel>
-              <IonInput value={city} onIonChange={e => setCity(e.detail.value || '')} />
-              {errorCity && <IonText color="danger">{errorCity}</IonText>}
+              <IonInput id='city-input' value={city} onIonChange={e => setCity(e.detail.value || '')} />
+              {errorCity && <IonText id='error-city-input' color="danger">{errorCity}</IonText>}
             </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Land: </IonLabel>
@@ -384,7 +385,7 @@ export const MarkerMenu: React.FC = () => {
               {errorCountry && <IonText color="danger">{errorCountry}</IonText>}
             </IonItem>
             <IonItem>
-              PKW<IonCheckbox  checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
+              PKW<IonCheckbox checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
               Fahrrad<IonCheckbox checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
               LKW<IonCheckbox checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
             </IonItem>
@@ -394,7 +395,7 @@ export const MarkerMenu: React.FC = () => {
               {errorImage && <IonText color="danger">{errorImage}</IonText>}
             </IonItem>
           </IonList>
-          <IonButton expand="block" onClick={handleSaveCoordinates}>
+          <IonButton expand="block" id='marker-submit' onClick={handleSaveCoordinates}>
             Speichern
           </IonButton>
           <IonButton expand="block" color="danger" onClick={closeModalCoordinates}>
@@ -419,7 +420,7 @@ export const MarkerMenu: React.FC = () => {
         message={"Parkplatz erfolgreich erstellt."}
         buttons={["OK"]}
       />
-    </>
+    </div>
   );
 };
 

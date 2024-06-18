@@ -11,6 +11,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/setupTests.ts',
+    minThreads: 0,
+    maxThreads: 1,
+    setupFiles: './__tests__/setupTests.ts',
   }
 })

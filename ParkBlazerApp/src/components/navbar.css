@@ -12,3 +12,20 @@
     padding: 20px;
     margin: 0;
   }
+
+  #nav-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  #popover-button {
+    margin-right: 20px;
+  }
+
+  .md.header-md.header-collapse-none {
+    box-shadow: none !important;
+  }
+
+  #user-name .md {
+    font-weight: bold;
+  }
