@@ -4,7 +4,6 @@
 	text-align: center;
 }
 
-
 /* Space between inputs */
 .profile-input {
 	margin-bottom: 1.5vh;
@@ -14,13 +13,10 @@
 	margin-bottom: 1.5vh;
 }
 
-
-/* Show Error when email not valid 
 /* Show Error when email not valid */
 .profile-input.has-value.ion-invalid .error-text.sc-ion-input-md {
 	display: block!important;
 }	
-
 
 .profile-grid.md.grid-fixed {
 	overflow: auto;

@@ -23,6 +23,7 @@ import axios from "axios";
 import "./UserProfile.css";
 import AuthService from "../utils/AuthService";
 import Navbar from "../components/navbar";
+import { parkingspaces } from "../data/parkingSpaces";
 
 const UserProfile: React.FC = () => {
     const initialUserData = {
@@ -77,56 +78,39 @@ const UserProfile: React.FC = () => {
         fetchUserData();
     }, []);
 
-    const fetchParkingSpots = async (username: string) => {
-        try {
-            const response = await axios.post('https://server-y2mz.onrender.com/api/get_parkingspots_created_by_user', {
-                username: username
-            });
-
-            setParkingSpots(response.data);
-        } catch (error: any) {
-            if (error.response && error.response.data && error.response.data.message) {
-                setError(error.response.data.message);
-            } else {
-                setError("An unexpected error occurred while fetching parking spots. Please try again later!");
-            }
-        }
+    const fetchParkingSpots = (username: string) => {
+        const userParkingSpots = parkingspaces.filter(spot => spot.username === username);
+        setParkingSpots(userParkingSpots);
     };
 
     const validatePassword = useCallback((password: string) => {
         return password.length > 10;
     }, []);
 
-    const validateCity = useCallback((city: string) => {
-        return city.trim().length > 0;
-    }, []);
-
-    const validateStreet = useCallback((street: string) => {
-        return street.trim().length > 0;
-    }, []);
-
-    const validateZip = useCallback((zip: string) => {
-        return zip.trim().length > 0;
-    }, []);
-
-    const validateHouseNumber = useCallback((houseNumber: string) => {
-        return houseNumber.trim().length > 0;
+    const validateAddressDetail = useCallback((field: string) => {
+        return field.trim().length > 0;
     }, []);
 
     const handleInputChange = (field: string) => (event: CustomEvent) => {
         const value = event.detail.value!;
         setUserData((prevState) => ({ ...prevState, [field]: value }));
 
-        if (field === "password") {
-            setPasswordValid(validatePassword(value));
-        } else if (field === "city") {
-            setCityValid(validateCity(value));
-        } else if (field === "street") {
-            setStreetValid(validateStreet(value));
-        } else if (field === "zip") {
-            setZipValid(validateZip(value));
-        } else if (field === "house_number") {
-            setHouseNumberValid(validateHouseNumber(value));
+        switch (field) {
+            case 'password':
+                setPasswordValid(validatePassword(value));
+                break;
+            case 'city':
+                setCityValid(validateAddressDetail(value));
+                break;
+            case 'street':
+                setStreetValid(validateAddressDetail(value));
+                break;
+            case 'zip':
+                setZipValid(validateAddressDetail(value));
+                break;
+            case 'house_number':
+                setHouseNumberValid(validateAddressDetail(value));
+                break;
         }
     };
 
@@ -150,7 +134,6 @@ const UserProfile: React.FC = () => {
         }
     };
 
-
     const toggleEditMode = () => {
         setEditMode(!editMode);
         if (!editMode) {
@@ -159,7 +142,6 @@ const UserProfile: React.FC = () => {
             setUserData(originalUserData);
         }
     };
-
 
     return (
         <>
@@ -334,4 +316,3 @@ const UserProfile: React.FC = () => {
 };
 
 export default UserProfile;
-

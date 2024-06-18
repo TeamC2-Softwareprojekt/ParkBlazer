@@ -28,10 +28,11 @@ import AuthService from "../utils/AuthService";
 import StarRating from "../components/StarRating";
 import { format, formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
+import { parkingSpace, parkingspaces, initParkingSpaces } from '../data/parkingSpaces';
 
 const ParkingspotDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [parkingspot, setParkingspot] = useState<any>(null);
+  const [parkingspot, setParkingspot] = useState<parkingSpace | null>(null);
   const [reviews, setReviews] = useState<any>(null);
   const [error, setError] = useState<string>("");
   const [rating, setRating] = useState<number>(1);
@@ -41,23 +42,16 @@ const ParkingspotDetails: React.FC = () => {
   const [modalImage, setModalImage] = useState<string>("");
 
   useEffect(() => {
-    const fetchParkingspotDetails = async () => {
-      try {
-        const response = await axios.post('https://server-y2mz.onrender.com/api/get_parkingspot_details', {
-          parkingspot_id: id
-        });
-        const parkingspotDetails = response.data;
-        setParkingspot(parkingspotDetails.parkingspotDetails[0]);
-      } catch (error: any) {
-        if (error.response && error.response.data && error.response.data.message) {
-          setError(error.response.data.message);
-        } else {
-          setError("An unexpected error occurred. Please try again later!");
-        }
+    const fetchParkingspotDetails = () => {
+      const parkingspotDetails = parkingspaces.find(ps => ps.parkingspot_id === parseInt(id));
+      if (parkingspotDetails) {
+        setParkingspot(parkingspotDetails);
+      } else {
+        setError("Parkingspot not found.");
       }
     };
 
-    fetchParkingspotDetails();
+    initParkingSpaces().then(fetchParkingspotDetails);
   }, [id]);
 
   useEffect(() => {
@@ -152,16 +146,14 @@ const ParkingspotDetails: React.FC = () => {
           <IonCard>
             <IonCardContent>
               <IonCardTitle>Available parkingspot types:</IonCardTitle>
-
               {parkingspot.type_car ? <IonIcon icon={car} size="large" color="primary"></IonIcon> : ""}
               {parkingspot.type_bike ? <IonIcon icon={bicycle} size="large" color="primary"></IonIcon> : ""}
-              {parkingspot.type_truk ? <IonIcon icon={bus} size="large" color="primary"></IonIcon> : ""}
+              {parkingspot.type_truck ? <IonIcon icon={bus} size="large" color="primary"></IonIcon> : ""}
             </IonCardContent>
           </IonCard>
           <IonCard>
             <IonCardContent>
               <IonCardTitle>Available parkingspots:</IonCardTitle>
-
               <IonText><strong>{parkingspot.available_spaces}</strong></IonText>
             </IonCardContent>
           </IonCard>
