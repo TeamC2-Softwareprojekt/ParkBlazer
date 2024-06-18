@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel } from '@ionic/react';
+import React, { useEffect, useState } from 'react';
+import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
+import { map } from './map';
+import AuthService from '../AuthService';
 
-function MarkerMenu() {
+
+export const MarkerMenu: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showModalCoordinates, setShowModalCoordinates] = useState(false);
@@ -20,9 +23,9 @@ function MarkerMenu() {
   const [typeCar, setTypeCar] = useState<boolean>(false);
   const [typeBike, setTypeBike] = useState<boolean>(false);
   const [typeTruk, setTypeTruk] = useState<boolean>(false);
+  const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
-  const [errorLatitude, setErrorLatitude] = useState<string>('');
-  const [errorLongitude, setErrorLongitude] = useState<string>('');
   const [errorTitle, setErrorTitle] = useState<string>('');
   const [errorDescription, setErrorDescription] = useState<string>('');
   const [errorAvailableSpaces, setErrorAvailableSpaces] = useState<string>('');
@@ -36,6 +39,18 @@ function MarkerMenu() {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationColor, setNotificationColor] = useState('success');
+  const [alert, setAlert] = useState(false);
+
+  const token = AuthService.getToken();
+
+  function handleMapClick(e: any) {
+    const coords = e.lngLat;
+    setLatitude(coords.lat.toString()); 
+    setLongitude(coords.lng.toString()); 
+    fetchAddress(coords.lat.toString(), coords.lng.toString());
+    openModalCoordinates();
+    map.current?.off('click', handleMapClick);
+  }
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -60,13 +75,45 @@ function MarkerMenu() {
   };
 
   const validateField = (value: string): boolean => { return value.trim().length > 0; };
+
+  const fetchAddress = async (lat: string, lng: string) => {
+    const apiKey = '0vf8x75eZh1xvgkTcJfy_yIomOKw5ww0YIuJanRkzmU';
+    try {
+      const response = await fetch(`https://revgeocode.search.hereapi.com/v1/revgeocode?at=${lat},${lng}&lang=en-US&apikey=${apiKey}`);
+      const data = await response.json();
+  
+      if (!(data.items && data.items.length > 0)) {
+        setNotificationMessage('No address found.');
+        setNotificationColor('danger');
+        setShowNotification(true);
+        return;
+      }
+      const address = data.items[0].address;
+      setStreet(address.street || '');
+      setHouseNumber(address.houseNumber || '');
+      setZip(address.postalCode || '');
+      setCity(address.city || '');
+      setCountry(address.countryName || '');
+      
+      // Set country select to the found country
+      const countryOption = countries.find(country => country.label === address.countryName);
+      if (countryOption) {
+        setSelectedCountry(countryOption.value);
+        setCountry(countryOption.value);
+      }
+    } catch (error) {
+      console.error('Error fetching address:', error); 
+      setNotificationMessage('Error fetching address.');
+      setNotificationColor('danger');
+      setShowNotification(true);
+    }
+  };
+  
   const handleSaveCoordinates = async () => {
     const lat = parseFloat(latitude);
     const lng = parseFloat(longitude);
     let valid = true;
     const validations = [
-      { isValid: !isNaN(lat) && lat >= -90 && lat <= 90, message: 'Bitte geben Sie einen gültigen Breitengrad zwischen -90 und 90 ein.', setError: setErrorLatitude },
-      { isValid: !isNaN(lng) && lng >= -180 && lng <= 180, message: 'Bitte geben Sie einen gültigen Längengrad zwischen -180 und 180 ein.', setError: setErrorLongitude },
       { isValid: validateField(title), message: 'Bitte geben Sie einen Titel ein.', setError: setErrorTitle },
       { isValid: validateField(street), message: 'Bitte geben Sie eine Adresse ein.', setError: setErrorStreet },
       { isValid: validateField(description), message: 'Bitte geben Sie eine Beschreibung ein.', setError: setErrorDescription },
@@ -104,7 +151,8 @@ function MarkerMenu() {
         const response = await fetch('https://server-y2mz.onrender.com/api/create_parkingspot', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
             name: title,
@@ -130,28 +178,28 @@ function MarkerMenu() {
           setNotificationMessage('Parkplatz erfolgreich gespeichert.');
           setNotificationColor('success');
           setShowNotification(true);
+          setAlert(true);
           console.log('Erfolgreich gespeichert:', data);
           resetAttributes();
         } else {
           const errorData = await response.json();
-          setNotificationMessage(errorData.message || 'Fehler beim Speichern.');
+          setNotificationMessage(errorData.message || 'Error saving spot.');
           setNotificationColor('danger');
           setShowNotification(true);
-          console.error('Fehler beim Speichern:', errorData);
+          console.error('Error savin spot:', errorData);
         }
       } catch (error) {
-        console.error('Fehler beim Speichern:', error);
-        setNotificationMessage('Fehler beim Speichern.');
+        console.error('Error savin spot:', error);
+        setNotificationMessage('Error savin spot');
         setNotificationColor('danger');
         setShowNotification(true);
-        console.error('Fehler beim Speichern:', error);
+        console.error('Error savin spot:', error);
       }
 
       closeModalCoordinates();
     }
   };
 
-  // this function is for handling the current location to create a new parking spot
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) return;
     
@@ -165,11 +213,12 @@ function MarkerMenu() {
         }
         setLatitude(position.coords.latitude.toString()); 
         setLongitude(position.coords.longitude.toString()); 
+        fetchAddress(position.coords.latitude.toString(), position.coords.longitude.toString());
         openModalCoordinates(); 
       },
       (error) => {
-        console.error('Error getting location', error);
-        setNotificationMessage('Fehler beim Abrufen der aktuellen Position.');
+        console.error('Error catching location:', error);
+        setNotificationMessage('Error catching current location.');
         setNotificationColor('danger');
         setShowNotification(true);
       },
@@ -180,10 +229,46 @@ function MarkerMenu() {
   };
 
   const handleSelectLocationOnMap = () => {
-    // #TODO: Logic to select location on map
-    console.log('Auf der Karte auswählen');
     closeModal();
+    setNotificationMessage('Bitte wählen Sie einen Punkt auf der Karte aus.');
+    setNotificationColor('success');
+    setShowNotification(true);
+    map.current?.on('click', handleMapClick);
   };
+  
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch('https://restcountries.com/v3.1/all');
+        if (!response.ok) {
+          throw new Error('Netzwerkantwort war nicht okay');
+        }
+        const data = await response.json();
+        const countryOptions = data.map((country: any) => ({
+          value: country.cca2,
+          label: country.name.common
+        }));
+
+        const preferredCountries = ['DE', 'US', 'FR'].map(code => 
+          countryOptions.find((country: { value: string; }) => country.value === code)
+        ).filter(Boolean);
+
+        const otherCountries = countryOptions.filter((country: any) => !preferredCountries.includes(country))
+          .sort((a: { label: string; }, b: { label: any; }) => a.label.localeCompare(b.label));
+
+        const sortedCountryOptions = [
+          ...preferredCountries,
+          ...otherCountries
+        ];
+
+        setCountries(sortedCountryOptions);
+      } catch (error) {
+        console.error('Error catching countries', error);
+      }
+    };
+
+    fetchCountries();
+  }, []);
 
   const resetAttributes = () => {
     setLatitude('');
@@ -197,8 +282,6 @@ function MarkerMenu() {
     setZip('');
     setCity('');
     setCountry('');
-    setErrorLatitude('');
-    setErrorLongitude('');
     setErrorTitle('');
     setErrorDescription('');
     setErrorAvailableSpaces('');
@@ -235,9 +318,6 @@ function MarkerMenu() {
           <IonButton expand="block" onClick={handleSelectLocationOnMap}>
             Auf der Karte auswählen
           </IonButton>
-          <IonButton id='create-marker-with-coordinates' expand="block" onClick={openModalCoordinates}>
-            Koordinaten eingeben
-          </IonButton>
           <IonButton expand="block" color="danger" onClick={closeModal}>
             Abbrechen
           </IonButton>
@@ -251,16 +331,6 @@ function MarkerMenu() {
         </IonHeader>
         <IonContent className="ion-padding">
           <IonList>
-            <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Breitengrad: </IonLabel>
-              <IonInput id='latitude-input' type="number" value={latitude} onIonChange={e => setLatitude(e.detail.value || '')} />
-              {errorLatitude && <IonText id='error-latitude-input' color="danger">{errorLatitude}</IonText>}
-            </IonItem>
-            <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Längengrad: </IonLabel>
-              <IonInput id='longitude-input' type="number" value={longitude} onIonChange={e => setLongitude(e.detail.value || '')} />
-              {errorLongitude && <IonText id='error-longitude-input' color="danger">{errorLongitude}</IonText>}
-            </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Titel: </IonLabel>
               <IonInput id='title-input' value={title} onIonChange={e => setTitle(e.detail.value || '')} />
@@ -298,13 +368,31 @@ function MarkerMenu() {
             </IonItem>
             <IonItem>
             <IonLabel style={{ marginRight: '10px' }}>Land: </IonLabel>
-              <IonInput id='country-input' value={country} onIonChange={e => setCountry(e.detail.value || '')} />
-              {errorCountry && <IonText id='error-country-input' color="danger">{errorCountry}</IonText>}
+              <IonSelect
+                value={selectedCountry}
+                placeholder="Wählen Sie ein Land"
+                onIonChange={e => {
+                  setSelectedCountry(e.detail.value);
+                  setCountry(e.detail.value);
+                }}
+              >
+                {countries.map(country => (
+                  <IonSelectOption key={country.value} value={country.value}>
+                    {country.label}
+                  </IonSelectOption>
+                ))}
+              </IonSelect>
+              {errorCountry && <IonText color="danger">{errorCountry}</IonText>}
             </IonItem>
             <IonItem>
               PKW<IonCheckbox checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
               Fahrrad<IonCheckbox checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
               LKW<IonCheckbox checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
+            </IonItem>
+            <IonItem>
+              <IonLabel style={{ marginRight: '10px' }}>Bild-URL: </IonLabel>
+              <IonInput value={image} onIonChange={e => setImage(e.detail.value || '')} />
+              {errorImage && <IonText color="danger">{errorImage}</IonText>}
             </IonItem>
           </IonList>
           <IonButton expand="block" id='marker-submit' onClick={handleSaveCoordinates}>
@@ -322,8 +410,20 @@ function MarkerMenu() {
         color={notificationColor}
         duration={2000}
       />
+      <IonAlert
+        isOpen={alert}
+        onDidDismiss={() => {
+          setAlert(false);
+          window.location.reload(); 
+        }}
+        header={"Successful"}
+        message={"Parkplatz erfolgreich erstellt."}
+        buttons={["OK"]}
+      />
     </div>
   );
-}
+};
 
 export default MarkerMenu;
+
+
