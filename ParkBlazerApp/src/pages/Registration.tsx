@@ -122,6 +122,7 @@ const Registration: React.FC = () => {
                         </IonText>
                         <IonInput
                             className={`register-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
+                            id="username-input"
                             type="text"
                             fill="solid"
                             label="Username"
@@ -131,6 +132,7 @@ const Registration: React.FC = () => {
                         />
                         <IonInput
                             className="register-input"
+                            id="firstname-input"
                             type="text"
                             fill="solid"
                             label="First Name"
@@ -140,6 +142,7 @@ const Registration: React.FC = () => {
                         />
                         <IonInput
                             className="register-input"
+                            id="lastname-input"
                             type="text"
                             fill="solid"
                             label="Last Name"
@@ -149,6 +152,7 @@ const Registration: React.FC = () => {
                         />
                         <IonInput
                             className={`register-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
+                            id="email-input"
                             type="email"
                             fill="solid"
                             label="Email"
@@ -159,6 +163,7 @@ const Registration: React.FC = () => {
                         />
                         <IonInput
                             className={`register-input ${isPasswordTouched && !passwordValid ? "ion-invalid" : ""}`}
+                            id="password-input"
                             type="password"
                             fill="solid"
                             label="Password"
@@ -169,6 +174,7 @@ const Registration: React.FC = () => {
                         />
                         <IonInput
                             className={`register-input ${isBirthdateTouched && !birthdateValid ? "ion-invalid" : ""}`}
+                            id="birthdate-input"
                             type="date"
                             fill="solid"
                             label="Birth Date"
@@ -179,6 +185,7 @@ const Registration: React.FC = () => {
                         />
                         <IonInput
                             className="register-input"
+                            id="street-input"
                             type="text"
                             fill="solid"
                             label="Street"
@@ -188,6 +195,7 @@ const Registration: React.FC = () => {
                         />
                         <IonInput
                             className="register-input"
+                            id="house-number-input"
                             type="text"
                             fill="solid"
                             label="House Number"
@@ -197,6 +205,7 @@ const Registration: React.FC = () => {
                         />
                         <IonInput
                             className="register-input"
+                            id="zip-input"
                             type="text"
                             fill="solid"
                             label="Zip"
@@ -206,6 +215,7 @@ const Registration: React.FC = () => {
                         />
                         <IonInput
                             className="register-input"
+                            id="city-input"
                             type="text"
                             fill="solid"
                             label="City"
@@ -213,7 +223,7 @@ const Registration: React.FC = () => {
                             value={city}
                             onIonInput={(e) => setCity(e.detail.value!)}
                         />
-                        <IonSelect aria-label="Country" label="Select Country" labelPlacement="floating" fill="solid" onIonChange={(e) => setCountry(e.detail.value!)}>
+                        <IonSelect id="country-input" aria-label="Country" label="Select Country" labelPlacement="floating" fill="solid" onIonChange={(e) => setCountry(e.detail.value!)}>
                             <IonSelectOption value="germany">Germany</IonSelectOption>
                             <IonSelectOption value="austria">Austria</IonSelectOption>
                             <IonSelectOption value="netherlands">Netherlands</IonSelectOption>
@@ -222,6 +232,7 @@ const Registration: React.FC = () => {
                             expand="block"
                             onClick={handleRegister}
                             className="register-button"
+                            id="register-submit"
                             disabled={!username || !firstname || !lastname || !email || !password || !birthdate || !street || !houseNumber || !zip || !city || !country || !emailValid || !passwordValid || !birthdateValid}
                         >
                             Register

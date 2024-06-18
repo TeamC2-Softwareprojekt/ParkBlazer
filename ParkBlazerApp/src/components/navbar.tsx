@@ -25,7 +25,6 @@ function Navbar() {
                 }
             });
             const userDetails = response.data;
-            console.log(userDetails);
             setUsername(userDetails.username);
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -44,7 +43,6 @@ function Navbar() {
         <IonHeader color="light">
             <IonToolbar color="light">
                 <IonTitle>ParkBlazer</IonTitle>
-
                 <IonButton
                     id="popover-button"
                     slot="end"
