@@ -26,8 +26,6 @@ export default function Map({onUpdateList}: {onUpdateList: any}) {
   const [mapController, setMapController] = useState<any>();
   const [locationCheckInterval, setLocationCheckInterval] = useState<number | null>(null);
   const [markerIsSet, setMarkerIsSet] = useState<boolean>(false);
-  const [latitude, setLatitude] = useState<string>('');
-  const [longitude, setLongitude] = useState<string>('');
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT';
 

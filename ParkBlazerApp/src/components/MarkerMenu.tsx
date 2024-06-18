@@ -44,6 +44,8 @@ export const MarkerMenu: React.FC = () => {
 
   const token = AuthService.getToken();
 
+  
+
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
@@ -74,28 +76,27 @@ export const MarkerMenu: React.FC = () => {
       const response = await fetch(`https://revgeocode.search.hereapi.com/v1/revgeocode?at=${lat},${lng}&lang=en-US&apikey=${apiKey}`);
       const data = await response.json();
   
-      if (data.items && data.items.length > 0) {
+      if (!(data.items && data.items.length > 0)) {
+        setNotificationMessage('Keine Adresse gefunden.');
+        setNotificationColor('danger');
+        setShowNotification(true);
+      } else {
         const address = data.items[0].address;
         setStreet(address.street || '');
         setHouseNumber(address.houseNumber || '');
         setZip(address.postalCode || '');
         setCity(address.city || '');
         setCountry(address.countryName || '');
-  
-        // Set country select to the found country
+      
         const countryOption = countries.find(country => country.label === address.countryName);
         if (countryOption) {
           setSelectedCountry(countryOption.value);
-          setCountry(countryOption.value); 
+          setCountry(countryOption.value);
         }
-      } else {
-        setNotificationMessage('Keine Adresse gefunden.');
-        setNotificationColor('danger');
-        setShowNotification(true);
       }
     } catch (error) {
-      console.error('Fehler beim Abrufen der Adresse:', error);
-      setNotificationMessage('Fehler beim Abrufen der Adresse.');
+      console.error('Error fetching address:', error); 
+      setNotificationMessage('Error fetching address.');
       setNotificationColor('danger');
       setShowNotification(true);
     }
@@ -221,13 +222,11 @@ export const MarkerMenu: React.FC = () => {
   };
 
   const handleSelectLocationOnMap = () => {
-    console.log('Die SelectionLocation vorher: '+globalSelectingLocation);
     closeModal();
     setNotificationMessage('Bitte wählen Sie einen Punkt auf der Karte aus.');
     setNotificationColor('success');
     setShowNotification(true);
     setGlobalSelectingLocation(true);
-    console.log('Die SelectionLocation: '+globalSelectingLocation);
   };
 
   useEffect(() => { 
@@ -426,7 +425,7 @@ export const MarkerMenu: React.FC = () => {
         isOpen={alert}
         onDidDismiss={() => {
           setAlert(false);
-          window.location.reload(); // Seite neu laden
+          window.location.reload(); 
         }}
         header={"Successful"}
         message={"Parkplatz erfolgreich erstellt."}
