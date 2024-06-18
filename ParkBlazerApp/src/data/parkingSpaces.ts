@@ -29,7 +29,7 @@ export let parkingspaces: parkingSpace[] = [];
 
 export async function initParkingSpaces() {
     if (parkingspaces?.length > 0) return;
-        
+
     let parkingspacesData = undefined;
     let private_parkingspaces = undefined;
     try {
@@ -46,7 +46,7 @@ export async function initParkingSpaces() {
         }
     });
 
-    parkingspaces = parkingspacesData?.data;    
+    parkingspaces = parkingspacesData?.data;
 }
 
 export function setDistancesToPoint(center: number[]) {
