@@ -7,38 +7,48 @@ import axios from 'axios';
 
 function Navbar() {
     const [loggedIn, setLoggedIn] = useState(AuthService.isLoggedIn());
-    const [username, setUsername] = useState<string>("");
+    const [username, setUsername] = useState<string>(localStorage.getItem('username') || "");
     const history = useHistory();
 
     const handleLogout = () => {
         AuthService.logout();
         setLoggedIn(false);
-        window.open('/home',"_self");
+        localStorage.removeItem('username');
+        window.open('/home', "_self");
     };
 
     const handleLogoClick = () => {
-        window.open('/home',"_self");
+        window.open('/home', "_self");
     };
 
     const handleUserMenu = async () => {
-        const token = AuthService.getToken();
-        try {
-            const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_details', {
-                headers: {
-                    Authorization: `Bearer ${token}`
+        if (!username) {
+            const token = AuthService.getToken();
+            try {
+                const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_details', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                const userDetails = response.data;
+                const fetchedUsername = userDetails.userDetails[0].username;
+                setUsername(fetchedUsername);
+                localStorage.setItem('username', fetchedUsername);
+            } catch (error: any) {
+                if (error.response && error.response.data && error.response.data.message) {
+                    throw new Error(error.response.data.message);
+                } else {
+                    throw new Error("An unexpected error occurred. Please try again later!");
                 }
-            });
-            const userDetails = response.data;
-            setUsername(userDetails.userDetails[0].username);
-        } catch (error: any) {
-            if (error.response && error.response.data && error.response.data.message) {
-                throw new Error(error.response.data.message);
-            } else {
-                throw new Error("An unexpected error occurred. Please try again later!");
             }
         }
     };
 
+    useEffect(() => {
+        if (loggedIn && !username) {
+            handleUserMenu();
+        }
+    }, [loggedIn]);
 
     return (
         <IonHeader color="light">
