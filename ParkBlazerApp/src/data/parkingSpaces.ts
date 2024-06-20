@@ -68,7 +68,23 @@ export function getFilteredParkingSpaces(filterParams: FilterParams): parkingSpa
     if (filterParams.currentSearchCenter?.length) list = getNearestParkingSpaces(filterParams.currentSearchCenter, 50);
 
     return list
-        // TODO: parking space category (private, public, all) and price
+        .filter(p => {
+            if (!filterParams.category) return true;
+            switch (filterParams.category) {
+                case "public":
+                    return !p.price_per_hour;
+                case "private":
+                    return p.price_per_hour;
+                default:
+                    return true;
+            }
+        })
+        .filter(p => {
+            if (!filterParams.price?.min && !filterParams.price?.max) return true;
+            if (!p.price_per_hour) return false;
+            return (filterParams.price?.min ? p.price_per_hour >= filterParams.price.min : true) &&
+                (filterParams.price?.max ? p.price_per_hour <= filterParams.price.max : true);
+        })
         .filter(p => {
             if (!filterParams.mode?.value) return true;
             if (filterParams.mode?.mode === "city") {

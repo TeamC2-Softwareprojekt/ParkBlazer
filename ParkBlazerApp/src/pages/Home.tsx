@@ -36,9 +36,9 @@ function Home() {
       currentFilterParams = { ...currentFilterParams, currentSearchCenter: [] };
       updateDistancesToUserLocation(currentFilterParams);
     } else {
-        currentFilterParams = { ...currentFilterParams, currentSearchCenter: [event.center[1], event.center[0]] };
+      currentFilterParams = { ...currentFilterParams, currentSearchCenter: [event.center[1], event.center[0]] };
     }
-    
+
     currentFilterParamsRef.current = currentFilterParams;
     applyFilter(currentFilterParams);
   }
@@ -55,19 +55,23 @@ function Home() {
     let filteredParkingSpaces = getFilteredParkingSpaces(currentFilterParams);
 
     if (filterParams.sort.by) {
+      const order = filterParams.sort.order === "desc" ? -1 : 1;
       switch (filterParams.sort.by) {
-        // TODO: implement sort by price
+        case "price":
+          const privateSpaces = filteredParkingSpaces.filter(p => p.price_per_hour);
+          const publicSpaces = filteredParkingSpaces.filter(p => !p.price_per_hour);
+          privateSpaces.sort((a, b) => (a.price_per_hour! - b.price_per_hour!) * order);
+          filteredParkingSpaces = privateSpaces.concat(publicSpaces);
+          break;
         case "distance":
-          filteredParkingSpaces.sort((a, b) => a.distance! - b.distance!);
+          filteredParkingSpaces.sort((a, b) => (a.distance! - b.distance!) * order);
           break;
         case "availableSpaces":
-          filteredParkingSpaces.sort((a, b) => a.available_spaces - b.available_spaces);
+          filteredParkingSpaces.sort((a, b) => (a.available_spaces - b.available_spaces) * order);
           break;
         default:
           break;
       }
-
-      if (filterParams.sort.order === "desc") filteredParkingSpaces.reverse();
     }
 
     setParkingSpaces(filteredParkingSpaces);
