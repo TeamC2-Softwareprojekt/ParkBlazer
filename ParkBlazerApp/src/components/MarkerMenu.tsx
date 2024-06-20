@@ -165,23 +165,21 @@ export const MarkerMenu: React.FC = () => {
     let data = JSON.stringify({
       name: title,
       description: description,
-      type: 'public',
       available_spaces: availableSpaces,
       image_url: imageUrl,
       latitude: latitude,
       longitude: longitude,
+      type_car: typeCar ? '1' : '0',
+      type_bike: typeBike ? '1' : '0',
+      type_truk: typeTruk ? '1' : '0',
       street: street,
       house_number: houseNumber,
       zip: zip,
       city: city,
       country: country,
-      type_car: typeCar ? '1' : '0',
-      type_bike: typeBike ? '1' : '0',
-      type_truk: typeTruk ? '1' : '0',
-      price_per_hour: privateSpot ? pricePerHour : undefined,
       availability_start_date: privateSpot ? selectedStartDate?.toISOString() : undefined,
       availability_end_date: privateSpot ? selectedEndDate?.toISOString() : undefined,
-      document: privateSpot ? selectedDocument : undefined
+      price_per_hour: privateSpot ? pricePerHour : undefined,
     });
 
     let url = 'https://server-y2mz.onrender.com/api/create_parkingspot';
@@ -202,6 +200,7 @@ export const MarkerMenu: React.FC = () => {
         setNotificationColor('success');
         setShowNotification(true);
         resetAttributes();
+        window.location.reload();
       } else {
         const errorData = await response.json();
         setNotificationMessage(errorData.message || 'Error while saving.');
