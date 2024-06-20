@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert, IonPopover, IonDatetime  } from '@ionic/react';
+import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert, IonPopover, IonDatetime } from '@ionic/react';
 import { chevronUpCircle, add } from 'ionicons/icons';
 import './MarkerMenu.css';
 import { map } from './map';
 import AuthService from '../utils/AuthService';
 import { parkingspaces } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
+import ImageUploader from '../components/ImageUploader';
+
 
 export const MarkerMenu: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -16,7 +18,7 @@ export const MarkerMenu: React.FC = () => {
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [availableSpaces, setAvailableSpaces] = useState<string>('');
-  const [image, setImage] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>('');
   const [street, setStreet] = useState<string>('');
   const [houseNumber, setHouseNumber] = useState<string>('');
   const [zip, setZip] = useState<string>('');
@@ -55,8 +57,8 @@ export const MarkerMenu: React.FC = () => {
 
   function handleMapClick(e: any) {
     const coords = e.lngLat;
-    setLatitude(coords.lat.toString()); 
-    setLongitude(coords.lng.toString()); 
+    setLatitude(coords.lat.toString());
+    setLongitude(coords.lng.toString());
     fetchAddress(coords.lat.toString(), coords.lng.toString());
     openModalCoordinates();
     map.current?.off('click', handleMapClick);
@@ -93,7 +95,7 @@ export const MarkerMenu: React.FC = () => {
     try {
       const response = await fetch(`https://revgeocode.search.hereapi.com/v1/revgeocode?at=${lat},${lng}&lang=en-US&apikey=${apiKey}`);
       const data = await response.json();
-  
+
       if (!(data.items && data.items.length > 0)) {
         setNotificationMessage('No address found.');
         setNotificationColor('danger');
@@ -106,7 +108,7 @@ export const MarkerMenu: React.FC = () => {
       setZip(address.postalCode || '');
       setCity(address.city || '');
       setCountry(address.countryName || '');
-      
+
       // Set country select to the found country
       const countryOption = countries.find(country => country.label === address.countryName);
       if (countryOption) {
@@ -114,13 +116,13 @@ export const MarkerMenu: React.FC = () => {
         setCountry(countryOption.value);
       }
     } catch (error) {
-      console.error('Error fetching address:', error); 
+      console.error('Error fetching address:', error);
       setNotificationMessage('Error fetching address.');
       setNotificationColor('danger');
       setShowNotification(true);
     }
   };
-  
+
   const handleSaveCoordinates = async () => {
     const lat = parseFloat(latitude);
     const lng = parseFloat(longitude);
@@ -165,7 +167,7 @@ export const MarkerMenu: React.FC = () => {
       description: description,
       type: 'public',
       available_spaces: availableSpaces,
-      image_url: image,
+      image_url: imageUrl,
       latitude: latitude,
       longitude: longitude,
       street: street,
@@ -227,10 +229,10 @@ export const MarkerMenu: React.FC = () => {
       return;
     }
 
-    setLatitude(userLocation.latitude.toString()); 
-    setLongitude(userLocation.longitude.toString()); 
+    setLatitude(userLocation.latitude.toString());
+    setLongitude(userLocation.longitude.toString());
     fetchAddress(userLocation.latitude.toString(), userLocation.longitude.toString());
-    openModalCoordinates(); 
+    openModalCoordinates();
   };
 
   const handleSelectLocationOnMap = () => {
@@ -240,7 +242,12 @@ export const MarkerMenu: React.FC = () => {
     setShowNotification(true);
     map.current?.on('click', handleMapClick);
   };
-  
+
+  const handleUploadComplete = (url: string) => {
+    setImageUrl(url);
+    setErrorImage('');
+  };
+
   useEffect(() => {
     const fetchCountries = async () => {
       try {
@@ -254,7 +261,7 @@ export const MarkerMenu: React.FC = () => {
           label: country.name.common
         }));
 
-        const preferredCountries = ['DE', 'US', 'FR'].map(code => 
+        const preferredCountries = ['DE', 'US', 'FR'].map(code =>
           countryOptions.find((country: { value: string; }) => country.value === code)
         ).filter(Boolean);
 
@@ -281,7 +288,7 @@ export const MarkerMenu: React.FC = () => {
     setTitle('');
     setDescription('');
     setAvailableSpaces('');
-    setImage('');
+    setImageUrl('');
     setStreet('');
     setHouseNumber('');
     setZip('');
@@ -341,7 +348,7 @@ export const MarkerMenu: React.FC = () => {
         <IonContent className="ion-padding">
           <IonList>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Titel: </IonLabel>
+              <IonLabel style={{ marginRight: '10px' }}>Titel: </IonLabel>
               <IonInput id='title-input' value={title} onIonChange={e => setTitle(e.detail.value || '')} />
               {errorTitle && <IonText id='error-title-input' color="danger">{errorTitle}</IonText>}
             </IonItem>
@@ -376,7 +383,7 @@ export const MarkerMenu: React.FC = () => {
               {errorCity && <IonText id='error-city-input' color="danger">{errorCity}</IonText>}
             </IonItem>
             <IonItem>
-            <IonLabel style={{ marginRight: '10px' }}>Land: </IonLabel>
+              <IonLabel style={{ marginRight: '10px' }}>Land: </IonLabel>
               <IonSelect
                 value={selectedCountry}
                 placeholder="Wählen Sie ein Land"
@@ -399,8 +406,8 @@ export const MarkerMenu: React.FC = () => {
               LKW<IonCheckbox class="marker-menu-checkbox" checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
             </IonItem>
             <IonItem>
-              <IonLabel style={{ marginRight: '10px' }}>Bild-URL: </IonLabel>
-              <IonInput value={image} onIonChange={e => setImage(e.detail.value || '')} />
+              <IonLabel position="stacked">Bild</IonLabel>
+              <ImageUploader onUploadComplete={handleUploadComplete} />
               {errorImage && <IonText color="danger">{errorImage}</IonText>}
             </IonItem>
             <IonItem>
@@ -454,7 +461,7 @@ export const MarkerMenu: React.FC = () => {
         isOpen={alert}
         onDidDismiss={() => {
           setAlert(false);
-          window.location.reload(); 
+          window.location.reload();
         }}
         header={"Successful"}
         message={"Parkplatz erfolgreich erstellt."}
