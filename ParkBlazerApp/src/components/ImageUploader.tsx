@@ -2,7 +2,11 @@
 import React, { useState } from 'react';
 import { uploadImageToCloudinary } from '../utils/CloudinaryUploader';
 
-const ImageUploader: React.FC = () => {
+interface ImageUploaderProps {
+  onUploadComplete: (url: string) => void;
+}
+
+const ImageUploader: React.FC<ImageUploaderProps> = ({ onUploadComplete }) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string>('');
 
@@ -17,6 +21,7 @@ const ImageUploader: React.FC = () => {
       try {
         const url = await uploadImageToCloudinary(imageFile);
         setImageUrl(url);
+        onUploadComplete(url)
       } catch (error) {
         console.error('Error uploading image:', error);
       }
@@ -26,12 +31,9 @@ const ImageUploader: React.FC = () => {
   return (
     <div>
       <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload Image</button>
+      <button onClick={handleUpload}>Bild hochladen</button>
       {imageUrl && (
-        <div>
-          <img src={imageUrl} alt="Uploaded" />
-          <p>Image URL: {imageUrl}</p>
-        </div>
+        <p>Bild hochgeladen.</p>
       )}
     </div>
   );
