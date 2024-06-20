@@ -298,11 +298,10 @@ const UserProfile: React.FC = () => {
                                     {parkingSpots && parkingSpots.map((spot, index) => (
                                         <IonItem key={index}>
                                             <IonThumbnail slot="start">
-                                                <img alt={`Thumbnail of ${spot.name}`} src={spot.thumbnailUrl || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
+                                                <img alt={`Thumbnail of ${spot.name}`} src={spot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
                                             </IonThumbnail>
-                                            <IonLabel>{spot.name}</IonLabel>
+                                            <IonLabel onClick={() => window.open(`http://localhost:8100/parkingspot_details/${spot.parkingspot_id}`, '_self')}>{spot.name}</IonLabel>
                                             <IonLabel>{spot.description}</IonLabel>
-                                            <IonLabel>{spot.available_spaces}</IonLabel>
                                         </IonItem>
                                     ))}
                                 </IonList>

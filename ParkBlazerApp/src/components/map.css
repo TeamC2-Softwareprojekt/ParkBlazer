@@ -22,3 +22,19 @@
   top: 10px;
   left: 10px;
 }
+
+.maplibregl-popup-content h3 {
+	cursor: pointer;
+}
+
+.modal_parkingspot_marker .ion-delegate-host.ion-page ion-card {
+	padding: 16px;
+}
+
+.modal_parkingspot_marker ion-card-header {
+	padding: 0;
+}
+
+#btn-close {
+	padding-right: 20px;
+}
