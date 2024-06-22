@@ -29,6 +29,7 @@ import StarRating from "../components/StarRating";
 import { format, formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { parkingSpace, parkingspaces, initParkingSpaces } from '../data/parkingSpaces';
+import RentCard from "../components/RentCard";
 
 const ParkingspotDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -135,42 +136,49 @@ const ParkingspotDetails: React.FC = () => {
               <IonCardSubtitle>{parkingspot.description}</IonCardSubtitle>
             </IonCardHeader>
           </IonCard>
+          <div id="parkingspotdetails-rent-container">
+            <div id="parkingspotdetails-container">
+              <IonCard>
+                <IonCardContent id="average-rating">
+                  <IonCardTitle>Average rating:</IonCardTitle>
+                  {calculateAverageRating(reviews)}
+                </IonCardContent>
+              </IonCard>
 
-          <IonCard>
-            <IonCardContent id="average-rating">
-              <IonCardTitle>Average rating:</IonCardTitle>
-              {calculateAverageRating(reviews)}
-            </IonCardContent>
-          </IonCard>
+              <IonCard>
+                <IonCardContent>
+                  <IonCardTitle>Available parkingspot types:</IonCardTitle>
+                  {parkingspot.type_car ? <IonIcon icon={car} size="large" color="primary"></IonIcon> : ""}
+                  {parkingspot.type_bike ? <IonIcon icon={bicycle} size="large" color="primary"></IonIcon> : ""}
+                  {parkingspot.type_truck ? <IonIcon icon={bus} size="large" color="primary"></IonIcon> : ""}
+                </IonCardContent>
+              </IonCard>
+              <IonCard>
+                <IonCardContent>
+                  <IonCardTitle>Available parkingspots:</IonCardTitle>
+                  <IonText><strong>{parkingspot.available_spaces}</strong></IonText>
+                </IonCardContent>
+              </IonCard>
 
-          <IonCard>
-            <IonCardContent>
-              <IonCardTitle>Available parkingspot types:</IonCardTitle>
-              {parkingspot.type_car ? <IonIcon icon={car} size="large" color="primary"></IonIcon> : ""}
-              {parkingspot.type_bike ? <IonIcon icon={bicycle} size="large" color="primary"></IonIcon> : ""}
-              {parkingspot.type_truck ? <IonIcon icon={bus} size="large" color="primary"></IonIcon> : ""}
-            </IonCardContent>
-          </IonCard>
-          <IonCard>
-            <IonCardContent>
-              <IonCardTitle>Available parkingspots:</IonCardTitle>
-              <IonText><strong>{parkingspot.available_spaces}</strong></IonText>
-            </IonCardContent>
-          </IonCard>
-          <IonCard>
-            <IonCardContent>
-              <IonCardTitle>Address:</IonCardTitle>
-              <IonText><strong>Street:</strong> {parkingspot.street}</IonText>
-              <br></br>
-              <IonText><strong>House number:</strong> {parkingspot.house_number}</IonText>
-              <br></br>
-              <IonText><strong>Zip:</strong> {parkingspot.zip}</IonText>
-              <br></br>
-              <IonText><strong>City:</strong> {parkingspot.city}</IonText>
-              <br></br>
-              <IonText><strong>Country:</strong> {parkingspot.country}</IonText>
-            </IonCardContent>
-          </IonCard>
+              <IonCard>
+                <IonCardContent>
+                  <IonCardTitle>Address:</IonCardTitle>
+                  <IonText><strong>Street:</strong> {parkingspot.street}</IonText>
+                  <br></br>
+                  <IonText><strong>House number:</strong> {parkingspot.house_number}</IonText>
+                  <br></br>
+                  <IonText><strong>Zip:</strong> {parkingspot.zip}</IonText>
+                  <br></br>
+                  <IonText><strong>City:</strong> {parkingspot.city}</IonText>
+                  <br></br>
+                  <IonText><strong>Country:</strong> {parkingspot.country}</IonText>
+                </IonCardContent>
+              </IonCard>
+            </div>
+            <div style={{ display: parkingspot?.price_per_hour ? "" : "none" }}>
+              <RentCard parkingspot={parkingspot} />
+            </div>
+          </div>
 
           <IonCard>
             <IonCardHeader>

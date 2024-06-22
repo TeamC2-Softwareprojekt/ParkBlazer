@@ -57,3 +57,16 @@ ion-content.parkingspotdetails-content {
 #rate-parkingspot ion-button {
 	margin-top: 2vh;
 }
+
+#parkingspotdetails-rent-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#parkingspotdetails-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+}

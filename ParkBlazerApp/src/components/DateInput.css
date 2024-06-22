@@ -1,0 +1,40 @@
+.date-input-container {
+    display: flex;
+    border: 1px solid gray;
+    border-radius: 10px;
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+.date-first-input {
+    position: relative;
+}
+
+.date-first-input::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 140%;
+    width: 1px;
+    height: 100%;
+    background-color: gray;
+}
+
+.date-input {
+    max-width: 126px;
+    font-size: medium;
+}
+
+#date-card-popover-input-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+#date-card-popover-input-container ion-datetime {
+    border-radius: 10px;
+}
+
+#date-card-popover {
+    --min-width: fit-content;
+}
