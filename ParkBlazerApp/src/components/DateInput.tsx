@@ -25,7 +25,7 @@ export default function DateInput({ parkingspot, setStartDate, setEndDate }: { p
       setThisStartDate(date);
       setThisEndDate(date2);
     }
-  });
+  }, [location]);
 
   useEffect(() => {
     if (!start_date || !end_date) return;
