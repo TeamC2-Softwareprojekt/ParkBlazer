@@ -17,13 +17,15 @@ import {
     IonCardTitle,
     IonItem,
     IonLabel,
-    IonList
+    IonList,
+    IonIcon
 } from "@ionic/react";
 import axios from "axios";
 import "./UserProfile.css";
 import AuthService from "../utils/AuthService";
 import Navbar from "../components/navbar";
-import { parkingspaces } from "../data/parkingSpaces";
+import { parkingspaces, initParkingSpaces } from "../data/parkingSpaces"; // Import initParkingSpaces
+import { trashOutline } from "ionicons/icons";
 
 const UserProfile: React.FC = () => {
     const initialUserData = {
@@ -50,6 +52,7 @@ const UserProfile: React.FC = () => {
     const [houseNumberValid, setHouseNumberValid] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
     const [parkingSpots, setParkingSpots] = useState<any[]>([]);
+    const [selectedParkingSpot, setSelectedParkingSpot] = useState<any>(null); // State to keep track of selected parking spot
 
     const history = useHistory();
 
@@ -67,20 +70,29 @@ const UserProfile: React.FC = () => {
                 setOriginalUserData(userDetails.userDetails[0]);
                 fetchParkingSpots(userDetails.userDetails[0].username);
             } catch (error: any) {
-                if (error.response && error.response.data && error.response.data.message) {
-                    setError(error.response.data.message);
-                } else {
-                    setError("An unexpected error occurred. Please try again later!");
-                }
+                handleError(error);
+            }
+        };
+
+        const fetchParkingSpots = async (username: string) => {
+            try {
+                await initParkingSpaces(); // Ensure parking spaces are initialized
+                const userParkingSpots = parkingspaces.filter(spot => spot.username === username);
+                setParkingSpots(userParkingSpots);
+            } catch (error) {
+                console.error('Error fetching parking spots:', error);
             }
         };
 
         fetchUserData();
     }, []);
 
-    const fetchParkingSpots = (username: string) => {
-        const userParkingSpots = parkingspaces.filter(spot => spot.username === username);
-        setParkingSpots(userParkingSpots);
+    const handleError = (error: any) => {
+        if (error.response && error.response.data && error.response.data.message) {
+            setError(error.response.data.message);
+        } else {
+            setError("An unexpected error occurred. Please try again later!");
+        }
     };
 
     const validatePassword = useCallback((password: string) => {
@@ -126,11 +138,7 @@ const UserProfile: React.FC = () => {
             setError(response.data.message);
             history.push("/profile");
         } catch (error: any) {
-            if (error.response && error.response.data && error.response.data.message) {
-                setError(error.response.data.message);
-            } else {
-                setError("An unexpected error occurred. Please try again later!");
-            }
+            handleError(error);
         }
     };
 
@@ -140,6 +148,28 @@ const UserProfile: React.FC = () => {
             setOriginalUserData(userData);
         } else {
             setUserData(originalUserData);
+        }
+    };
+
+    const handleDeleteParkingspot = async () => {
+        if (selectedParkingSpot) {
+            try {
+                const token = AuthService.getToken();
+                await axios.delete(`https://server-y2mz.onrender.com/api/delete_parkingspot/${selectedParkingSpot.parkingspot_id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                // Update parking spots after deletion
+                const updatedSpots = parkingSpots.filter(spot => spot.parkingspot_id !== selectedParkingSpot.parkingspot_id);
+                setParkingSpots(updatedSpots);
+
+                setSelectedParkingSpot(null); // Clear selected spot
+                setError(""); // Clear any previous errors
+            } catch (error: any) {
+                handleError(error);
+            }
         }
     };
 
@@ -262,9 +292,9 @@ const UserProfile: React.FC = () => {
                                 disabled={!editMode}
                                 onIonChange={(e) => setUserData((prevState) => ({ ...prevState, country: e.detail.value! }))}
                             >
-                                <IonSelectOption value="Germany">Germany</IonSelectOption>
-                                <IonSelectOption value="Austria">Austria</IonSelectOption>
-                                <IonSelectOption value="Netherlands">Netherlands</IonSelectOption>
+                                <IonSelectOption value="Switzerland">Switzerland</IonSelectOption>
+                                <IonSelectOption value="France">France</IonSelectOption>
+                                <IonSelectOption value="Italy">Italy</IonSelectOption>
                             </IonSelect>
                             <IonButton
                                 expand="block"
@@ -287,31 +317,62 @@ const UserProfile: React.FC = () => {
                         </div>
                     </IonCol>
                 </IonRow>
+                {/* Displaying user's parking spots */}
                 <IonRow className="ion-justify-content-center ion-align-items-center full-height">
                     <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
                         <IonCard>
                             <IonCardHeader>
-                                <IonCardTitle>Deine angelegten Parkplätze</IonCardTitle>
+                                <IonCardTitle>Your Created Parking Spots</IonCardTitle>
                             </IonCardHeader>
                             <IonCardContent>
-                                <IonList>
-                                    {parkingSpots && parkingSpots.map((spot, index) => (
-                                        <IonItem key={index}>
-                                            <IonThumbnail slot="start">
-                                                <img alt={`Thumbnail of ${spot.name}`} src={spot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
-                                            </IonThumbnail>
-                                            <IonLabel onClick={() => window.open(`http://localhost:8100/parkingspot_details/${spot.parkingspot_id}`, '_self')}>{spot.name}</IonLabel>
-                                            <IonLabel>{spot.description}</IonLabel>
-                                        </IonItem>
-                                    ))}
-                                </IonList>
+                                {parkingSpots.length === 0 ? (
+                                    <IonText color="medium">
+                                        <p>Noch keine Parkplätze angelegt.</p>
+                                    </IonText>
+                                ) : (
+                                    <IonList>
+                                        {parkingSpots.map((spot, index) => (
+                                            <IonItem key={index}>
+                                                <IonThumbnail slot="start">
+                                                    <img src={spot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} alt={`Thumbnail of ${spot.name}`} />
+                                                </IonThumbnail>
+                                                <IonLabel>{spot.name}</IonLabel>
+                                                <IonButton
+                                                    color="light"
+                                                    onClick={() => setSelectedParkingSpot(spot)}
+                                                >
+                                                    <IonIcon icon={trashOutline} size="medium" color="primary"></IonIcon>
+                                                </IonButton>
+                                            </IonItem>
+                                        ))}
+                                    </IonList>
+                                )}
                             </IonCardContent>
                         </IonCard>
                     </IonCol>
                 </IonRow>
             </IonGrid>
+            {/* Alert for deleting a parking spot */}
+            <IonAlert
+                header="Parkplatz löschen"
+                isOpen={!!selectedParkingSpot}
+                buttons={[
+                    {
+                        text: 'Abbrechen',
+                        role: 'cancel',
+                        handler: () => setSelectedParkingSpot(null)
+                    },
+                    {
+                        text: 'Löschen',
+                        role: 'confirm',
+                        handler: handleDeleteParkingspot
+                    },
+                ]}
+                message={`Soll ${selectedParkingSpot?.name} gelöscht werden?`}
+            ></IonAlert>
         </>
     );
+
 };
 
 export default UserProfile;
