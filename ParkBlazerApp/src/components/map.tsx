@@ -10,7 +10,7 @@ import './map.css';
 import MarkerMenu from './MarkerMenu';
 import { initParkingSpaces, parkingSpace, parkingspaces } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
-import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle } from '@ionic/react';
+import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle, IonDatetime } from '@ionic/react';
 import { checkmark, close, informationCircle } from 'ionicons/icons';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
@@ -153,22 +153,11 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
                 </IonCard>
                 {selectedSpot.availability_start_date && selectedSpot.availability_end_date && (
                   <IonCard>
-                    <IonText><strong>Verfügbarkeit:</strong></IonText>
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-                      <Calendar
-                        defaultView="month"
-                        value={[new Date(selectedSpot.availability_start_date), new Date(selectedSpot.availability_end_date)]}
-                        tileDisabled={({ date, view }) => {
-                          const startDate = selectedSpot.availability_start_date ? new Date(selectedSpot.availability_start_date) : null;
-                          const endDate = selectedSpot.availability_end_date ? new Date(selectedSpot.availability_end_date) : null;
-                          if (!startDate || !endDate) {
-                            return true;
-                          }
-                          return view === 'month' && (date < startDate || date > endDate);
-                        }}
-                      />
-                    </div>
-                  </IonCard>
+                  <IonText><strong>Verfügbarkeit:</strong></IonText>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+                    <IonDatetime className="date-picker" value={selectedSpot?.availability_start_date} readonly={true} />
+                  </div>
+                </IonCard>
                 )}
               </>
             )}
