@@ -12,6 +12,8 @@ import { initParkingSpaces, parkingSpace, parkingspaces } from '../data/parkingS
 import { getUserLocation } from '../data/userLocation';
 import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle } from '@ionic/react';
 import { checkmark, close, informationCircle } from 'ionicons/icons';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
@@ -24,6 +26,7 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
   const locationMarker = useRef<maptilersdk.Marker>();
   const [selectedSpot, setSelectedSpot] = useState<parkingSpace | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [isPrivateModal, setIsPrivateModal] = useState(false);
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT';
 
@@ -75,6 +78,7 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
 
       marker.getElement().addEventListener('click', () => {
         setSelectedSpot(spot);
+        setIsPrivateModal(!!spot.price_per_hour);
         setShowModal(true);
       });
     });
@@ -142,6 +146,32 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
               <br></br>
               <IonText><strong>Lastwagen:</strong> <IonIcon icon={selectedSpot.type_truck ? checkmark : close} /></IonText>
             </IonCard>
+            {isPrivateModal && (
+              <>
+                <IonCard>
+                  <IonText><strong>Preis:</strong> {selectedSpot.price_per_hour} €</IonText>
+                </IonCard>
+                {selectedSpot.availability_start_date && selectedSpot.availability_end_date && (
+                  <IonCard>
+                    <IonText><strong>Verfügbarkeit:</strong></IonText>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+                      <Calendar
+                        defaultView="month"
+                        value={[new Date(selectedSpot.availability_start_date), new Date(selectedSpot.availability_end_date)]}
+                        tileDisabled={({ date, view }) => {
+                          const startDate = selectedSpot.availability_start_date ? new Date(selectedSpot.availability_start_date) : null;
+                          const endDate = selectedSpot.availability_end_date ? new Date(selectedSpot.availability_end_date) : null;
+                          if (!startDate || !endDate) {
+                            return true;
+                          }
+                          return view === 'month' && (date < startDate || date > endDate);
+                        }}
+                      />
+                    </div>
+                  </IonCard>
+                )}
+              </>
+            )}
           </IonContent>
         </IonModal>
       )}
