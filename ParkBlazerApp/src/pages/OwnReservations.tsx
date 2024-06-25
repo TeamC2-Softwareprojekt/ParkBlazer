@@ -176,7 +176,7 @@ const OwnReservations: React.FC = () => {
                                         </IonItem>
                                     ))}
                                 <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)} className="custom-modal">
-                                <IonContent className="custom-modal">
+                                <IonContent>
                                 {selectedInvoice ? (
                                 <IonGrid>
                                     <IonRow>
