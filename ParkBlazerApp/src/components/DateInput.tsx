@@ -4,7 +4,7 @@ import "./DateInput.css";
 import { format } from 'date-fns';
 import { parkingSpace } from '../data/parkingSpaces';
 
-export default function DateInput({ parkingspot, setStartDate, setEndDate }: { parkingspot: parkingSpace, setStartDate: any, setEndDate: any }) {
+export default function DateInput({ parkingspace, setStartDate, setEndDate }: { parkingspace: parkingSpace, setStartDate: any, setEndDate: any }) {
   const [start_date, setThisStartDate] = useState<Date | null>(null);
   const [end_date, setThisEndDate] = useState<Date | null>(null);
   const [selectStart, setSelectStart] = useState<boolean>(true);
@@ -19,13 +19,13 @@ export default function DateInput({ parkingspot, setStartDate, setEndDate }: { p
       date.setMilliseconds(0);
       let date2 = new Date(date);
       date2.setHours(date2.getHours() + 24);
-      if (date2.getTime() > new Date(parkingspot?.availability_end_date!).getTime()) {
-        date2 = new Date(parkingspot?.availability_end_date!);
+      if (date2.getTime() > new Date(parkingspace?.availability_end_date!).getTime()) {
+        date2 = new Date(parkingspace?.availability_end_date!);
       }
       setThisStartDate(date);
       setThisEndDate(date2);
     }
-  }, [location]);
+  }, []);
 
   useEffect(() => {
     if (!start_date || !end_date) return;
@@ -72,29 +72,29 @@ export default function DateInput({ parkingspot, setStartDate, setEndDate }: { p
 
     if (e.target.classList.contains("start-date")) {
       if (date.getTime() > end_date?.getTime()!) {
-        if (date.getTime() > new Date(parkingspot?.availability_end_date!).getTime()) {
-          setThisEndDate(new Date(parkingspot?.availability_end_date!));
+        if (date.getTime() > new Date(parkingspace?.availability_end_date!).getTime()) {
+          setThisEndDate(new Date(parkingspace?.availability_end_date!));
           return;
         }
         setThisEndDate(date);
         return;
       }
-      if (date.getTime() < new Date(parkingspot?.availability_start_date!).getTime()) {
-        setThisStartDate(new Date(parkingspot?.availability_start_date!));
+      if (date.getTime() < new Date(parkingspace?.availability_start_date!).getTime()) {
+        setThisStartDate(new Date(parkingspace?.availability_start_date!));
         return;
       }
       setThisStartDate(date);
     } else {
       if (date.getTime() < start_date?.getTime()!) {
-        if (date.getTime() < new Date(parkingspot?.availability_start_date!).getTime()) {
-          setThisStartDate(new Date(parkingspot?.availability_start_date!));
+        if (date.getTime() < new Date(parkingspace?.availability_start_date!).getTime()) {
+          setThisStartDate(new Date(parkingspace?.availability_start_date!));
           return;
         }
         setThisStartDate(date);
         return;
       }
-      if (date.getTime() > new Date(parkingspot?.availability_end_date!).getTime()) {
-        setThisEndDate(new Date(parkingspot?.availability_end_date!));
+      if (date.getTime() > new Date(parkingspace?.availability_end_date!).getTime()) {
+        setThisEndDate(new Date(parkingspace?.availability_end_date!));
         return;
       }
       setThisEndDate(date);
@@ -168,7 +168,7 @@ export default function DateInput({ parkingspot, setStartDate, setEndDate }: { p
               <IonInput value={end_date ? format(end_date!, 'dd.MM.yyyy HH:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} className="date-input end-date" />
             </div>
           </div>
-          <IonDatetime ref={calendarRef} presentation="date" multiple={true} minuteValues={"0,30"} min={parkingspot?.availability_start_date} max={parkingspot?.availability_end_date} onIonChange={e => handleDateChange(e)} />
+          <IonDatetime ref={calendarRef} presentation="date" multiple={true} minuteValues={"0,30"} min={parkingspace?.availability_start_date} max={parkingspace?.availability_end_date} onIonChange={e => handleDateChange(e)} />
         </div>
       </IonPopover>
     </>

@@ -5,7 +5,7 @@ import { parkingSpace } from '../data/parkingSpaces';
 import DateInput from "./DateInput";
 import { useHistory } from "react-router";
 
-export default function RentCard({ parkingspot }: { parkingspot: parkingSpace }) {
+export default function RentCard({ parkingspace }: { parkingspace: parkingSpace }) {
   const [start_date, setStartDate] = useState<Date | null>(null);
   const [end_date, setEndDate] = useState<Date | null>(null);
   const [rentTimeInHours, setRentTimeInHours] = useState<number>(0);
@@ -17,7 +17,7 @@ export default function RentCard({ parkingspot }: { parkingspot: parkingSpace })
   }, [start_date, end_date]);
 
   function handleRentClick(e: any) {
-    history.push(`/Rent/${parkingspot.parkingspot_id}?start_date=${start_date?.toISOString()}&end_date=${end_date?.toISOString()}`);
+    history.push(`/Rent/${parkingspace.parkingspot_id}?start_date=${start_date?.toISOString()}&end_date=${end_date?.toISOString()}`);
     window.location.reload();
   }
 
@@ -28,7 +28,7 @@ export default function RentCard({ parkingspot }: { parkingspot: parkingSpace })
           <IonCardHeader>
             <IonCardTitle>
               <div id="rent-card-price">
-                {parkingspot?.price_per_hour}€
+                {parkingspace?.price_per_hour}€
                 <div id="rent-card-price-description">
                   pro Stunde
                 </div>
@@ -36,17 +36,17 @@ export default function RentCard({ parkingspot }: { parkingspot: parkingSpace })
             </IonCardTitle>
           </IonCardHeader>
           <IonCardContent>
-            <DateInput parkingspot={parkingspot} setStartDate={setStartDate} setEndDate={setEndDate} />
+            <DateInput parkingspace={parkingspace} setStartDate={setStartDate} setEndDate={setEndDate} />
             <IonButton onClick={e => handleRentClick(e)} id="rent-card-button" >Mieten</IonButton>
             {rentTimeInHours < 0.5 ?
               end_date ? <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> : "" :
               <div id="price-calculation-container">
                 <div className="price-calculation">
                   <div>
-                    {parkingspot?.price_per_hour + " € x " + rentTimeInHours + " Stunden"}
+                    {parkingspace?.price_per_hour + " € x " + rentTimeInHours + " Stunden"}
                   </div>
                   <div>
-                    {(parkingspot.price_per_hour! * rentTimeInHours).toFixed(2) + "€"}
+                    {(parkingspace.price_per_hour! * rentTimeInHours).toFixed(2) + "€"}
                   </div>
                 </div>
                 <div className="price-calculation">
@@ -54,7 +54,7 @@ export default function RentCard({ parkingspot }: { parkingspot: parkingSpace })
                     Servicegebühr 10%
                   </div>
                   <div>
-                    {(parkingspot.price_per_hour! * rentTimeInHours * 0.1).toFixed(2) + "€"}
+                    {(parkingspace.price_per_hour! * rentTimeInHours * 0.1).toFixed(2) + "€"}
                   </div>
                 </div>
                 <div className="price-calculation">
@@ -62,7 +62,7 @@ export default function RentCard({ parkingspot }: { parkingspot: parkingSpace })
                     Steuern 19%
                   </div>
                   <div>
-                    {(parkingspot.price_per_hour! * rentTimeInHours * 0.19).toFixed(2) + "€"}
+                    {(parkingspace.price_per_hour! * rentTimeInHours * 0.19).toFixed(2) + "€"}
                   </div>
                 </div>
                 <div className="price-calculation" id="rent-card-total-price">
@@ -70,7 +70,7 @@ export default function RentCard({ parkingspot }: { parkingspot: parkingSpace })
                     Gesamtpreis
                   </div>
                   <div>
-                    {(parkingspot.price_per_hour! * rentTimeInHours * 1.29).toFixed(2) + "€"}
+                    {(parkingspace.price_per_hour! * rentTimeInHours * 1.29).toFixed(2) + "€"}
                   </div>
                 </div>
               </div>

@@ -26,7 +26,7 @@ import axios from "axios";
 import { bicycle, bus, car } from "ionicons/icons";
 import AuthService from "../utils/AuthService";
 import StarRating from "../components/StarRating";
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { parkingSpace, parkingspaces, initParkingSpaces } from '../data/parkingSpaces';
 import RentCard from "../components/RentCard";
@@ -176,7 +176,7 @@ const ParkingspotDetails: React.FC = () => {
               </IonCard>
             </div>
             <div style={{ display: parkingspot?.price_per_hour ? "" : "none" }}>
-              <RentCard parkingspot={parkingspot} />
+              <RentCard parkingspace={parkingspot} />
             </div>
           </div>
 

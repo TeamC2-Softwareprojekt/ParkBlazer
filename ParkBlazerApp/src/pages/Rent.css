@@ -14,7 +14,7 @@
 #information-list-container {
     display: flex;
     flex-direction: column;
-    border-bottom: 1px solid gray;
+    border-bottom: 2px solid gray;
     margin-bottom: 10px;
     padding-bottom: 10px;
 }
@@ -35,16 +35,18 @@
 #rent-body {
     display: flex;
     align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 #rent-information-container {
-    margin-right: 50px;
+    margin-right: 100px;
     min-width: 400px;
+    margin-bottom: 50px;
 }
 
 #payment-method {
     margin-top: 10px;
-    border-bottom: 1px solid gray;
+    border-bottom: 2px solid gray;
     padding-bottom: 30px;
 }
 
@@ -77,7 +79,6 @@
 }
 
 #information-card {
-    margin-left: 50px;
     box-shadow: 0px 0px 10px 0px #0054e9;
     border-radius: 10px;
 }
@@ -101,7 +102,7 @@
 #information-card-content {
     display: flex;
     flex-direction: column;
-    border-top: 1px solid gray;
+    border-top: 2px solid gray;
     margin: 15px;
     -webkit-padding-start: 0px;
 }
