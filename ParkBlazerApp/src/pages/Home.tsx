@@ -6,6 +6,7 @@ import ParkingSpaceList from '../components/parkingSpaceList';
 import Filter, { FilterParams, defaultFilterParams } from '../components/filter';
 import { parkingSpace, initParkingSpaces, parkingspaces, getFilteredParkingSpaces, setDistancesToPoint } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
+import { getAverageRatingOfParkingspot, getReviewsOfParkingspot, initReviews } from '../data/review';
 
 function Home() {
   const [parkingSpacesList, setParkingSpaces] = useState<parkingSpace[]>([]);
@@ -13,12 +14,13 @@ function Home() {
   let currentFilterParams: FilterParams = currentFilterParamsRef.current;
 
   useEffect(() => {
-    const fetchParkingSpaces = async () => {
+    const fetchData = async () => {
       await initParkingSpaces();
+      await initReviews();
       setParkingSpaces(parkingspaces);
     }
 
-    fetchParkingSpaces();
+    fetchData();
   }, []);
 
   function updateDistancesToUserLocation(filterParams: FilterParams = currentFilterParamsRef.current) {
@@ -68,6 +70,12 @@ function Home() {
           break;
         case "availableSpaces":
           filteredParkingSpaces.sort((a, b) => (a.available_spaces - b.available_spaces) * order);
+          break;
+        case "rating":
+          const ratedSpaces = filteredParkingSpaces.filter(p => getReviewsOfParkingspot(p.parkingspot_id).length);
+          const unratedSpaces = filteredParkingSpaces.filter(p => !getReviewsOfParkingspot(p.parkingspot_id).length);
+          ratedSpaces.sort((a, b) => (getAverageRatingOfParkingspot(a.parkingspot_id) - getAverageRatingOfParkingspot(b.parkingspot_id)) * order);
+          filteredParkingSpaces = ratedSpaces.concat(unratedSpaces);
           break;
         default:
           break;

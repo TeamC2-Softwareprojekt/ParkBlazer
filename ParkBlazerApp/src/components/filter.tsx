@@ -125,7 +125,7 @@ export default function Filter({ onFilterApply }: { onFilterApply: any }) {
                             <IonLabel>-</IonLabel>
                             <IonInput ref={inputs.inputPriceMax} label="Maximum" type="number" placeholder="0€" labelPlacement="stacked" fill="outline" clearOnEdit={true} inputMode="numeric" min={0} />
                         </div>
-                        <IonInput ref={inputs.inputSpaces} class="filter-content-section" label="Anzahl an Parkplätzen" type="number" placeholder="0" labelPlacement="stacked" fill="outline" clearOnEdit={true} inputMode="numeric" min={0} />
+                        <IonInput ref={inputs.inputSpaces} className="filter-content-section" label="Anzahl an Parkplätzen" type="number" placeholder="0" labelPlacement="stacked" fill="outline" clearOnEdit={true} inputMode="numeric" min={0} />
                         <div id="filter-mode" className="filter-content-section">
                             <IonSelect id="filter-select-mode" className="filter-select" label="Filtern nach" placeholder={searchMode.component.props.label} interface="popover" fill="outline" labelPlacement="stacked" onIonChange={(event) => switchSearchMode(event)}>
                                 <IonSelectOption value="radius">Radius</IonSelectOption>
@@ -138,6 +138,7 @@ export default function Filter({ onFilterApply }: { onFilterApply: any }) {
                                 <IonSelectOption value="price">Preis</IonSelectOption>
                                 <IonSelectOption value="distance">Entfernung</IonSelectOption>
                                 <IonSelectOption value="availableSpaces">Verfügbaren Parkplätze</IonSelectOption>
+                                <IonSelectOption value="rating">Bewertung</IonSelectOption>
                             </IonSelect>
                             <IonSelect ref={selectSortOrder} className="filter-select" id="filter-select-order" label="Reihenfolge" placeholder="Aufsteigend" labelPlacement="stacked" interface="popover" fill="outline">
                                 <IonSelectOption value="asc">Aufsteigend</IonSelectOption>
