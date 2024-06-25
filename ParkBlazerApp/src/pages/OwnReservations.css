@@ -1,0 +1,16 @@
+/* Style Heading */
+.reservation-heading {
+	font-weight: bold;
+	text-align: center;
+}
+
+.custom-modal {
+    --max-width: 50%; /* Maximale Breite des Modals */
+    --max-height: 30%; /* Maximale Höhe des Modals */
+    --min-height: auto; /* Mindesthöhe des Modals */
+    --overflow: hidden; /* Verhindert Überlauf */
+    --position: relative; /* Relative Positionierung */
+    --top: 80%; /* Zentriert das Modal vertikal */
+    --left: 100%; /* Zentriert das Modal horizontal */
+    
+}
