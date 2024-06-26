@@ -1,30 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IonInput, IonDatetime, IonPopover } from "@ionic/react";
 import "./DateInput.css";
-import { format } from 'date-fns';
-import { parkingSpace } from '../data/parkingSpaces';
+import { format, parse, isValid } from 'date-fns';
+import { getReservedDates, parkingSpace } from '../data/parkingSpaces';
 
 export default function DateInput({ parkingspace, setStartDate, setEndDate }: { parkingspace: parkingSpace, setStartDate: any, setEndDate: any }) {
   const [start_date, setThisStartDate] = useState<Date | null>(null);
   const [end_date, setThisEndDate] = useState<Date | null>(null);
   const [selectStart, setSelectStart] = useState<boolean>(true);
+  const [restrictedDates, setRestrictedDates] = useState<Date[][] | null>(null);
   const calendarRef = useRef<HTMLIonDatetimeElement>(null);
 
   useEffect(() => {
-    if (!start_date) {
-      let date = new Date();
-      if (date.getMinutes() <= 59 && date.getMinutes() >= 15) date.setMinutes(30);
-      else date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
-      let date2 = new Date(date);
-      date2.setHours(date2.getHours() + 24);
-      if (date2.getTime() > new Date(parkingspace?.availability_end_date!).getTime()) {
-        date2 = new Date(parkingspace?.availability_end_date!);
-      }
-      setThisStartDate(date);
-      setThisEndDate(date2);
+    async function fetchRestrictedDates() {
+      setRestrictedDates(await getReservedDates(parkingspace?.private_parkingspot_id!));
     }
+
+    fetchRestrictedDates();
   }, []);
 
   useEffect(() => {
@@ -34,117 +26,135 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
     setEndDate(end_date);
   }, [start_date, end_date]);
 
-  function handleDateTextChange(e: any) {
-    const [datePart, timePart] = String(e.target.value)?.split(' ');
-    if (!datePart || !timePart) {
-      if (e.target.classList.contains("start-date"))
-        e.target.value = format(start_date!, 'dd.MM.yyyy HH:mm');
-      else e.target.value = format(end_date!, 'dd.MM.yyyy HH:mm');
-      return;
+  function isAvailable(date: Date): boolean {
+    if (!restrictedDates) return true;
+    for (let i = 0; i < restrictedDates.length; i++) {
+      if (date.getDate() >= restrictedDates[i][0].getDate() && date.getDate() <= restrictedDates[i][1].getDate()) {
+        return false;
+      }
     }
+    return true;
+  }
 
-    let [hours, minutes] = timePart.split(':');
-    let [day, month, year] = datePart.split('.');
-    if (!hours || !minutes || !day || !month || !year) {
-      if (e.target.classList.contains("start-date"))
-        e.target.value = format(start_date!, 'dd.MM.yyyy HH:mm');
-      else e.target.value = format(end_date!, 'dd.MM.yyyy HH:mm');
-      return;
-    }
+  function isDateWithinRange(date: Date, start: Date, end: Date): boolean {
+    if (start.getTime() > end.getTime())
+      return date >= end && date <= start;
+    return date >= start && date <= end;
+  }
 
-    day = day.length < 2 ? "0" + day : day;
-    month = month.length < 2 ? "0" + month : month;
-    hours = hours.length < 2 ? "0" + hours : hours;
-    minutes = minutes.length < 2 ? "0" + minutes : minutes;
-    const date = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00`);
+  function findRestrictedDateInRange(start: Date, end: Date): boolean {
+    if (!restrictedDates) return false;
+    return restrictedDates.some(([startDate, endDate]) =>
+      isDateWithinRange(startDate, start, end) || isDateWithinRange(endDate, start, end)
+    );
+  }
 
-    if (isNaN(date.getTime())) {
-      console.error("Invalid date");
-      e.target.value = format(e.target.classList.contains("start-date") ? start_date! : end_date!, 'dd.MM.yyyy HH:mm');
-      return;
-    }
+  function adjustDateToAvailability(date: Date, isStartDate: boolean): Date {
+    const availabilityStartDate = new Date(parkingspace?.availability_start_date!);
+    const availabilityEndDate = new Date(parkingspace?.availability_end_date!);
 
-    if (date.getMinutes() <= 59 && date.getMinutes() >= 15) {
-      date.setMinutes(30);
+    if (isStartDate && date < availabilityStartDate) return availabilityStartDate;
+    if (!isStartDate && date > availabilityEndDate) return availabilityEndDate;
+    return date;
+  }
+
+  function parseDateTimeFromInput(inputValue: string): Date | null {
+    const [datePart, timePart] = inputValue.split(' ');
+    if (!datePart || !timePart) return null;
+
+    const date = parse(`${datePart} ${timePart}`, 'dd.MM.yyyy HH:mm', new Date());
+    return isValid(date) ? date : null;
+  }
+
+  function parseDateFromEvent(event: any): Date | null {
+    const value = event.target.value;
+    let date;
+
+    if (value && Array.isArray(value) && value.length === 1) {
+      date = new Date(value[0]);
+      date.setHours(12);
+    } else if (value && typeof value[2] === 'string') {
+      const [year, month, day] = value[2].split('-');
+      date = new Date(`${year}-${month}-${day}T10:00:00Z`);
     } else {
-      date.setMinutes(0);
+      return null;
     }
 
-    if (e.target.classList.contains("start-date")) {
-      if (date.getTime() > end_date?.getTime()!) {
-        if (date.getTime() > new Date(parkingspace?.availability_end_date!).getTime()) {
-          setThisEndDate(new Date(parkingspace?.availability_end_date!));
-          return;
-        }
-        setThisEndDate(date);
-        return;
-      }
-      if (date.getTime() < new Date(parkingspace?.availability_start_date!).getTime()) {
-        setThisStartDate(new Date(parkingspace?.availability_start_date!));
-        return;
-      }
-      setThisStartDate(date);
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  function adjustMinutes(date: Date): Date {
+    const minutes = date.getMinutes();
+    date.setMinutes(minutes >= 15 && minutes <= 59 ? 30 : 0);
+    return date;
+  }
+
+  function determineDateToUpdate(date: Date, startDate: Date, endDate: Date, selectStart: boolean): 'start' | 'end' {
+    if (startDate === endDate || selectStart) {
+      return 'start';
+    } else if (Math.abs(date.getTime() - startDate.getTime()) < Math.abs(date.getTime() - endDate.getTime())) {
+      return 'start';
     } else {
-      if (date.getTime() < start_date?.getTime()!) {
-        if (date.getTime() < new Date(parkingspace?.availability_start_date!).getTime()) {
-          setThisStartDate(new Date(parkingspace?.availability_start_date!));
-          return;
-        }
-        setThisStartDate(date);
-        return;
-      }
-      if (date.getTime() > new Date(parkingspace?.availability_end_date!).getTime()) {
-        setThisEndDate(new Date(parkingspace?.availability_end_date!));
-        return;
-      }
-      setThisEndDate(date);
+      return 'end';
     }
   }
 
-  function handleDateChange(e: any) {
-    if (!e.target.value) return;
+  function handleDateChange(date: Date, isStartDate: boolean) {
+    if (!date || !isAvailable(date)) return;
 
-    if (e.target.value.length == 1) {
-      let date = new Date(e.target.value[0]);
-      date.setHours(12);
-      setThisStartDate(date);
-      setThisEndDate(date);
-      return;
-    }
+    const adjustedDate = adjustDateToAvailability(date, isStartDate);
+    const otherDate = isStartDate ? end_date : start_date;
 
-    let [year, month, day] = String(e.target.value[2]).split('-');
-    const date = new Date(`${year}-${month}-${day}T12:00:00`);
-
-    if (isNaN(date.getTime())) {
-      console.error("Invalid date");
-      e.target.value = format(e.target.classList.contains("start-date") ? start_date! : end_date!, 'dd.MM.yyyy HH:mm');
-      return;
-    }
-    
-    if (start_date == end_date) {
-      if (date.getTime() < start_date?.getTime()!) {
-        setThisStartDate(date);
-      }
-      else {
-        setThisEndDate(date);
-      }
-      return;
-    }
-
-    let dateIsCloserToStart = Math.abs(date.getTime() - start_date?.getTime()!) < Math.abs(date.getTime() - end_date?.getTime()!);
-    if ((date.getTime() < start_date?.getTime()! && !selectStart) || (date.getTime() > end_date?.getTime()! && selectStart)) {
-      if (dateIsCloserToStart) {
-        setThisStartDate(date);
+    if (otherDate && findRestrictedDateInRange(adjustedDate, otherDate)) {
+      setThisStartDate(adjustedDate);
+      setThisEndDate(adjustedDate);
+    } else {
+      if (isStartDate) {
+        if (adjustedDate > end_date!) setThisEndDate(adjustedDate);
+        else setThisStartDate(adjustedDate);
       } else {
-        setThisEndDate(date);
+        if (adjustedDate < start_date!) setThisStartDate(adjustedDate);
+        else setThisEndDate(adjustedDate);
       }
     }
-    else if (selectStart) {
+  }
+
+  function handleInvalidDate(event: any) {
+    console.error("Invalid date");
+    event.target.value = format(event.target.classList.contains("start-date") ? start_date! : end_date!, 'dd.MM.yyyy HH:mm');
+  }
+
+  // Handles changes from the text input
+  function handleDateTextChange(event: any) {
+    const inputValue = event.target.value;
+    const isStartDate = event.target.classList.contains("start-date");
+
+    const parsedDate = parseDateTimeFromInput(inputValue);
+    if (!parsedDate || !isAvailable(parsedDate)) {
+      handleInvalidDate(event);
+      return;
+    }
+
+    const adjustedDate = adjustMinutes(parsedDate);
+    handleDateChange(adjustedDate, isStartDate);
+  }
+
+  // Handles changes from the calendar
+  function handleCalenderChange(e: any) {
+    const date = parseDateFromEvent(e);
+    if (!date || !isAvailable(date)) {
+      handleInvalidDate(e);
+      return;
+    }
+
+    if (calendarRef?.current?.value?.length === 1) {
       setThisStartDate(date);
-    }
-    else {
       setThisEndDate(date);
+      return;
     }
+
+    const dateToUpdate = determineDateToUpdate(date, start_date!, end_date!, selectStart);
+    handleDateChange(date, dateToUpdate === 'start');
     setSelectStart(!selectStart);
   }
 
@@ -168,7 +178,7 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
               <IonInput value={end_date ? format(end_date!, 'dd.MM.yyyy HH:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} className="date-input end-date" />
             </div>
           </div>
-          <IonDatetime ref={calendarRef} presentation="date" multiple={true} minuteValues={"0,30"} min={parkingspace?.availability_start_date} max={parkingspace?.availability_end_date} onIonChange={e => handleDateChange(e)} />
+          <IonDatetime isDateEnabled={dateISOString => isAvailable(new Date(dateISOString))} ref={calendarRef} presentation="date" multiple={true} minuteValues={"0,30"} min={parkingspace?.availability_start_date} max={parkingspace?.availability_end_date} onIonChange={e => handleCalenderChange(e)} />
         </div>
       </IonPopover>
     </>

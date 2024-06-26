@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { FilterParams } from '../components/filter';
 import { getUserLocation } from './userLocation';
+import AuthService from '../utils/AuthService';
 
 export interface parkingSpace {
     available_spaces: number;
@@ -90,6 +91,29 @@ export function getFilteredParkingSpaces(filterParams: FilterParams): parkingSpa
             if (!filterParams.minAvailableSpaces) return true;
             return p.available_spaces >= filterParams.minAvailableSpaces;
         });
+}
+
+export async function getReservedDates(private_parkingspt_id: number): Promise<Date[][]> {
+    if (!AuthService.isLoggedIn()) return Promise.resolve([]);
+    await initParkingSpaces();
+    let data;
+    try {
+        const response = await fetch('https://server-y2mz.onrender.com/api/user_reservations', {
+            headers: {
+            Authorization: `Bearer ${AuthService.getToken()}`
+            },
+        });
+        if (response.ok) {
+            data = await response.json();
+        }
+        else {
+            console.error(await response.text());
+        }
+    } catch (error: any) {
+        console.error(error);
+    }
+
+    return Promise.resolve(data?.filter((r: any) => r.private_parkingspot_id === private_parkingspt_id).map((r: any) => [new Date(r.start_date), new Date(r.end_date)]));
 }
 
 function getDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: number) {

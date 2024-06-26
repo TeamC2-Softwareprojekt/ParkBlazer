@@ -101,6 +101,7 @@ export default function Rent() {
     } catch (error: any) {
       console.error(error);
     }
+    handleRedirect("/home");
   }
 
   return (
