@@ -11,7 +11,7 @@ import MarkerMenu from './MarkerMenu';
 import { initParkingSpaces, parkingSpace, parkingspaces } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
 import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle } from '@ionic/react';
-import { checkmark, close, informationCircle } from 'ionicons/icons';
+import { checkmark, close, enterOutline, informationCircle } from 'ionicons/icons';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
@@ -109,6 +109,9 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
           <IonHeader>
             <IonToolbar>
               <IonTitle>{selectedSpot.name}</IonTitle>
+              <IonButton slot="end" onClick={() => window.open(`http://localhost:8100/parkingspot_report/${selectedSpot.parkingspot_id}`, '_self')}>
+                <IonIcon icon={enterOutline} />
+              </IonButton>
               <IonButton slot="end" onClick={() => window.open(`http://localhost:8100/parkingspot_details/${selectedSpot.parkingspot_id}`, '_self')}>
                 <IonIcon icon={informationCircle} />
               </IonButton>

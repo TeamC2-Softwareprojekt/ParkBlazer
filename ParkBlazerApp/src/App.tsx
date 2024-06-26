@@ -9,6 +9,7 @@ import UserProfile from './pages/UserProfile';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 import ParkingspotDetails from './pages/ParkingspotDetails';
+import ParkingspotReport from './pages/ParkingspotReport';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -60,6 +61,13 @@ const App: React.FC = () => (
         </Route>
         <Route path="/parkingspot_details/:id">
           <ParkingspotDetails />
+        </Route>
+        <Route path="/parkingspot_report/:id">
+          {AuthService.isLoggedIn() ? (
+            <ParkingspotReport />
+          ) : (
+            <Redirect to="/home" />
+          )}
         </Route>
         <Route path="/login">
           {AuthService.isLoggedIn() ? (
