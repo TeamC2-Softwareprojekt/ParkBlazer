@@ -7,7 +7,6 @@ import Login from './pages/Login';
 import Registration from './pages/Registration';
 import UserProfile from './pages/UserProfile';
 import ViewMessage from './pages/ViewMessage';
-import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 import ParkingspotDetails from './pages/ParkingspotDetails';
 
 
@@ -41,6 +40,8 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 import AuthService from './utils/AuthService';
+import UserParkingspots from './pages/UserParkingspots';
+import ParkingspotEdit from './pages/ParkingspotEdit';
 
 
 setupIonicReact();
@@ -61,6 +62,13 @@ const App: React.FC = () => (
         <Route path="/parkingspot_details/:id">
           <ParkingspotDetails />
         </Route>
+        <Route path="/parkingspot_edit/:id">
+          {AuthService.isLoggedIn() ? (
+            <ParkingspotEdit />
+          ) : (
+            <Redirect to="/home" />
+          )}
+        </Route>
         <Route path="/login">
           {AuthService.isLoggedIn() ? (
             <Redirect to="/home" />
@@ -75,9 +83,16 @@ const App: React.FC = () => (
             <Registration />
           )}
         </Route>
-        <Route path="/userprofile">
+        <Route path="/user_profile">
           {AuthService.isLoggedIn() ? (
-            <UserProfile/>
+            <UserProfile />
+          ) : (
+            <Redirect to="/home" />
+          )}
+        </Route>
+        <Route path="/user_parkingspots">
+          {AuthService.isLoggedIn() ? (
+            <UserParkingspots />
           ) : (
             <Redirect to="/home" />
           )}

@@ -57,3 +57,9 @@ ion-content.parkingspotdetails-content {
 #rate-parkingspot ion-button {
 	margin-top: 2vh;
 }
+
+.md.card-content-md.parkingspot-edit ion-icon {
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+}

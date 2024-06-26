@@ -18,16 +18,19 @@ import {
   IonInput,
   IonModal,
   IonImg,
+  IonToggle,
 } from "@ionic/react";
 import "./ParkingspotDetails.css";
 import Navbar from "../components/navbar";
 import axios from "axios";
-import { bicycle, bus, car } from "ionicons/icons";
+import { bicycle, bus, car, createOutline } from "ionicons/icons";
 import AuthService from "../utils/AuthService";
 import StarRating from "../components/StarRating";
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { parkingSpace, parkingspaces, initParkingSpaces } from '../data/parkingSpaces';
+import ImageUploader from '../components/ImageUploader';
+
 
 const ParkingspotDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -127,111 +130,117 @@ const ParkingspotDetails: React.FC = () => {
       )}
       {parkingspot && reviews && (
         <IonContent className="parkingspotdetails-content ion-padding">
-          <IonCard>
-            <img alt="Parkingspot Image" src={parkingspot.image_url} onClick={() => openModal(parkingspot.image_url)} />
-            <IonCardHeader>
-              <IonCardTitle className="card-title">{parkingspot.name}</IonCardTitle>
-              <IonCardSubtitle>{parkingspot.description}</IonCardSubtitle>
-            </IonCardHeader>
-          </IonCard>
+          <IonGrid fixed className="parkingspotdetails-grid">
+            <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+              <IonCol className="parkingspotdetails-col" size="12" size-sm="12" size-md="12">
+                <IonCard>
+                  <img alt="Parkingspot Image" src={parkingspot.image_url} onClick={() => openModal(parkingspot.image_url)} />
+                  <IonCardHeader>
+                    <IonCardTitle className="card-title">{parkingspot.name}</IonCardTitle>
+                    <IonCardSubtitle>{parkingspot.description}</IonCardSubtitle>
+                  </IonCardHeader>
+                </IonCard>
 
-          <IonCard>
-            <IonCardContent id="average-rating">
-              <IonCardTitle>Average rating:</IonCardTitle>
-              {calculateAverageRating(reviews)}
-            </IonCardContent>
-          </IonCard>
+                <IonCard>
+                  <IonCardContent id="average-rating">
+                    <IonCardTitle>Average rating:</IonCardTitle>
+                    {calculateAverageRating(reviews)}
+                  </IonCardContent>
+                </IonCard>
 
-          <IonCard>
-            <IonCardContent>
-              <IonCardTitle>Available parkingspot types:</IonCardTitle>
-              {parkingspot.type_car ? <IonIcon icon={car} size="large" color="primary"></IonIcon> : ""}
-              {parkingspot.type_bike ? <IonIcon icon={bicycle} size="large" color="primary"></IonIcon> : ""}
-              {parkingspot.type_truck ? <IonIcon icon={bus} size="large" color="primary"></IonIcon> : ""}
-            </IonCardContent>
-          </IonCard>
-          <IonCard>
-            <IonCardContent>
-              <IonCardTitle>Available parkingspots:</IonCardTitle>
-              <IonText><strong>{parkingspot.available_spaces}</strong></IonText>
-            </IonCardContent>
-          </IonCard>
-          <IonCard>
-            <IonCardContent>
-              <IonCardTitle>Address:</IonCardTitle>
-              <IonText><strong>Street:</strong> {parkingspot.street}</IonText>
-              <br></br>
-              <IonText><strong>House number:</strong> {parkingspot.house_number}</IonText>
-              <br></br>
-              <IonText><strong>Zip:</strong> {parkingspot.zip}</IonText>
-              <br></br>
-              <IonText><strong>City:</strong> {parkingspot.city}</IonText>
-              <br></br>
-              <IonText><strong>Country:</strong> {parkingspot.country}</IonText>
-            </IonCardContent>
-          </IonCard>
+                <IonCard>
+                  <IonCardContent>
+                    <IonCardTitle>Available parkingspot types:</IonCardTitle>
+                    {parkingspot.type_car ? <IonIcon icon={car} size="large" color="primary"></IonIcon> : ""}
+                    {parkingspot.type_bike ? <IonIcon icon={bicycle} size="large" color="primary"></IonIcon> : ""}
+                    {parkingspot.type_truck ? <IonIcon icon={bus} size="large" color="primary"></IonIcon> : ""}
+                  </IonCardContent>
+                </IonCard>
+                <IonCard>
+                  <IonCardContent>
+                    <IonCardTitle>Available parkingspots:</IonCardTitle>
+                    <IonText><strong>{parkingspot.available_spaces}</strong></IonText>
+                  </IonCardContent>
+                </IonCard>
+                <IonCard>
+                  <IonCardContent>
+                    <IonCardTitle>Address:</IonCardTitle>
+                    <IonText><strong>Street:</strong> {parkingspot.street}</IonText>
+                    <br></br>
+                    <IonText><strong>House number:</strong> {parkingspot.house_number}</IonText>
+                    <br></br>
+                    <IonText><strong>Zip:</strong> {parkingspot.zip}</IonText>
+                    <br></br>
+                    <IonText><strong>City:</strong> {parkingspot.city}</IonText>
+                    <br></br>
+                    <IonText><strong>Country:</strong> {parkingspot.country}</IonText>
+                  </IonCardContent>
+                </IonCard>
 
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle>Reviews:</IonCardTitle>
-            </IonCardHeader>
-            <IonCardContent>
-              <IonGrid className="reviews">
-                {reviews.map((review: any, index: any) => (
-                  <IonRow key={index}>
-                    <IonCol>
-                      <IonText><strong>{review.username} ({formatDistanceToNow(review.created_date, { addSuffix: true, locale: enUS })})</strong></IonText>
-                      <StarRating rating={review.rating} />
-                      <IonText>{review.comment}</IonText>
-                    </IonCol>
-                  </IonRow>
-                ))}
-              </IonGrid>
-            </IonCardContent>
-          </IonCard>
+                <IonCard>
+                  <IonCardHeader>
+                    <IonCardTitle>Reviews:</IonCardTitle>
+                  </IonCardHeader>
+                  <IonCardContent>
+                    <IonGrid className="reviews">
+                      {reviews.map((review: any, index: any) => (
+                        <IonRow key={index}>
+                          <IonCol>
+                            <IonText><strong>{review.username} ({formatDistanceToNow(review.created_date, { addSuffix: true, locale: enUS })})</strong></IonText>
+                            <StarRating rating={review.rating} />
+                            <IonText>{review.comment}</IonText>
+                          </IonCol>
+                        </IonRow>
+                      ))}
+                    </IonGrid>
+                  </IonCardContent>
+                </IonCard>
 
-          {AuthService.isLoggedIn() && (
-            <IonCard>
-              <IonCardHeader>
-                <IonCardTitle>Rate the parkingspot:</IonCardTitle>
-              </IonCardHeader>
-              <IonCardContent id="rate-parkingspot">
-                <IonGrid>
-                  <IonRow>
-                    <IonCol>
-                      <IonText>Rating (1-5):</IonText>
-                      <StarRating rating={rating} onRatingChange={setRating} /> { }
-                    </IonCol>
-                  </IonRow>
-                  <IonRow>
-                    <IonCol>
-                      <IonText>Comment:</IonText>
-                      <IonInput value={comment} onIonChange={e => setComment(e.detail.value!)}></IonInput>
-                    </IonCol>
-                  </IonRow>
-                  <IonRow>
-                    <IonCol>
-                      <IonButton onClick={handleRatingSubmit}>Save</IonButton>
-                    </IonCol>
-                  </IonRow>
-                </IonGrid>
-              </IonCardContent>
-            </IonCard>
-          )}
+                {AuthService.isLoggedIn() && (
+                  <IonCard>
+                    <IonCardHeader>
+                      <IonCardTitle>Rate the parkingspot:</IonCardTitle>
+                    </IonCardHeader>
+                    <IonCardContent id="rate-parkingspot">
+                      <IonGrid>
+                        <IonRow>
+                          <IonCol>
+                            <IonText>Rating (1-5):</IonText>
+                            <StarRating rating={rating} onRatingChange={setRating} /> { }
+                          </IonCol>
+                        </IonRow>
+                        <IonRow>
+                          <IonCol>
+                            <IonText>Comment:</IonText>
+                            <IonInput value={comment} onIonChange={e => setComment(e.detail.value!)}></IonInput>
+                          </IonCol>
+                        </IonRow>
+                        <IonRow>
+                          <IonCol>
+                            <IonButton onClick={handleRatingSubmit}>Save</IonButton>
+                          </IonCol>
+                        </IonRow>
+                      </IonGrid>
+                    </IonCardContent>
+                  </IonCard>
+                )}
 
-          <IonAlert
-            isOpen={alert}
-            onDidDismiss={() => window.location.reload()}
-            header={"Successful"}
-            message={"Your review has been successfully submitted."}
-            buttons={["OK"]}
-          />
+                <IonAlert
+                  isOpen={alert}
+                  onDidDismiss={() => window.location.reload()}
+                  header={"Successful"}
+                  message={"Your review has been successfully submitted."}
+                  buttons={["OK"]}
+                />
 
-          <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
-            <IonContent>
-              <IonImg src={modalImage} />
-            </IonContent>
-          </IonModal>
+                <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
+                  <IonContent>
+                    <IonImg src={modalImage} />
+                  </IonContent>
+                </IonModal>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
         </IonContent>
       )}
     </IonPage>

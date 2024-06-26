@@ -1,31 +1,30 @@
 .heading {   
-   margin: 0;
-    padding: 0px;
-    background-color: 
-  black;
-    color: 
-  white;
-    text-align: center;
-  }
-  
-  .heading > h1 {
-    padding: 20px;
-    margin: 0;
-  }
+  margin: 0;
+  padding: 0px;
+  background-color: 
+black;
+  color: 
+white;
+  text-align: center;
+}
 
-  #nav-avatar {
-    width: 30px;
-    height: 30px;
-  }
+#nav-avatar {
+  width: 30px;
+  height: 30px;
+}
 
-  #popover-button {
-    margin-right: 20px;
-  }
+.md.header-md.header-collapse-none {
+  box-shadow: none !important;
+}
 
-  .md.header-md.header-collapse-none {
-    box-shadow: none !important;
-  }
+#user-name .md {
+  font-weight: bold;
+}
 
-  #user-name .md {
-    font-weight: bold;
-  }
+#navbar-title {
+  padding: 0;
+}
+
+.navbar ion-toolbar {
+	padding: 0 5vw;
+}
