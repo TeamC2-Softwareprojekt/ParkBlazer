@@ -42,6 +42,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 import AuthService from './utils/AuthService';
+import UserReports from './pages/UserReports';
 
 
 setupIonicReact();
@@ -65,6 +66,13 @@ const App: React.FC = () => (
         <Route path="/parkingspot_report/:id">
           {AuthService.isLoggedIn() ? (
             <ParkingspotReport />
+          ) : (
+            <Redirect to="/home" />
+          )}
+        </Route>
+        <Route path="/user_reports">
+          {AuthService.isLoggedIn() ? (
+            <UserReports />
           ) : (
             <Redirect to="/home" />
           )}

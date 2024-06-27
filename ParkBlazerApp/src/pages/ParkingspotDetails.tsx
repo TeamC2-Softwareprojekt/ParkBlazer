@@ -180,7 +180,7 @@ const ParkingspotDetails: React.FC = () => {
                 {reviews.map((review: any, index: any) => (
                   <IonRow key={index}>
                     <IonCol>
-                      <IonText><strong>{review.username} ({formatDistanceToNow(review.created_date, { addSuffix: true, locale: enUS })})</strong></IonText>
+                      <IonText><strong>{review.username}</strong></IonText>
                       <StarRating rating={review.rating} />
                       <IonText>{review.comment}</IonText>
                     </IonCol>
