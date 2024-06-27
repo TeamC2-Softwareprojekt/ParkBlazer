@@ -1,5 +1,5 @@
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonContent, IonItem, IonLabel, IonPopover, IonText } from "@ionic/react";
-import { initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingSpaces";
+import { getReservedDates, initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingSpaces";
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbar";
 import { useHistory, useParams } from "react-router";
@@ -10,6 +10,7 @@ import AuthService from "../utils/AuthService";
 import { de } from 'date-fns/locale';
 import StarRating from "../components/StarRating";
 import axios from "axios";
+import { adjustMinutes, findRestrictedDateInRange, adjustDateToAvailability } from "../utils/dateUtils";
 
 export default function Rent() {
   const [parkingspace, setParkingspot] = useState<parkingSpace | null>(null);
@@ -18,6 +19,7 @@ export default function Rent() {
   const [rentTimeInHours, setRentTimeInHours] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<string>("Paypal");
   const [reviews, setReviews] = useState<any>(null);
+  const [restrictedDates, setRestrictedDates] = useState<Date[][] | null>(null);
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
 
@@ -26,18 +28,17 @@ export default function Rent() {
     let startDate = new Date(String(queryParams.get("start_date")));
     let endDate = new Date(String(queryParams.get("end_date")));
 
-    startDate = validateDate(startDate);
-    endDate = validateDate(endDate);
+    startDate = adjustMinutes(startDate);
+    endDate = adjustMinutes(endDate);
     setStartDate(startDate);
     setEndDate(endDate);
-
-    setRentTimeInHours(parseFloat(((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)).toFixed(2)));
 
     async function getParkingspot() {
       await initParkingSpaces();
       const parkingspotDetails = parkingspaces.find(ps => ps.parkingspot_id === Number(id));
       if (parkingspotDetails) {
         setParkingspot(parkingspotDetails);
+        setRestrictedDates(await getReservedDates(parkingspotDetails.private_parkingspot_id!));
       }
     }
 
@@ -57,6 +58,16 @@ export default function Rent() {
     getParkingspot();
   }, []);
 
+  useEffect(() => {
+    if (!start_date && !end_date) return;
+    if (!validateDates(start_date!, end_date!)) {
+      setStartDate(null);
+      setEndDate(null);
+    } else {
+      setRentTimeInHours(parseFloat(((end_date!.getTime() - start_date!.getTime()) / (1000 * 60 * 60)).toFixed(2)));
+    }
+  }, [restrictedDates]);
+
   function calculateAverageRating(reviews: any[]) {
     if (!reviews || reviews.length === 0) return "No reviews yet";
 
@@ -68,15 +79,17 @@ export default function Rent() {
     );
   };
 
-  function validateDate(date: Date) {
-    if (isNaN(date.getTime())) {
-      date = new Date();
+  function validateDates(startDate: Date, endDate: Date) {
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return false;
     }
-    date.setMilliseconds(0);
-    date.setSeconds(0);
-    if (date.getMinutes() <= 59 && date.getMinutes() >= 15) date.setMinutes(30);
-    else date.setMinutes(0);
-    return date;
+    else if (findRestrictedDateInRange(startDate, endDate, restrictedDates!)) {
+      return false;
+    }
+    else if (adjustDateToAvailability(startDate, parkingspace!, true).toDateString() !== startDate.toDateString() || adjustDateToAvailability(endDate, parkingspace!, false).toDateString() !== endDate.toDateString()) {
+      return false;
+    }
+    return true;
   }
 
   function handleRedirect(location: string) {
@@ -181,7 +194,9 @@ export default function Rent() {
                         Einzelheiten zum Preis
                       </div>
                       {rentTimeInHours < 0.5 ?
-                        end_date ? <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> : "" :
+                        !start_date && !end_date ?
+                          <IonText color="danger">Invalides Datum</IonText> :
+                          <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> :
                         <div id="price-calculation-container">
                           <div className="price-calculation">
                             <IonLabel>{parkingspace?.price_per_hour + " € x " + rentTimeInHours + " Stunden"}</IonLabel>

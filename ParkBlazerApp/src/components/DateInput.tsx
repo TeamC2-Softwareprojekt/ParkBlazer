@@ -3,6 +3,7 @@ import { IonInput, IonDatetime, IonPopover } from "@ionic/react";
 import "./DateInput.css";
 import { format, parse, isValid } from 'date-fns';
 import { getReservedDates, parkingSpace } from '../data/parkingSpaces';
+import { adjustDateToAvailability, adjustMinutes, findRestrictedDateInRange } from "../utils/dateUtils";
 
 export default function DateInput({ parkingspace, setStartDate, setEndDate }: { parkingspace: parkingSpace, setStartDate: any, setEndDate: any }) {
   const [start_date, setThisStartDate] = useState<Date | null>(null);
@@ -36,28 +37,6 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
     return true;
   }
 
-  function isDateWithinRange(date: Date, start: Date, end: Date): boolean {
-    if (start.getTime() > end.getTime())
-      return date >= end && date <= start;
-    return date >= start && date <= end;
-  }
-
-  function findRestrictedDateInRange(start: Date, end: Date): boolean {
-    if (!restrictedDates) return false;
-    return restrictedDates.some(([startDate, endDate]) =>
-      isDateWithinRange(startDate, start, end) || isDateWithinRange(endDate, start, end)
-    );
-  }
-
-  function adjustDateToAvailability(date: Date, isStartDate: boolean): Date {
-    const availabilityStartDate = new Date(parkingspace?.availability_start_date!);
-    const availabilityEndDate = new Date(parkingspace?.availability_end_date!);
-
-    if (isStartDate && date < availabilityStartDate) return availabilityStartDate;
-    if (!isStartDate && date > availabilityEndDate) return availabilityEndDate;
-    return date;
-  }
-
   function parseDateTimeFromInput(inputValue: string): Date | null {
     const [datePart, timePart] = inputValue.split(' ');
     if (!datePart || !timePart) return null;
@@ -83,12 +62,6 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
     return isNaN(date.getTime()) ? null : date;
   }
 
-  function adjustMinutes(date: Date): Date {
-    const minutes = date.getMinutes();
-    date.setMinutes(minutes >= 15 && minutes <= 59 ? 30 : 0);
-    return date;
-  }
-
   function determineDateToUpdate(date: Date, startDate: Date, endDate: Date, selectStart: boolean): 'start' | 'end' {
     if (startDate === endDate || selectStart) {
       return 'start';
@@ -102,10 +75,10 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
   function handleDateChange(date: Date, isStartDate: boolean) {
     if (!date || !isAvailable(date)) return;
 
-    const adjustedDate = adjustDateToAvailability(date, isStartDate);
+    const adjustedDate = adjustDateToAvailability(date, parkingspace, isStartDate);
     const otherDate = isStartDate ? end_date : start_date;
 
-    if (otherDate && findRestrictedDateInRange(adjustedDate, otherDate)) {
+    if (otherDate && findRestrictedDateInRange(adjustedDate, otherDate, restrictedDates!)) {
       setThisStartDate(adjustedDate);
       setThisEndDate(adjustedDate);
     } else {
