@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Map from '../components/map';
 import Navbar from '../components/navbar';
 import './Home.css';
@@ -6,6 +6,7 @@ import ParkingSpaceList from '../components/parkingSpaceList';
 import Filter, { FilterParams, defaultFilterParams } from '../components/filter';
 import { parkingSpace, initParkingSpaces, parkingspaces, getFilteredParkingSpaces, setDistancesToPoint } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
+import { getAverageRatingOfParkingspot, getReviewsOfParkingspot, initReviews } from '../data/review';
 
 function Home() {
   const [parkingSpacesList, setParkingSpaces] = useState<parkingSpace[]>([]);
@@ -13,12 +14,13 @@ function Home() {
   let currentFilterParams: FilterParams = currentFilterParamsRef.current;
 
   useEffect(() => {
-    const fetchParkingSpaces = async () => {
+    const fetchData = async () => {
       await initParkingSpaces();
+      await initReviews();
       setParkingSpaces(parkingspaces);
     }
 
-    fetchParkingSpaces();
+    fetchData();
   }, []);
 
   function updateDistancesToUserLocation(filterParams: FilterParams = currentFilterParamsRef.current) {
@@ -36,14 +38,14 @@ function Home() {
       currentFilterParams = { ...currentFilterParams, currentSearchCenter: [] };
       updateDistancesToUserLocation(currentFilterParams);
     } else {
-        currentFilterParams = { ...currentFilterParams, currentSearchCenter: [event.center[1], event.center[0]] };
+      currentFilterParams = { ...currentFilterParams, currentSearchCenter: [event.center[1], event.center[0]] };
     }
-    
+
     currentFilterParamsRef.current = currentFilterParams;
     applyFilter(currentFilterParams);
   }
 
-  function applyFilter(filterParams: any) {
+  const applyFilter = useCallback((filterParams: any) => {
     if (parkingspaces == undefined || parkingspaces.length === 0) return;
 
     if (currentFilterParams.currentSearchCenter?.length)
@@ -55,23 +57,33 @@ function Home() {
     let filteredParkingSpaces = getFilteredParkingSpaces(currentFilterParams);
 
     if (filterParams.sort.by) {
+      const order = filterParams.sort.order === "desc" ? -1 : 1;
       switch (filterParams.sort.by) {
-        // TODO: implement sort by price
+        case "price":
+          const privateSpaces = filteredParkingSpaces.filter(p => p.price_per_hour);
+          const publicSpaces = filteredParkingSpaces.filter(p => !p.price_per_hour);
+          privateSpaces.sort((a, b) => (a.price_per_hour! - b.price_per_hour!) * order);
+          filteredParkingSpaces = privateSpaces.concat(publicSpaces);
+          break;
         case "distance":
-          filteredParkingSpaces.sort((a, b) => a.distance! - b.distance!);
+          filteredParkingSpaces.sort((a, b) => (a.distance! - b.distance!) * order);
           break;
         case "availableSpaces":
-          filteredParkingSpaces.sort((a, b) => a.available_spaces - b.available_spaces);
+          filteredParkingSpaces.sort((a, b) => (a.available_spaces - b.available_spaces) * order);
+          break;
+        case "rating":
+          const ratedSpaces = filteredParkingSpaces.filter(p => getReviewsOfParkingspot(p.parkingspot_id).length);
+          const unratedSpaces = filteredParkingSpaces.filter(p => !getReviewsOfParkingspot(p.parkingspot_id).length);
+          ratedSpaces.sort((a, b) => (getAverageRatingOfParkingspot(a.parkingspot_id) - getAverageRatingOfParkingspot(b.parkingspot_id)) * order);
+          filteredParkingSpaces = ratedSpaces.concat(unratedSpaces);
           break;
         default:
           break;
       }
-
-      if (filterParams.sort.order === "desc") filteredParkingSpaces.reverse();
     }
 
     setParkingSpaces(filteredParkingSpaces);
-  }
+  }, []);
 
   return (
     <div className="Home">
