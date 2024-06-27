@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Map from '../components/map';
 import Navbar from '../components/navbar';
 import './Home.css';
@@ -45,7 +45,7 @@ function Home() {
     applyFilter(currentFilterParams);
   }
 
-  function applyFilter(filterParams: any) {
+  const applyFilter = useCallback((filterParams: any) => {
     if (parkingspaces == undefined || parkingspaces.length === 0) return;
 
     if (currentFilterParams.currentSearchCenter?.length)
@@ -83,7 +83,7 @@ function Home() {
     }
 
     setParkingSpaces(filteredParkingSpaces);
-  }
+  }, []);
 
   return (
     <div className="Home">

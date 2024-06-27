@@ -42,7 +42,7 @@ export function getAverageRatingOfParkingspot(parkingspot_id: number) {
 
     const totalRating = parkingspotReviews.reduce((acc: any, curr: any) => acc + curr.rating, 0);
 
-    return totalRating / parkingspotReviews.length;
+    return Math.round((totalRating / parkingspotReviews.length) * 100) / 100;
 }
 
 export async function createReview(rating: number, comment: string, parkingspot_id: number) {
