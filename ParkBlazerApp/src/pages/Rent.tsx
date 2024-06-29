@@ -5,12 +5,12 @@ import Navbar from "../components/navbar";
 import { useHistory, useParams } from "react-router";
 import { format } from "date-fns";
 import "./Rent.css";
-import "../components/RentCard.css";
 import AuthService from "../utils/AuthService";
 import { de } from 'date-fns/locale';
 import StarRating from "../components/StarRating";
 import axios from "axios";
 import { adjustMinutes, findRestrictedDateInRange, adjustDateToAvailability } from "../utils/dateUtils";
+import PriceCalculation from "../components/PriceCalculation";
 
 export default function Rent() {
   const [parkingspace, setParkingspot] = useState<parkingSpace | null>(null);
@@ -54,7 +54,7 @@ export default function Rent() {
       }
     };
 
-    fetchReviews()
+    fetchReviews();
     getParkingspot();
   }, []);
 
@@ -131,9 +131,7 @@ export default function Rent() {
                 <div id="rent-information-container">
                   <div id="information-list-container">
                     <div className="list-item">
-                      <div className="list-header">
-                        Datum
-                      </div>
+                      <IonLabel className="list-header">Datum</IonLabel>
                       <div className="list-content">
                         {end_date && start_date ?
                           start_date.toDateString() === end_date.toDateString() ? format(end_date, 'dd. MMMM', { locale: de })
@@ -144,9 +142,7 @@ export default function Rent() {
                       </div>
                     </div>
                     <div className="list-item">
-                      <div className="list-header">
-                        Länge
-                      </div>
+                      <IonLabel className="list-header">Länge</IonLabel>
                       <div className="list-content">
                         {rentTimeInHours ?
                           rentTimeInHours < 1 ? `${Math.round(rentTimeInHours * 60)} Minuten`
@@ -156,9 +152,7 @@ export default function Rent() {
                     </div>
                   </div>
                   <div id="payment-method">
-                    <div id="payment-method-header">
-                      Wähle deine Zahlungsart
-                    </div>
+                    <div id="payment-method-header">Wähle deine Zahlungsart</div>
                     <IonButton id="payment-method-button"> {paymentMethod} </IonButton>
                   </div>
                   <IonPopover trigger="payment-method-button" dismissOnSelect={true}>
@@ -169,9 +163,7 @@ export default function Rent() {
                   {AuthService.isLoggedIn() ?
                     <IonButton disabled={!(rentTimeInHours > 0)} onClick={handleRentClick} id="rent-button">Mieten</IonButton> :
                     <>
-                      <div id="login-warning">
-                        Logge dich ein oder registriere dich, um zu Mieten
-                      </div>
+                      <div id="login-warning">Logge dich ein oder registriere dich, um zu Mieten</div>
                       <div id="login-register-buttons">
                         <IonButton onClick={e => handleRedirect("/login")}>Login</IonButton>
                         <IonButton onClick={e => handleRedirect("/registration")}>Registrierung</IonButton>
@@ -180,44 +172,23 @@ export default function Rent() {
                 </div>
 
                 <IonCard id="information-card">
-                  <div id="information-card-container">
-                    <IonCardHeader id="information-card-header">
-                      <img alt="Parkingspot Image" src={parkingspace?.image_url} id="information-card-parkingspace-image" />
-                      <div>
-                        <strong>{parkingspace?.name}</strong> <br />
-                        {parkingspace?.city + " " + parkingspace?.zip + ", " + parkingspace?.street + " " + parkingspace?.house_number} <br />
-                        {calculateAverageRating(reviews)}
-                      </div>
-                    </IonCardHeader>
-                    <IonCardContent id="information-card-content">
-                      <div id="information-card-content-header">
-                        Einzelheiten zum Preis
-                      </div>
-                      {rentTimeInHours < 0.5 ?
-                        !start_date && !end_date ?
-                          <IonText color="danger">Invalides Datum</IonText> :
-                          <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> :
-                        <div id="price-calculation-container">
-                          <div className="price-calculation">
-                            <IonLabel>{parkingspace?.price_per_hour + " € x " + rentTimeInHours + " Stunden"}</IonLabel>
-                            {(parkingspace?.price_per_hour! * rentTimeInHours).toFixed(2) + "€"}
-                          </div>
-                          <div className="price-calculation">
-                            <IonLabel>Servicegebühr 10%</IonLabel>
-                            {(parkingspace?.price_per_hour! * rentTimeInHours * 0.1).toFixed(2) + "€"}
-                          </div>
-                          <div className="price-calculation">
-                            <IonLabel>Steuern 19%</IonLabel>
-                            {(parkingspace?.price_per_hour! * rentTimeInHours * 0.19).toFixed(2) + "€"}
-                          </div>
-                          <div className="price-calculation" id="rent-card-total-price">
-                            <IonLabel>Gesamtpreis</IonLabel>
-                            {(parkingspace?.price_per_hour! * rentTimeInHours * 1.29).toFixed(2) + "€"}
-                          </div>
-                        </div>
-                      }
-                    </IonCardContent>
-                  </div>
+                  <IonCardHeader id="information-card-header">
+                    <img alt="Parkingspot Image" src={parkingspace?.image_url} id="information-card-parkingspace-image" />
+                    <div>
+                      <strong>{parkingspace?.name}</strong> <br />
+                      {parkingspace?.city + " " + parkingspace?.zip + ", " + parkingspace?.street + " " + parkingspace?.house_number} <br />
+                      {calculateAverageRating(reviews)}
+                    </div>
+                  </IonCardHeader>
+                  <IonCardContent id="information-card-content">
+                    <IonLabel>Einzelheiten zum Preis</IonLabel>
+                    {rentTimeInHours < 0.5 ?
+                      !start_date && !end_date ?
+                        <IonText color="danger">Invalides Datum</IonText> :
+                        <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> :
+                      <PriceCalculation parkingspace={parkingspace} rentTimeInHours={rentTimeInHours} />
+                    }
+                  </IonCardContent>
                 </IonCard>
               </div>
             </div>

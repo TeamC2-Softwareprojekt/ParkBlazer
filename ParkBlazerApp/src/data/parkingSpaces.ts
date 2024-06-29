@@ -95,7 +95,6 @@ export function getFilteredParkingSpaces(filterParams: FilterParams): parkingSpa
 
 export async function getReservedDates(private_parkingspt_id: number): Promise<Date[][]> {
     if (!AuthService.isLoggedIn()) return Promise.resolve([]);
-    await initParkingSpaces();
     let data;
     try {
         const response = await fetch('https://server-y2mz.onrender.com/api/user_reservations', {

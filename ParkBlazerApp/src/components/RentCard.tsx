@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { IonButton, IonText, IonCard, IonCardContent, IonCardHeader, IonCardTitle } from "@ionic/react";
+import { IonButton, IonText, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonLabel } from "@ionic/react";
 import "./RentCard.css";
 import { parkingSpace } from '../data/parkingSpaces';
 import DateInput from "./DateInput";
 import { useHistory } from "react-router";
+import PriceCalculation from "./PriceCalculation";
 
 export default function RentCard({ parkingspace }: { parkingspace: parkingSpace }) {
   const [start_date, setStartDate] = useState<Date | null>(null);
@@ -24,58 +25,21 @@ export default function RentCard({ parkingspace }: { parkingspace: parkingSpace 
   return (
     <>
       <IonCard id="rent-card">
+        <IonCardHeader>
+          <IonCardTitle>
+            <IonLabel id="rent-card-price">
+              {parkingspace?.price_per_hour}€
+            </IonLabel>
+            pro Stunde
+          </IonCardTitle>
+        </IonCardHeader>
         <IonCardContent>
-          <IonCardHeader>
-            <IonCardTitle>
-              <div id="rent-card-price">
-                {parkingspace?.price_per_hour}€
-                <div id="rent-card-price-description">
-                  pro Stunde
-                </div>
-              </div>
-            </IonCardTitle>
-          </IonCardHeader>
-          <IonCardContent>
-            <DateInput parkingspace={parkingspace} setStartDate={setStartDate} setEndDate={setEndDate} />
-            <IonButton onClick={e => handleRentClick(e)} id="rent-card-button" >Mieten</IonButton>
-            {rentTimeInHours < 0.5 ?
-              end_date ? <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> : "" :
-              <div id="price-calculation-container">
-                <div className="price-calculation">
-                  <div>
-                    {parkingspace?.price_per_hour + " € x " + rentTimeInHours + " Stunden"}
-                  </div>
-                  <div>
-                    {(parkingspace.price_per_hour! * rentTimeInHours).toFixed(2) + "€"}
-                  </div>
-                </div>
-                <div className="price-calculation">
-                  <div>
-                    Servicegebühr 10%
-                  </div>
-                  <div>
-                    {(parkingspace.price_per_hour! * rentTimeInHours * 0.1).toFixed(2) + "€"}
-                  </div>
-                </div>
-                <div className="price-calculation">
-                  <div>
-                    Steuern 19%
-                  </div>
-                  <div>
-                    {(parkingspace.price_per_hour! * rentTimeInHours * 0.19).toFixed(2) + "€"}
-                  </div>
-                </div>
-                <div className="price-calculation" id="rent-card-total-price">
-                  <div>
-                    Gesamtpreis
-                  </div>
-                  <div>
-                    {(parkingspace.price_per_hour! * rentTimeInHours * 1.29).toFixed(2) + "€"}
-                  </div>
-                </div>
-              </div>
-            }
-          </IonCardContent>
+          <DateInput parkingspace={parkingspace} setStartDate={setStartDate} setEndDate={setEndDate} />
+          <IonButton onClick={e => handleRentClick(e)} id="rent-card-button" >Mieten</IonButton>
+          {rentTimeInHours < 0.5 ?
+            end_date ? <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> : "" :
+            <PriceCalculation parkingspace={parkingspace} rentTimeInHours={rentTimeInHours} />
+          }
         </IonCardContent>
       </IonCard>
     </>)
