@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { IonIcon } from '@ionic/react';
+import { informationCircleOutline } from 'ionicons/icons';
+import { trashBin } from 'ionicons/icons';
+import { cardOutline } from 'ionicons/icons';
 import { useHistory } from "react-router-dom";
+import { bicycle, bus, car } from "ionicons/icons";
 import {
     IonInput,
     IonCol,
@@ -22,13 +27,13 @@ import {
     IonContent,
     IonHeader,
     IonTitle,
-    IonToolbar
+    IonToolbar,
 } from "@ionic/react";
 import axios from "axios";
 import AuthService from "../utils/AuthService";
 import "./OwnReservations.css";
 import Navbar from "../components/navbar";
-import { parkingspaces } from "../data/parkingSpaces";
+import { parkingSpace, parkingspaces } from "../data/parkingSpaces";
 
 
 const OwnReservations: React.FC = () => {
@@ -82,11 +87,17 @@ const OwnReservations: React.FC = () => {
     }
 
     
-    const [privateparkingSpots, setPrivateParkingSpots] = useState<Parkingspot[]>([]);
+   
     const [combinedData, setCombinedData] = useState<CombinedData[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
+    const [showModalTwo, setShowModalTwo] = useState<boolean>(false);
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+    const [currentParkingSpot, setcurrentParkingspot] = useState<Parkingspot | null>(null);
     
+    function setError(message: any) {
+        throw new Error("Function not implemented.");
+    }
+
     useEffect(() => {
         const fetchUserData = async () => {
             const token = AuthService.getToken();
@@ -103,7 +114,7 @@ const OwnReservations: React.FC = () => {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                const userDetails = parkingspaces;
+                
                 const reservations: Reservation[] = reservationsResponse.data;
                 const allparkingspaces: Parkingspot[] = parkingspaces;
 
@@ -148,6 +159,12 @@ const OwnReservations: React.FC = () => {
             }
         }
     };
+
+    const fetchCurrentParkingspot = (spot: Parkingspot) => {
+        setcurrentParkingspot(spot);
+        setShowModalTwo(true);
+    }
+
     
     return(
         <>
@@ -167,14 +184,99 @@ const OwnReservations: React.FC = () => {
                                             <IonThumbnail slot="start">
                                                 <img alt={`Thumbnail of ${data.parkingspot.name}`} src={data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
                                             </IonThumbnail>
-                                                <IonLabel onClick={() => fetchInvoiceDetails(data.reservation.reservation_id)}>
-                                                {data.parkingspot.name}
-                                                </IonLabel>
+                                            <IonLabel onClick={() => window.open(`http://localhost:8100/parkingspot_details/${data.parkingspot.parkingspot_id}`, '_self')}>{data.parkingspot.name}</IonLabel>
+                                            <IonIcon
+                                                icon={informationCircleOutline}
+                                                onClick={() => fetchCurrentParkingspot(data.parkingspot)}
+                                                style={{ marginLeft: '4px', cursor: 'pointer', color: 'white' }} 
+                                            />
+
+                                            <IonIcon 
+                                                icon={cardOutline} 
+                                                onClick={() => fetchInvoiceDetails(data.reservation.reservation_id)} 
+                                                style={{ marginLeft: '4px', cursor: 'pointer', color: 'white' }} 
+                                            />
+
                                                 <IonLabel>{data.reservation.status}</IonLabel>
                                                 <IonLabel>{data.reservation.start_date}</IonLabel>
                                                 <IonLabel>{data.reservation.end_date}</IonLabel>
+                                                <IonIcon icon={trashBin} style={{ fontSize: '24px', color: 'white' }} />                                               
                                         </IonItem>
                                     ))}
+                                <IonModal isOpen={showModalTwo} onDidDismiss={() => setShowModalTwo(false)} className="custom-modal">                                
+                                <IonContent>
+                                {currentParkingSpot ? (
+                                <IonGrid>
+                                    <IonRow>
+                                        <IonCol>
+                                            <IonLabel>
+                                                <h1>Informationen:   {currentParkingSpot.name} </h1>
+                                            </IonLabel>
+                                        </IonCol>
+                                    </IonRow>
+                                    <IonRow>
+                                        <IonCol>
+                                            <IonLabel>
+                                                <h2>Parkmöglichkeiten</h2>
+                                            </IonLabel>
+                                            {currentParkingSpot.type_car ? <IonIcon icon={car} size="large" color="primary"></IonIcon> : ""}
+                                            {currentParkingSpot.type_bike ? <IonIcon icon={bicycle} size="large" color="primary"></IonIcon> : ""}
+                                            {currentParkingSpot.type_truck ? <IonIcon icon={bus} size="large" color="primary"></IonIcon> : ""}
+                                        </IonCol>
+                                        <IonCol>
+                                            <IonRow>    
+                                                <IonCol>       
+                                                    <IonLabel><strong>Freie parkplätze:</strong> {currentParkingSpot.available_spaces}</IonLabel>                                                                                       
+                                                </IonCol>
+                                            </IonRow>
+                                            <IonRow>    
+                                                <IonCol> 
+                                                    <IonLabel>      
+                                                        <strong>Street:</strong> {currentParkingSpot.street}
+                                                    </IonLabel>                                                                                       
+                                                </IonCol>
+                                            </IonRow>
+                                            <IonRow>
+                                                <IonCol>
+                                                    <IonLabel>                                                    
+                                                        <strong>House number:</strong> {currentParkingSpot.house_number}
+                                                    </IonLabel>                                                    
+                                                </IonCol>
+                                            </IonRow>
+                                            <IonRow>
+                                                <IonCol>
+                                                    <IonLabel>
+                                                        <strong>Zip:</strong> {currentParkingSpot.zip}
+                                                    </IonLabel>
+                                                </IonCol>
+                                            </IonRow>
+                                            <IonRow>
+                                                <IonCol>
+                                                    <IonLabel>
+                                                        <strong>City:</strong> {currentParkingSpot.city}
+                                                    </IonLabel>
+                                                </IonCol>
+                                            </IonRow>
+                                            <IonRow>
+                                                <IonCol>
+                                                    <IonLabel>
+                                                        <strong>Country:</strong> {currentParkingSpot.country}
+                                                    </IonLabel>
+                                                </IonCol>
+                                            </IonRow>
+                                        </IonCol>
+                                        <IonRow>
+                                            <IonCol className="ion-text-center">
+                                                <IonButton onClick={() => setShowModalTwo(false)}>Schließen</IonButton>
+                                            </IonCol>
+                                        </IonRow>
+                                    </IonRow>
+                                </IonGrid>
+                                ): (
+                                    <IonLabel>Laden...</IonLabel>
+                                )}
+                                </IonContent>
+                                </IonModal>
                                 <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)} className="custom-modal">
                                 <IonContent>
                                 {selectedInvoice ? (
@@ -236,9 +338,4 @@ const OwnReservations: React.FC = () => {
 
     );
 }
-
 export default OwnReservations;
-
-function setError(message: any) {
-    throw new Error("Function not implemented.");
-}

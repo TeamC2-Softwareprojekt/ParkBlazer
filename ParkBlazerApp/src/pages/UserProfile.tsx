@@ -118,17 +118,8 @@ const UserProfile: React.FC = () => {
         const userPrivateParkingSpots = parkingspaces.filter(spot => spot.username === username && spot.price_per_hour);
         setPrivateParkingSpots(userPrivateParkingSpots);
     }
-    /*
-    const handleLabelClick = (spot: any) => {
-        setSelectedSpot(spot);
-        setShowModal(true);
-    };
+    
 
-    const closeModal = () => {
-        setShowModal(false);
-        setSelectedSpot(null);
-    };
-*/
     const validatePassword = useCallback((password: string) => {
         return password.length > 10;
     }, []);
