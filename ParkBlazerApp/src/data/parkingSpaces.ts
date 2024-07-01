@@ -23,6 +23,7 @@ export interface parkingSpace {
     price_per_hour?: number;
     availability_start_date?: string;
     availability_end_date?: string;
+    private_parkingspot_id?: number;
 }
 
 export let parkingspaces: parkingSpace[] = [];

@@ -1,0 +1,16 @@
+#rent-card {
+    box-shadow: 0px 0px 10px 0px #0054e9;
+    border-radius: 10px;
+    min-width: 500px;
+    margin-left: 40px;
+    padding: 10px;
+}
+
+#rent-card-price {
+    font-size: 25px;
+    margin-right: 5px;
+}
+
+#rent-card-button {
+    width: 100%;
+}
