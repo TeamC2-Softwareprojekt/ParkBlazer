@@ -26,7 +26,7 @@ export const MarkerMenu: React.FC = () => {
   const [country, setCountry] = useState<string>('');
   const [typeCar, setTypeCar] = useState<boolean>(false);
   const [typeBike, setTypeBike] = useState<boolean>(false);
-  const [typeTruk, setTypeTruk] = useState<boolean>(false);
+  const [typeTruck, setTypeTruck] = useState<boolean>(false);
   const [privateSpot, setPrivateSpot] = useState<boolean>(false);
   const [pricePerHour, setPricePerHour] = useState<number>();
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
@@ -171,7 +171,7 @@ export const MarkerMenu: React.FC = () => {
       longitude: longitude,
       type_car: typeCar ? '1' : '0',
       type_bike: typeBike ? '1' : '0',
-      type_truk: typeTruk ? '1' : '0',
+      type_truck: typeTruck ? '1' : '0',
       street: street,
       house_number: houseNumber,
       zip: zip,
@@ -402,7 +402,7 @@ export const MarkerMenu: React.FC = () => {
             <IonItem>
               PKW<IonCheckbox class="marker-menu-checkbox" checked={typeCar} onIonChange={e => setTypeCar(e.detail.checked)} />
               Fahrrad<IonCheckbox class="marker-menu-checkbox" checked={typeBike} onIonChange={e => setTypeBike(e.detail.checked)} />
-              LKW<IonCheckbox class="marker-menu-checkbox" checked={typeTruk} onIonChange={e => setTypeTruk(e.detail.checked)} />
+              LKW<IonCheckbox class="marker-menu-checkbox" checked={typeTruck} onIonChange={e => setTypeTruck(e.detail.checked)} />
             </IonItem>
             <IonItem>
               <IonLabel position="stacked">Bild</IonLabel>
