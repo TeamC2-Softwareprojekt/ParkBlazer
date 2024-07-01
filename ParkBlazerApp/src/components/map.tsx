@@ -11,7 +11,9 @@ import MarkerMenu from './MarkerMenu';
 import { initParkingSpaces, parkingSpace, parkingspaces } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
 import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle } from '@ionic/react';
-import { checkmark, close, informationCircle } from 'ionicons/icons';
+import { checkmark, close, enterOutline, informationCircle } from 'ionicons/icons';
+import { formatDistanceToNow } from 'date-fns';
+import { enUS, de } from 'date-fns/locale';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
@@ -24,6 +26,7 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
   const locationMarker = useRef<maptilersdk.Marker>();
   const [selectedSpot, setSelectedSpot] = useState<parkingSpace | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [availabilityReports, setAvailabilityReports] = useState<any[]>([]);
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT';
 
@@ -76,8 +79,19 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
       marker.getElement().addEventListener('click', () => {
         setSelectedSpot(spot);
         setShowModal(true);
+        fetchAvailabilityReports(spot.parkingspot_id);
       });
     });
+  };
+
+  const fetchAvailabilityReports = async (parkingspotId: any) => {
+    try {
+      const response = await fetch(`https://server-y2mz.onrender.com/api/parking_availability_reports/${parkingspotId}`);
+      const data = await response.json();
+      setAvailabilityReports(data.reports);
+    } catch (error) {
+      console.error("Fehler beim Abrufen der Parkplatzverfügbarkeitsberichte:", error);
+    }
   };
 
   const markUserLocation = () => {
@@ -109,6 +123,9 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
           <IonHeader>
             <IonToolbar>
               <IonTitle>{selectedSpot.name}</IonTitle>
+              <IonButton slot="end" onClick={() => window.open(`http://localhost:8100/parkingspot_report/${selectedSpot.parkingspot_id}`, '_self')}>
+                <IonIcon icon={enterOutline} />
+              </IonButton>
               <IonButton slot="end" onClick={() => window.open(`http://localhost:8100/parkingspot_details/${selectedSpot.parkingspot_id}`, '_self')}>
                 <IonIcon icon={informationCircle} />
               </IonButton>
@@ -118,6 +135,12 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
             </IonToolbar>
           </IonHeader>
           <IonContent>
+            <IonCard>
+              <IonCardHeader>
+                <IonCardSubtitle>Aktuelle Auslastung:</IonCardSubtitle>
+              </IonCardHeader>
+              <IonText><strong>{availabilityReports.length > 0 ? availabilityReports[0].available_spaces + "/" + selectedSpot.available_spaces + " (" + (formatDistanceToNow(availabilityReports[0].parking_availability_report_date, { addSuffix: true, locale: de })) + ")" : "Keine Daten verfügbar"}</strong></IonText>
+            </IonCard>
             <IonCard>
               {selectedSpot.image_url && <img src={selectedSpot.image_url} alt="Parkplatzbild" style={{ maxWidth: '100%' }} />}
             </IonCard>

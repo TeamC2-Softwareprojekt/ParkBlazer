@@ -9,6 +9,7 @@ import UserProfile from './pages/UserProfile';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 import ParkingspotDetails from './pages/ParkingspotDetails';
+import ParkingspotReport from './pages/ParkingspotReport';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -41,6 +42,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 import AuthService from './utils/AuthService';
+import UserReports from './pages/UserReports';
 
 
 setupIonicReact();
@@ -60,6 +62,20 @@ const App: React.FC = () => (
         </Route>
         <Route path="/parkingspot_details/:id">
           <ParkingspotDetails />
+        </Route>
+        <Route path="/parkingspot_report/:id">
+          {AuthService.isLoggedIn() ? (
+            <ParkingspotReport />
+          ) : (
+            <Redirect to="/home" />
+          )}
+        </Route>
+        <Route path="/user_reports">
+          {AuthService.isLoggedIn() ? (
+            <UserReports />
+          ) : (
+            <Redirect to="/home" />
+          )}
         </Route>
         <Route path="/login">
           {AuthService.isLoggedIn() ? (

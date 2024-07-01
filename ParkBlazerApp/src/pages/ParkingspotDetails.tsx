@@ -25,8 +25,6 @@ import axios from "axios";
 import { bicycle, bus, car } from "ionicons/icons";
 import AuthService from "../utils/AuthService";
 import StarRating from "../components/StarRating";
-import { formatDistanceToNow } from 'date-fns';
-import { enUS } from 'date-fns/locale';
 import { parkingSpace, parkingspaces, initParkingSpaces } from '../data/parkingSpaces';
 
 const ParkingspotDetails: React.FC = () => {
@@ -180,7 +178,7 @@ const ParkingspotDetails: React.FC = () => {
                 {reviews.map((review: any, index: any) => (
                   <IonRow key={index}>
                     <IonCol>
-                      <IonText><strong>{review.username} ({formatDistanceToNow(review.created_date, { addSuffix: true, locale: enUS })})</strong></IonText>
+                      <IonText><strong>{review.username}</strong></IonText>
                       <StarRating rating={review.rating} />
                       <IonText>{review.comment}</IonText>
                     </IonCol>
