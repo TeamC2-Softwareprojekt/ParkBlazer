@@ -10,8 +10,9 @@ import './map.css';
 import MarkerMenu from './MarkerMenu';
 import { initParkingSpaces, parkingSpace, parkingspaces } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
-import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle } from '@ionic/react';
+import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle, IonDatetime } from '@ionic/react';
 import { checkmark, close, informationCircle } from 'ionicons/icons';
+import 'react-calendar/dist/Calendar.css';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
@@ -24,6 +25,7 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
   const locationMarker = useRef<maptilersdk.Marker>();
   const [selectedSpot, setSelectedSpot] = useState<parkingSpace | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [isPrivateModal, setIsPrivateModal] = useState(false);
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT';
 
@@ -67,14 +69,21 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
 
   const displayParkingSpotsOnMap = () => {
     if (!map.current) return;
-
+  
     parkingspaces?.forEach((spot) => {
-      const marker = new maptilersdk.Marker({ color: "#0000FF" })
+      let markerColor = "#0000FF";
+  
+      if (spot.price_per_hour) {
+        markerColor = "#228B22";
+      }
+  
+      const marker = new maptilersdk.Marker({ color: markerColor })
         .setLngLat([spot.longitude, spot.latitude])
         .addTo(map.current!);
-
+  
       marker.getElement().addEventListener('click', () => {
         setSelectedSpot(spot);
+        setIsPrivateModal(!!spot.price_per_hour);
         setShowModal(true);
       });
     });
@@ -142,6 +151,21 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
               <br></br>
               <IonText><strong>Lastwagen:</strong> <IonIcon icon={selectedSpot.type_truck ? checkmark : close} /></IonText>
             </IonCard>
+            {isPrivateModal && (
+              <>
+                <IonCard>
+                  <IonText><strong>Preis:</strong> {selectedSpot.price_per_hour} €</IonText>
+                </IonCard>
+                {selectedSpot.availability_start_date && selectedSpot.availability_end_date && (
+                  <IonCard>
+                  <IonText><strong>Verfügbarkeit:</strong></IonText>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+                    <IonDatetime className="date-picker" value={selectedSpot?.availability_start_date} readonly={true} />
+                  </div>
+                </IonCard>
+                )}
+              </>
+            )}
           </IonContent>
         </IonModal>
       )}
