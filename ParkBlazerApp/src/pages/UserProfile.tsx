@@ -17,12 +17,7 @@ import {
     IonCardTitle,
     IonItem,
     IonLabel,
-    IonModal,
-    IonList,
-    IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar
+    IonList
 } from "@ionic/react";
 import axios from "axios";
 import "./UserProfile.css";
@@ -55,34 +50,8 @@ const UserProfile: React.FC = () => {
     const [houseNumberValid, setHouseNumberValid] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
     const [parkingSpots, setParkingSpots] = useState<any[]>([]);
-    const [privateparkingSpots, setPrivateParkingSpots] = useState<any[]>([]);
-    const [showModal, setShowModal] = useState(false);
-    const [selectedSpot, setSelectedSpot] = useState<ParkingSpace | null>(null);
 
     const history = useHistory();
-
-    interface ParkingSpace {
-        available_spaces: number;
-        city: string;
-        country: string;
-        description: string;
-        house_number: string;
-        image_url: string;
-        latitude: number;
-        longitude: number;
-        name: string;
-        parkingspot_id: number;
-        street: string;
-        type_bike: number;
-        type_car: number;
-        type_truck: number;
-        username: string;
-        zip: string;
-        distance?: number;
-        price_per_hour?: number;
-        availability_start_date?: string;
-        availability_end_date?: string;
-      }
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -97,7 +66,6 @@ const UserProfile: React.FC = () => {
                 setUserData(userDetails.userDetails[0]);
                 setOriginalUserData(userDetails.userDetails[0]);
                 fetchParkingSpots(userDetails.userDetails[0].username);
-                fetchPrivateParkingSpots(userDetails.userDetails[0].username);
             } catch (error: any) {
                 if (error.response && error.response.data && error.response.data.message) {
                     setError(error.response.data.message);
@@ -111,14 +79,9 @@ const UserProfile: React.FC = () => {
     }, []);
 
     const fetchParkingSpots = (username: string) => {
-        const userParkingSpots = parkingspaces.filter(spot => spot.username === username && !spot.price_per_hour);
+        const userParkingSpots = parkingspaces.filter(spot => spot.username === username);
         setParkingSpots(userParkingSpots);
     };
-    const fetchPrivateParkingSpots = (username: string) => {
-        const userPrivateParkingSpots = parkingspaces.filter(spot => spot.username === username && spot.price_per_hour);
-        setPrivateParkingSpots(userPrivateParkingSpots);
-    }
-    
 
     const validatePassword = useCallback((password: string) => {
         return password.length > 10;
@@ -328,33 +291,11 @@ const UserProfile: React.FC = () => {
                     <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
                         <IonCard>
                             <IonCardHeader>
-                                <IonCardTitle>Deine öffentlichen parkplätze</IonCardTitle>
+                                <IonCardTitle>Deine angelegten Parkplätze</IonCardTitle>
                             </IonCardHeader>
                             <IonCardContent>
                                 <IonList>
                                     {parkingSpots && parkingSpots.map((spot, index) => (
-                                        <IonItem key={index}>
-                                            <IonThumbnail slot="start">
-                                                <img alt={`Thumbnail of ${spot.name}`} src={spot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
-                                            </IonThumbnail>
-                                            <IonLabel onClick={() => window.open(`http://localhost:8100/parkingspot_details/${spot.parkingspot_id}`, '_self')}>{spot.name}</IonLabel>
-                                            <IonLabel>{spot.description}</IonLabel>
-                                        </IonItem>
-                                    ))}
-                                </IonList>
-                            </IonCardContent>
-                        </IonCard>
-                    </IonCol>
-                </IonRow>
-                <IonRow className="ion-justify-content-center ion-align-items-center full-height">
-                    <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
-                        <IonCard>
-                            <IonCardHeader>
-                                <IonCardTitle>Deine privaten Parkplätze</IonCardTitle>
-                            </IonCardHeader>
-                            <IonCardContent>
-                                <IonList>
-                                    {privateparkingSpots && privateparkingSpots.map((spot, index) => (
                                         <IonItem key={index}>
                                             <IonThumbnail slot="start">
                                                 <img alt={`Thumbnail of ${spot.name}`} src={spot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
@@ -374,5 +315,3 @@ const UserProfile: React.FC = () => {
 };
 
 export default UserProfile;
-
-                        
