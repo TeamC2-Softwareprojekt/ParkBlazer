@@ -74,6 +74,9 @@ function Navbar() {
                                     <IonItem button={true} detail={false} routerLink="/userprofile">
                                         Profil
                                     </IonItem>
+                                    <IonItem button={true} detail={false} routerLink="/ownreservations">
+                                        Buchungen
+                                    </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
                                         Logout
                                     </IonItem>
