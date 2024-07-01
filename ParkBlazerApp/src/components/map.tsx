@@ -68,12 +68,18 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
 
   const displayParkingSpotsOnMap = () => {
     if (!map.current) return;
-
+  
     parkingspaces?.forEach((spot) => {
-      const marker = new maptilersdk.Marker({ color: "#FF0000" })
+      let markerColor = "#0000FF";
+  
+      if (spot.price_per_hour) {
+        markerColor = "#228B22";
+      }
+  
+      const marker = new maptilersdk.Marker({ color: markerColor })
         .setLngLat([spot.longitude, spot.latitude])
         .addTo(map.current!);
-
+  
       marker.getElement().addEventListener('click', () => {
         setSelectedSpot(spot);
         setIsPrivateModal(!!spot.price_per_hour);
@@ -89,7 +95,7 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
 
     if (locationMarker) locationMarker.current?.remove();
 
-    locationMarker.current = new maptilersdk.Marker({ color: "#0000FF" });
+    locationMarker.current = new maptilersdk.Marker({ color: "#FF0000" });
     locationMarker.current?.setLngLat([location.longitude, location.latitude]);
     locationMarker.current?.setPopup(new maptilersdk.Popup().setHTML("<h3>Ihr Standort</h3>"));
     locationMarker.current?.addTo(map.current);
