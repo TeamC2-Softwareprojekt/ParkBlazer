@@ -12,7 +12,6 @@ import { initParkingSpaces, parkingSpace, parkingspaces } from '../data/parkingS
 import { getUserLocation } from '../data/userLocation';
 import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle, IonDatetime } from '@ionic/react';
 import { checkmark, close, informationCircle } from 'ionicons/icons';
-import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
