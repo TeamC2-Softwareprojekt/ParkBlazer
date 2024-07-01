@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import AuthService from "../utils/AuthService";
+import "./UserReports.css";
 import { formatDistanceToNow } from "date-fns";
 import { de } from "date-fns/locale";
 
@@ -37,10 +38,10 @@ const UserReports: React.FC = () => {
             <IonGrid fixed className="userreports-grid">
                 <IonRow className="ion-justify-content-center ion-align-items-center full-height">
                     <IonCol className="userreports-col" size="12" size-sm="12" size-md="12">
+                        <IonText color="primary" className="register-title">
+                            <h1 className="userreports-heading">Deine Meldungen</h1>
+                        </IonText>
                         <IonCard>
-                            <IonCardHeader>
-                                <IonCardTitle>Deine Parkplatz-Meldungen</IonCardTitle>
-                            </IonCardHeader>
                             <IonCardContent>
                                 <IonList>
                                     {reports && reports.map((report: any, index: any) => (
