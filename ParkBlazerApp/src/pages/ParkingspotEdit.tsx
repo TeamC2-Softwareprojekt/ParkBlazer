@@ -22,7 +22,6 @@ import ImageUploader from "../components/ImageUploader";
 const ParkingspotEdit: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [parkingspot, setParkingspot] = useState<parkingSpace | null>(null);
-    const [originalParkingspot, setOriginalParkingspot] = useState<parkingSpace | null>(null);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [availableSpaces, setAvailableSpaces] = useState<string>("");
@@ -38,9 +37,8 @@ const ParkingspotEdit: React.FC = () => {
             const parkingspotDetails = parkingspaces.find(ps => ps.parkingspot_id === parseInt(id));
             if (parkingspotDetails) {
                 setParkingspot(parkingspotDetails);
-                setOriginalParkingspot(parkingspotDetails);
             } else {
-                setError("Parkplatz nicht gefunden.");
+                setError("Parkingspot not found.");
             }
         };
 
@@ -80,16 +78,13 @@ const ParkingspotEdit: React.FC = () => {
     };
 
     const toggleEditMode = () => {
-        setEditMode(!editMode);
-        if (!editMode) {
-            setOriginalParkingspot(parkingspot);
-            setImageUrl(parkingspot?.image_url || "");
-        } else {
-            if (originalParkingspot) {
-                setParkingspot(originalParkingspot);
-                setImageUrl(originalParkingspot.image_url || "");
-            }
+        if (editMode && parkingspot) {
+            setName(parkingspot.name);
+            setDescription(parkingspot.description);
+            setAvailableSpaces(parkingspot.available_spaces.toString());
+            setImageUrl(parkingspot.image_url || "");
         }
+        setEditMode(!editMode);
     };
 
     const handleUploadComplete = (url: string) => {

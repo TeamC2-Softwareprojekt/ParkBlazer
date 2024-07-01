@@ -23,13 +23,12 @@ import {
 import "./ParkingspotDetails.css";
 import Navbar from "../components/navbar";
 import axios from "axios";
-import { bicycle, bus, car, createOutline } from "ionicons/icons";
+import { bicycle, bus, car } from "ionicons/icons";
 import AuthService from "../utils/AuthService";
 import StarRating from "../components/StarRating";
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { parkingSpace, parkingspaces, initParkingSpaces } from '../data/parkingSpaces';
-import ImageUploader from '../components/ImageUploader';
 
 
 const ParkingspotDetails: React.FC = () => {

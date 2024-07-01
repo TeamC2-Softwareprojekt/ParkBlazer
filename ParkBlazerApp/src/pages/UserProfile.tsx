@@ -12,7 +12,6 @@ import {
     IonSelectOption,
     IonPage,
     IonContent,
-    ScrollDetail,
 } from "@ionic/react";
 import axios from "axios";
 import "./UserProfile.css";
@@ -71,7 +70,7 @@ const UserProfile: React.FC = () => {
             try {
                 const response = await fetch('https://restcountries.com/v3.1/all');
                 if (!response.ok) {
-                    throw new Error('Netzwerkantwort war nicht okay');
+                    throw new Error('Cannont get countries!');
                 }
                 const data = await response.json();
                 const countryOptions = data.map((country: any) => ({

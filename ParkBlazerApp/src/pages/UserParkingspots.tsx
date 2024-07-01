@@ -39,7 +39,7 @@ const UserProfile: React.FC = () => {
                 setParkingSpots(userParkingSpots);
                 setLoading(false);
             } catch (error) {
-                setError("Fehler beim Laden der Parkplätze!");
+                setError("Error loading the parkingspots!");
                 setLoading(false);
             }
         };
@@ -55,21 +55,22 @@ const UserProfile: React.FC = () => {
     };
 
     const handleDeleteParkingspot = async () => {
-        if (selectedParkingSpot) {
-            try {
-                const token = AuthService.getToken();
-                await axios.delete(`https://server-y2mz.onrender.com/api/delete_parkingspot/${selectedParkingSpot.parkingspot_id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                const updatedSpots = parkingSpots.filter(spot => spot.parkingspot_id !== selectedParkingSpot.parkingspot_id);
-                setParkingSpots(updatedSpots);
-                setSelectedParkingSpot(null);
-                setError("");
-            } catch (error: any) {
-                handleError(error);
-            }
+        if (!selectedParkingSpot) {
+            return
+        }
+        try {
+            const token = AuthService.getToken();
+            await axios.delete(`https://server-y2mz.onrender.com/api/delete_parkingspot/${selectedParkingSpot.parkingspot_id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            const updatedSpots = parkingSpots.filter(spot => spot.parkingspot_id !== selectedParkingSpot.parkingspot_id);
+            setParkingSpots(updatedSpots);
+            setSelectedParkingSpot(null);
+            setError("");
+        } catch (error: any) {
+            handleError(error);
         }
     };
 
