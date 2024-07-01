@@ -1,5 +1,5 @@
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonContent, IonItem, IonLabel, IonPopover, IonText } from "@ionic/react";
-import { getReservedDates, initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingSpaces";
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonContent, IonLabel, IonSelect, IonSelectOption, IonSpinner, IonText } from "@ionic/react";
+import { initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingSpaces";
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbar";
 import { useHistory, useParams } from "react-router";
@@ -11,6 +11,7 @@ import StarRating from "../components/StarRating";
 import axios from "axios";
 import { adjustMinutes, findRestrictedDateInRange, adjustDateToAvailability } from "../utils/dateUtils";
 import PriceCalculation from "../components/PriceCalculation";
+import { createReservation, getReservedDates } from "../data/reservation";
 
 export default function Rent() {
   const [parkingspace, setParkingspot] = useState<parkingSpace | null>(null);
@@ -38,7 +39,8 @@ export default function Rent() {
       const parkingspotDetails = parkingspaces.find(ps => ps.parkingspot_id === Number(id));
       if (parkingspotDetails) {
         setParkingspot(parkingspotDetails);
-        setRestrictedDates(await getReservedDates(parkingspotDetails.private_parkingspot_id!));
+        let data = await getReservedDates(parkingspace?.private_parkingspot_id!);
+        setRestrictedDates(data.map(reservation => [new Date(reservation.start_date), new Date(reservation.end_date)]));
       }
     }
 
@@ -97,22 +99,10 @@ export default function Rent() {
     window.location.reload();
   }
 
-  async function handleRentClick(e: any) {
-    try {
-      await axios.post('https://server-y2mz.onrender.com/api/create_reservation', {
-        start_date: start_date?.toISOString(),
-        end_date: end_date?.toISOString(),
-        private_parkingspot_id: parkingspace?.private_parkingspot_id,
-        amount: Number((parkingspace?.price_per_hour! * rentTimeInHours * 1.29).toFixed(2)),
-        payment_method: paymentMethod,
-        userId: AuthService.getToken()
-      }, {
-        headers: {
-          Authorization: `Bearer ${AuthService.getToken()}`
-        }
-      });
-    } catch (error: any) {
-      console.error(error);
+  async function handleRentClick() {
+    if (!await createReservation(start_date!, end_date!, parkingspace!, rentTimeInHours, paymentMethod)) {
+      alert("Fehler beim Mieten des Parkplatzes");
+      return;
     }
     handleRedirect("/home");
   }
@@ -120,7 +110,24 @@ export default function Rent() {
   return (
     <>
       <Navbar />
-      {parkingspace && parkingspace.price_per_hour ?
+      {!parkingspace && (
+        <IonCard>
+          <IonCardContent>
+            <IonText color="medium">Daten werden geladen</IonText>
+            <IonSpinner name="crescent" />
+          </IonCardContent>
+        </IonCard>
+      )}
+
+      {parkingspace && !parkingspace.price_per_hour && (
+        <IonCard>
+          <IonCardContent>
+            <IonText color="danger">Keine Privaten Parkplätze mit der ID:{parkingspace.parkingspot_id} gefunden</IonText>
+          </IonCardContent>
+        </IonCard>
+      )}
+
+      {parkingspace && parkingspace.price_per_hour && (
         <IonContent>
           <div id="rent-container">
             <div>
@@ -153,13 +160,12 @@ export default function Rent() {
                   </div>
                   <div id="payment-method">
                     <div id="payment-method-header">Wähle deine Zahlungsart</div>
-                    <IonButton id="payment-method-button"> {paymentMethod} </IonButton>
+                    <IonSelect onIonChange={e => setPaymentMethod(e.target.value)} placeholder="Paypal" labelPlacement="stacked" interface="popover" fill="outline">
+                      <IonSelectOption value="Paypal">Paypal</IonSelectOption>
+                      <IonSelectOption value="Kreditkarte">Kreditkarte</IonSelectOption>
+                      <IonSelectOption value="Sofortüberweisung">Sofortüberweisung</IonSelectOption>
+                    </IonSelect>
                   </div>
-                  <IonPopover trigger="payment-method-button" dismissOnSelect={true}>
-                    <IonItem onClick={() => setPaymentMethod("Paypal")}>Paypal</IonItem>
-                    <IonItem onClick={() => setPaymentMethod("Kreditkarte")}>Kreditkarte</IonItem>
-                    <IonItem onClick={() => setPaymentMethod("Sofortüberweisung")}>Sofortüberweisung</IonItem>
-                  </IonPopover>
                   {AuthService.isLoggedIn() ?
                     <IonButton disabled={!(rentTimeInHours > 0)} onClick={handleRentClick} id="rent-button">Mieten</IonButton> :
                     <>
@@ -194,6 +200,6 @@ export default function Rent() {
             </div>
           </div>
         </IonContent>
-        : <div>Kein Privaten Parkplatz mit der ID {id} gefunden</div>}
-    </>)
+      )}
+    </>);
 }

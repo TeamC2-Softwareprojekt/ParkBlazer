@@ -23,24 +23,23 @@ export default function RentCard({ parkingspace }: { parkingspace: parkingSpace 
   }
 
   return (
-    <>
-      <IonCard id="rent-card">
-        <IonCardHeader>
-          <IonCardTitle>
-            <IonLabel id="rent-card-price">
-              {parkingspace?.price_per_hour}€
-            </IonLabel>
-            pro Stunde
-          </IonCardTitle>
-        </IonCardHeader>
-        <IonCardContent>
-          <DateInput parkingspace={parkingspace} setStartDate={setStartDate} setEndDate={setEndDate} />
-          <IonButton onClick={e => handleRentClick(e)} id="rent-card-button" >Mieten</IonButton>
-          {rentTimeInHours < 0.5 ?
-            end_date ? <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> : "" :
-            <PriceCalculation parkingspace={parkingspace} rentTimeInHours={rentTimeInHours} />
-          }
-        </IonCardContent>
-      </IonCard>
-    </>)
+    <IonCard id="rent-card">
+      <IonCardHeader>
+        <IonCardTitle>
+          <IonLabel id="rent-card-price">
+            {parkingspace.price_per_hour}€
+          </IonLabel>
+          pro Stunde
+        </IonCardTitle>
+      </IonCardHeader>
+      <IonCardContent>
+        <DateInput parkingspace={parkingspace} setStartDate={setStartDate} setEndDate={setEndDate} />
+        <IonButton disabled={!start_date || !end_date} onClick={handleRentClick} id="rent-card-button">Mieten</IonButton>
+        {rentTimeInHours < 0.5 ?
+          (end_date ? <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> : "")
+          : <PriceCalculation parkingspace={parkingspace} rentTimeInHours={rentTimeInHours} />
+        }
+      </IonCardContent>
+    </IonCard>
+  );
 }

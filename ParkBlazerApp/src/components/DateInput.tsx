@@ -2,19 +2,21 @@ import React, { useState, useEffect, useRef } from "react";
 import { IonInput, IonDatetime, IonPopover } from "@ionic/react";
 import "./DateInput.css";
 import { format, parse, isValid } from 'date-fns';
-import { getReservedDates, parkingSpace } from '../data/parkingSpaces';
+import { parkingSpace } from '../data/parkingSpaces';
 import { adjustDateToAvailability, adjustMinutes, findRestrictedDateInRange } from "../utils/dateUtils";
+import { getReservedDates } from "../data/reservation";
 
 export default function DateInput({ parkingspace, setStartDate, setEndDate }: { parkingspace: parkingSpace, setStartDate: any, setEndDate: any }) {
   const [start_date, setThisStartDate] = useState<Date | null>(null);
   const [end_date, setThisEndDate] = useState<Date | null>(null);
   const [selectStart, setSelectStart] = useState<boolean>(true);
-  const [restrictedDates, setRestrictedDates] = useState<Date[][] | null>(null);
+  const [restrictedDates, setRestrictedDates] = useState<Date[][]>([]);
   const calendarRef = useRef<HTMLIonDatetimeElement>(null);
 
   useEffect(() => {
     async function fetchRestrictedDates() {
-      setRestrictedDates(await getReservedDates(parkingspace?.private_parkingspot_id!));
+      let data = await getReservedDates(parkingspace.private_parkingspot_id!);
+      setRestrictedDates(data.map(reservation => [new Date(reservation.start_date), new Date(reservation.end_date)]));
     }
 
     fetchRestrictedDates();
@@ -26,16 +28,6 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
     setStartDate(start_date);
     setEndDate(end_date);
   }, [start_date, end_date]);
-
-  function isAvailable(date: Date): boolean {
-    if (!restrictedDates) return true;
-    for (let i = 0; i < restrictedDates.length; i++) {
-      if (date.getDate() >= restrictedDates[i][0].getDate() && date.getDate() <= restrictedDates[i][1].getDate()) {
-        return false;
-      }
-    }
-    return true;
-  }
 
   function parseDateTimeFromInput(inputValue: string): Date | null {
     const [datePart, timePart] = inputValue.split(' ');
@@ -73,12 +65,12 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
   }
 
   function handleDateChange(date: Date, isStartDate: boolean) {
-    if (!date || !isAvailable(date)) return;
+    if (!date || findRestrictedDateInRange(date, date, restrictedDates)) return;
 
     const adjustedDate = adjustDateToAvailability(date, parkingspace, isStartDate);
     const otherDate = isStartDate ? end_date : start_date;
 
-    if (otherDate && findRestrictedDateInRange(adjustedDate, otherDate, restrictedDates!)) {
+    if (otherDate && findRestrictedDateInRange(adjustedDate, otherDate, restrictedDates)) {
       setThisStartDate(adjustedDate);
       setThisEndDate(adjustedDate);
     } else {
@@ -103,7 +95,7 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
     const isStartDate = event.target.classList.contains("start-date");
 
     const parsedDate = parseDateTimeFromInput(inputValue);
-    if (!parsedDate || !isAvailable(parsedDate)) {
+    if (!parsedDate || findRestrictedDateInRange(parsedDate, parsedDate, restrictedDates)) {
       handleInvalidDate(event);
       return;
     }
@@ -115,10 +107,7 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
   // Handles changes from the calendar
   function handleCalenderChange(e: any) {
     const date = parseDateFromEvent(e);
-    if (!date || !isAvailable(date)) {
-      handleInvalidDate(e);
-      return;
-    }
+    if (!date) return;
 
     if (calendarRef?.current?.value?.length === 1) {
       setThisStartDate(date);
@@ -133,17 +122,17 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
 
   return (
     <>
-      <div className="date-input-container">
-        <IonInput value={start_date ? format(start_date!, 'dd.MM.yyyy HH:mm') : ""} label="Start Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} id="start-date-text-input" className="date-input start-date " />
-        <IonInput value={end_date ? format(end_date!, 'dd.MM.yyyy HH:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} className="date-input" />
+      <div className="date-input-container" id="date-card-popover-trigger">
+        <IonInput value={start_date ? format(start_date, 'dd.MM.yyyy hh:mm') : ""} label="Start Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY hh:mm" onIonChange={e => handleDateTextChange(e)} className="date-input start-date" />
+        <IonInput value={end_date ? format(end_date, 'dd.MM.yyyy hh:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY hh:mm" onIonChange={e => handleDateTextChange(e)} className="date-input" />
       </div>
-      <IonPopover keepContentsMounted={true} trigger="start-date-text-input" id="date-card-popover" side="bottom" alignment="start">
+      <IonPopover keepContentsMounted={true} trigger="date-card-popover-trigger" id="date-card-popover" side="bottom" alignment="start">
         <div id="date-card-popover-input-container">
           <div className="date-input-container">
-            <IonInput value={start_date ? format(start_date!, 'dd.MM.yyyy HH:mm') : ""} label="Start Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} className="date-input start-date" />
-            <IonInput value={end_date ? format(end_date!, 'dd.MM.yyyy HH:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} className="date-input" />
+            <IonInput value={start_date ? format(start_date, 'dd.MM.yyyy hh:mm') : ""} label="Start Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY hh:mm" onIonChange={e => handleDateTextChange(e)} className="date-input start-date" />
+            <IonInput value={end_date ? format(end_date, 'dd.MM.yyyy hh:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY hh:mm" onIonChange={e => handleDateTextChange(e)} className="date-input" />
           </div>
-          <IonDatetime isDateEnabled={dateISOString => isAvailable(new Date(dateISOString))} ref={calendarRef} presentation="date" multiple={true} minuteValues={"0,30"} min={parkingspace?.availability_start_date} max={parkingspace?.availability_end_date} onIonChange={e => handleCalenderChange(e)} />
+          <IonDatetime isDateEnabled={dateISOString => !findRestrictedDateInRange(new Date(dateISOString), new Date(dateISOString), restrictedDates)} ref={calendarRef} presentation="date" multiple={true} min={parkingspace.availability_start_date} max={parkingspace.availability_end_date} onIonChange={e => handleCalenderChange(e)} />
         </div>
       </IonPopover>
     </>

@@ -175,9 +175,9 @@ const ParkingspotDetails: React.FC = () => {
                 </IonCardContent>
               </IonCard>
             </div>
-            <div style={{ display: parkingspot?.price_per_hour ? "" : "none" }}>
+            {!!parkingspot.price_per_hour &&
               <RentCard parkingspace={parkingspot} />
-            </div>
+            }
           </div>
 
           <IonCard>

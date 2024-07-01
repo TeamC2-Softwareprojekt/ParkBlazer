@@ -6,8 +6,8 @@ export default function PriceCalculation({ parkingspace, rentTimeInHours }: { pa
   return (
     <div id="price-calculation-container">
       <div className="price-calculation">
-        <IonLabel>{parkingspace?.price_per_hour + " € x " + rentTimeInHours + " Stunden"}</IonLabel>
-        {(parkingspace?.price_per_hour! * rentTimeInHours).toFixed(2) + "€"}
+        <IonLabel>{parkingspace.price_per_hour + " € x " + rentTimeInHours + " Stunden"}</IonLabel>
+        {(parkingspace.price_per_hour! * rentTimeInHours).toFixed(2) + "€"}
       </div>
       <div className="price-calculation">
         <IonLabel>Servicegebühr 10%</IonLabel>
