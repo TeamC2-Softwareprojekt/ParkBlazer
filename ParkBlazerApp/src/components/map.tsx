@@ -13,7 +13,7 @@ import { getUserLocation } from '../data/userLocation';
 import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle } from '@ionic/react';
 import { checkmark, close, enterOutline, informationCircle } from 'ionicons/icons';
 import { formatDistanceToNow } from 'date-fns';
-import { enUS, de } from 'date-fns/locale';
+import { de } from 'date-fns/locale';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
@@ -84,15 +84,24 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
     });
   };
 
-  const fetchAvailabilityReports = async (parkingspotId: any) => {
+  const fetchAvailabilityReports = async (parkingspotId: number) => {
     try {
       const response = await fetch(`https://server-y2mz.onrender.com/api/parking_availability_reports/${parkingspotId}`);
       const data = await response.json();
-      setAvailabilityReports(data.reports);
+
+      // Ensure that parking_availability_report_date is a Date object
+      const sortedReports = data.reports.sort((a: any, b: any) => {
+        const dateA = new Date(a.parking_availability_report_date).getTime();
+        const dateB = new Date(b.parking_availability_report_date).getTime();
+        return dateB - dateA; // Most recent first
+      });
+
+      setAvailabilityReports(sortedReports);
     } catch (error) {
       console.error("Fehler beim Abrufen der Parkplatzverfügbarkeitsberichte:", error);
     }
   };
+
 
   const markUserLocation = () => {
     const location = getUserLocation();
@@ -139,7 +148,13 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
               <IonCardHeader>
                 <IonCardSubtitle>Aktuelle Auslastung:</IonCardSubtitle>
               </IonCardHeader>
-              <IonText><strong>{availabilityReports.length > 0 ? availabilityReports[0].available_spaces + "/" + selectedSpot.available_spaces + " (" + (formatDistanceToNow(availabilityReports[0].parking_availability_report_date, { addSuffix: true, locale: de })) + ")" : "Keine Daten verfügbar"}</strong></IonText>
+              <IonText>
+                <strong>
+                  {availabilityReports.length > 0 ?
+                    `${availabilityReports[0].available_spaces}/${selectedSpot.available_spaces} (${formatDistanceToNow(new Date(availabilityReports[0].parking_availability_report_date), { addSuffix: true, locale: de })})`
+                    : "Keine Daten verfügbar"}
+                </strong>
+              </IonText>
             </IonCard>
             <IonCard>
               {selectedSpot.image_url && <img src={selectedSpot.image_url} alt="Parkplatzbild" style={{ maxWidth: '100%' }} />}

@@ -5,7 +5,6 @@ import {
     IonButton,
     IonCol,
     IonContent,
-    IonGrid,
     IonInput,
     IonItem,
     IonList,
@@ -22,11 +21,18 @@ import { IonInputCustomEvent } from "@ionic/core";
 import axios from "axios";
 import AuthService from "../utils/AuthService";
 
+enum ReportType {
+    None = 0,
+    Availability = 1,
+    NotExisting = 2,
+    Update = 3,
+    Other = 4
+}
+
 const ParkingspotReport: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [parkingspot, setParkingspot] = useState<parkingSpace | null>(null);
-    const [reportType, setReportType] = useState<string>("");
-    const [reportAvailability, setReportAvailability] = useState<number>(0);
+    const [reportType, setReportType] = useState<ReportType>(ReportType.None);
     const [reportDescription, setReportDescription] = useState<string | null | undefined>("");
     const [currentAvailability, setCurrentAvailability] = useState<number>(0);
     const [descriptionValid, setDescriptionValid] = useState<boolean>(false);
@@ -39,7 +45,7 @@ const ParkingspotReport: React.FC = () => {
             if (parkingspotDetails) {
                 setParkingspot(parkingspotDetails);
             } else {
-                console.log("Parkingspot not found.");
+                console.error("Parkingspot not found.");
             }
         };
 
@@ -51,25 +57,21 @@ const ParkingspotReport: React.FC = () => {
 
         switch (value) {
             case 'select-availability':
-                setReportType('Aktuelle Auslastung melden');
-                setReportAvailability(1);
+                setReportType(ReportType.Availability);
                 break;
             case 'select-not-existing':
-                setReportType('Parkplatz existiert nicht');
-                setReportAvailability(2);
+                setReportType(ReportType.NotExisting);
                 break;
             case 'select-update':
-                setReportType('Parkplatzdetails aktualisieren');
-                setReportAvailability(2);
+                setReportType(ReportType.Update);
                 break;
             case 'select-other':
-                setReportType('Sonstiges');
-                setReportAvailability(2);
+                setReportType(ReportType.Other);
                 break;
             default:
-                setReportAvailability(0);
+                setReportType(ReportType.None);
+                break;
         }
-
     }
 
     const handleSubmitReport = async () => {
@@ -77,7 +79,7 @@ const ParkingspotReport: React.FC = () => {
             const token = AuthService.getToken();
             let response;
 
-            if (reportAvailability === 1) {
+            if (reportType === ReportType.Availability) {
                 response = await axios.post(
                     'https://server-y2mz.onrender.com/api/insert_parking_availability_report',
                     {
@@ -116,7 +118,6 @@ const ParkingspotReport: React.FC = () => {
         }
     };
 
-
     function handleAvailabilityChange(event: IonInputCustomEvent<InputChangeEventDetail>): void {
         const value = event.detail.value;
         if (value && (!isNaN(Number(value)) && Number(value) >= 0 && Number(value) <= 80)) {
@@ -131,7 +132,7 @@ const ParkingspotReport: React.FC = () => {
 
     function handleReportCommentChange(event: IonInputCustomEvent<InputChangeEventDetail>): void {
         const value = event.detail.value;
-        if (value === "") {
+        if (!value) {
             setDescriptionValid(false);
             setReportDescription("");
         } else {
@@ -143,72 +144,70 @@ const ParkingspotReport: React.FC = () => {
     return (
         <IonPage>
             <Navbar />
-            <IonContent className="parkingspotreport-content ion-padding">
-                <IonGrid fixed className="profile-grid">
-                    <IonRow className="ion-justify-content-center ion-align-items-center full-height">
-                        <IonCol className="profile-col" size="12" size-sm="12" size-md="12">
-                            <IonText color="primary" className="userparkingspots-title">
-                                <h1 className="userparkingspots-heading">Melde einen Parkplatz</h1>
-                            </IonText>
-                            {parkingspot &&
-                                <IonList>
-                                    <IonItem>
-                                        <IonSelect
-                                            label="Grund der Anfrage"
-                                            placeholder=""
-                                            onIonChange={handleSelectChange}
+            <IonContent className="ion-padding">
+                <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+                    <IonCol className="profile-col" size="12" size-sm="12" size-md="12">
+                        <IonText>
+                            <h1 className="userparkingspots-heading">Melde einen Parkplatz</h1>
+                        </IonText>
+                        {parkingspot &&
+                            <IonList>
+                                <IonItem>
+                                    <IonSelect
+                                        label="Grund der Anfrage"
+                                        placeholder=""
+                                        onIonChange={handleSelectChange}
+                                    >
+                                        <IonSelectOption value="select-availability">Aktuelle Auslastung melden</IonSelectOption>
+                                        <IonSelectOption value="select-not-existing">Parkplatz existiert nicht</IonSelectOption>
+                                        <IonSelectOption value="select-update">Parkplatzdetails aktualisieren</IonSelectOption>
+                                        <IonSelectOption value="select-other">Sonstiges</IonSelectOption>
+                                    </IonSelect>
+                                </IonItem>
+                                {reportType === ReportType.Availability && (
+                                    <div>
+                                        <IonInput
+                                            type="number"
+                                            fill="solid"
+                                            label={`Aktuell freie Parkplätze (Gesamt: ${parkingspot.available_spaces})`}
+                                            labelPlacement="floating"
+                                            onIonChange={handleAvailabilityChange}
+                                            min={0}
+                                            max={parkingspot.available_spaces}
+                                        />
+                                        <IonButton
+                                            expand="block"
+                                            onClick={handleSubmitReport}
+                                            className="submit-button"
+                                            disabled={!availabilityValid}
                                         >
-                                            <IonSelectOption value="select-availability">Aktuelle Auslastung melden</IonSelectOption>
-                                            <IonSelectOption value="select-not-existing">Parkplatz existiert nicht</IonSelectOption>
-                                            <IonSelectOption value="select-update">Parkplatzdetails aktualisieren</IonSelectOption>
-                                            <IonSelectOption value="select-other">Sonstiges</IonSelectOption>
-                                        </IonSelect>
-                                    </IonItem>
-                                    {reportAvailability === 1 && (
-                                        <div className="current-availability">
-                                            <IonInput
-                                                type="number"
-                                                fill="solid"
-                                                label={`Aktuell freie Parkplätze (Gesamt: ${parkingspot.available_spaces})`}
-                                                labelPlacement="floating"
-                                                onIonChange={handleAvailabilityChange}
-                                                min={0}
-                                                max={parkingspot.available_spaces}
-                                            />
-                                            <IonButton
-                                                expand="block"
-                                                onClick={handleSubmitReport}
-                                                className="submit-button"
-                                                disabled={!availabilityValid}
-                                            >
-                                                Senden
-                                            </IonButton>
-                                        </div>
-                                    )}
-                                    {reportAvailability === 2 && (
-                                        <div className="report-comment">
-                                            <IonInput
-                                                type="text"
-                                                fill="solid"
-                                                label="Kommentar"
-                                                labelPlacement="floating"
-                                                onIonChange={handleReportCommentChange}
-                                            />
-                                            <IonButton
-                                                expand="block"
-                                                onClick={handleSubmitReport}
-                                                className="submit-button"
-                                                disabled={!descriptionValid}
-                                            >
-                                                Senden
-                                            </IonButton>
-                                        </div>
-                                    )}
-                                </IonList>
-                            }
-                        </IonCol>
-                    </IonRow>
-                </IonGrid>
+                                            Senden
+                                        </IonButton>
+                                    </div>
+                                )}
+                                {reportType !== ReportType.None && reportType !== ReportType.Availability && (
+                                    <div>
+                                        <IonInput
+                                            type="text"
+                                            fill="solid"
+                                            label="Kommentar"
+                                            labelPlacement="floating"
+                                            onIonChange={handleReportCommentChange}
+                                        />
+                                        <IonButton
+                                            expand="block"
+                                            onClick={handleSubmitReport}
+                                            className="submit-button"
+                                            disabled={!descriptionValid}
+                                        >
+                                            Senden
+                                        </IonButton>
+                                    </div>
+                                )}
+                            </IonList>
+                        }
+                    </IonCol>
+                </IonRow>
             </IonContent>
         </IonPage>
     );
