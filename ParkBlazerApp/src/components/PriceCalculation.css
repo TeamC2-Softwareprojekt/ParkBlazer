@@ -6,7 +6,6 @@
     text-decoration: underline;
     text-decoration-color: gray;
     color: var(--ion-color-step-850, var(--ion-text-color-step-150, #262626)); 
-    margin-top: 10px;
 }
 
 #price-calculation-container {

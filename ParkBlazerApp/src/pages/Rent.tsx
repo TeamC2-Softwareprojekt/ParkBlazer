@@ -21,6 +21,7 @@ export default function Rent() {
   const [paymentMethod, setPaymentMethod] = useState<string>("Paypal");
   const [reviews, setReviews] = useState<any>(null);
   const [restrictedDates, setRestrictedDates] = useState<Date[][] | null>(null);
+  const [error, setError] = useState<string>("");
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
 
@@ -41,6 +42,8 @@ export default function Rent() {
         setParkingspot(parkingspotDetails);
         let data = await getReservedDates(parkingspace?.private_parkingspot_id!);
         setRestrictedDates(data.map(reservation => [new Date(reservation.start_date), new Date(reservation.end_date)]));
+      } else {
+        setError("Parkingspot not found");
       }
     }
 
@@ -110,11 +113,19 @@ export default function Rent() {
   return (
     <>
       <Navbar />
-      {!parkingspace && (
+      {!parkingspace && !error && (
         <IonCard>
           <IonCardContent>
             <IonText color="medium">Daten werden geladen</IonText>
             <IonSpinner name="crescent" />
+          </IonCardContent>
+        </IonCard>
+      )}
+
+      {error && (
+        <IonCard>
+          <IonCardContent>
+            <IonText color="danger">{error}</IonText>
           </IonCardContent>
         </IonCard>
       )}
