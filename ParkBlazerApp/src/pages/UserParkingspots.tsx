@@ -28,19 +28,15 @@ const UserProfile: React.FC = () => {
     const [error, setError] = useState<string>("");
     const [parkingSpots, setParkingSpots] = useState<any[]>([]);
     const [selectedParkingSpot, setSelectedParkingSpot] = useState<any>(null);
-    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchParkingSpots = async (username: any) => {
             try {
-                setLoading(true);
                 await initParkingSpaces();
                 const userParkingSpots = parkingspaces.filter(spot => spot.username === username);
                 setParkingSpots(userParkingSpots);
-                setLoading(false);
             } catch (error) {
                 setError("Error loading the parkingspots!");
-                setLoading(false);
             }
         };
         fetchParkingSpots(localStorage.getItem('username'));
@@ -86,7 +82,7 @@ const UserProfile: React.FC = () => {
                             <IonText color="primary" className="userparkingspots-title">
                                 <h1 className="userparkingspots-heading">Deine angelegten Parkplätze</h1>
                             </IonText>
-                            {loading ? (
+                            {!parkingSpots && !error ? (
                                 <IonCard>
                                     <IonCardContent>
                                         <IonText className="no-parkingspots-text" color="medium">Laden...</IonText>
@@ -95,7 +91,7 @@ const UserProfile: React.FC = () => {
                                 </IonCard>
                             ) : (
                                 <>
-                                    {parkingSpots.length === 0 ? (
+                                    {parkingSpots && parkingSpots.length === 0 ? (
                                         <IonCard>
                                             <IonCardContent>
                                                 <IonText className="no-parkingspots-text" color="medium">Noch keine Parkplätze angelegt.</IonText>
