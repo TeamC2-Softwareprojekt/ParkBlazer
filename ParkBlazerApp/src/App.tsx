@@ -6,7 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Registration from './pages/Registration';
 import UserProfile from './pages/UserProfile';
-import OwnReservations from './pages/OwnReservations';
+import OwnReservations from './pages/Reservations';
 import ViewMessage from './pages/ViewMessage';
 import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 import ParkingspotDetails from './pages/ParkingspotDetails';
