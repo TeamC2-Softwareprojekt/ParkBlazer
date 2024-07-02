@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { IonIcon } from '@ionic/react';
 import { informationCircleOutline } from 'ionicons/icons';
-import { trashBin } from 'ionicons/icons';
 import { cardOutline } from 'ionicons/icons';
-import { useHistory } from "react-router-dom";
 import { bicycle, bus, car } from "ionicons/icons";
 import {
     IonCol,
@@ -25,7 +23,7 @@ import axios from "axios";
 import AuthService from "../utils/AuthService";
 import "./Reservations.css";
 import Navbar from "../components/navbar";
-import { parkingSpace, parkingspaces } from "../data/parkingSpaces";
+import { initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingSpaces";
 
 
 const OwnReservations: React.FC = () => {
@@ -39,30 +37,6 @@ const OwnReservations: React.FC = () => {
     private_parkingspot_id: number;
     user_id: number;
     }   
-
-
-    interface Parkingspot {
-    available_spaces: number;
-    city: string;
-    country: string;
-    description: string;
-    house_number: string;
-    image_url: string;
-    latitude: number;
-    longitude: number;
-    name: string;
-    parkingspot_id: number;
-    street: string;
-    type_bike: number;
-    type_car: number;
-    type_truck: number;
-    username: string;
-    zip: string;
-    distance?: number;
-    price_per_hour?: number;
-    availability_start_date?: string;
-    availability_end_date?: string;
-    }
 
     interface CombinedData {
     reservation: Reservation;
@@ -101,6 +75,7 @@ const OwnReservations: React.FC = () => {
                     }
                 });
                 
+                await initParkingSpaces();
                 const reservations: Reservation[] = reservationsResponse.data;
                 const allparkingspaces: parkingSpace[] = parkingspaces;
 
@@ -146,11 +121,11 @@ const OwnReservations: React.FC = () => {
         }
     };
 
-    const fetchCurrentParkingspot = (spot: parkingSpace) => {
+    const openModalInformation = (spot: parkingSpace) => {
         setcurrentParkingspot(spot);
         setShowModalInformation(true);
     }
-    const fetchImage = (imageUrl: string) => {
+    const openModalImage = (imageUrl: string) => {
         setSelectedImage(imageUrl);
         setShowModalImage(true);
     };
@@ -171,7 +146,7 @@ const OwnReservations: React.FC = () => {
                             <IonList>                               
                                 {combinedData && combinedData.map((data, index)  => (
                                     <IonItem key={index}>
-                                        <IonThumbnail slot="start" onClick={() => fetchImage(data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg")}>
+                                        <IonThumbnail slot="start" onClick={() => openModalImage(data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg")}>
                                             <img alt={`Thumbnail of ${data.parkingspot.name}`} src={data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
                                         </IonThumbnail>
                                         <div className="data-row">
@@ -181,7 +156,7 @@ const OwnReservations: React.FC = () => {
                                             <IonLabel className="label-margin"><strong>End-Datum:</strong> {data.reservation.end_date}</IonLabel>                                            
                                             <IonIcon
                                                 icon={informationCircleOutline}
-                                                onClick={() => fetchCurrentParkingspot(data.parkingspot)}
+                                                onClick={() => openModalInformation(data.parkingspot)}
                                                 className="icon-style" />                                            
                                             <IonIcon 
                                                 icon={cardOutline} 
