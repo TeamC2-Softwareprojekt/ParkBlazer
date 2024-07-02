@@ -17,7 +17,7 @@ export default function RentCard({ parkingspace }: { parkingspace: parkingSpace 
     setRentTimeInHours(parseFloat(((end_date.getTime() - start_date.getTime()) / (1000 * 60 * 60)).toFixed(2)));
   }, [start_date, end_date]);
 
-  function handleRentClick(e: any) {
+  function handleRentClick() {
     history.push(`/Rent/${parkingspace.parkingspot_id}?start_date=${start_date?.toISOString()}&end_date=${end_date?.toISOString()}`);
     window.location.reload();
   }
