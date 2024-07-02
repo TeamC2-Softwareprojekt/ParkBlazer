@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { IonIcon } from '@ionic/react';
+import { IonAlert, IonIcon, IonPopover } from '@ionic/react';
 import { informationCircleOutline } from 'ionicons/icons';
 import { cardOutline } from 'ionicons/icons';
 import { bicycle, bus, car } from "ionicons/icons";
@@ -24,6 +24,7 @@ import AuthService from "../utils/AuthService";
 import "./Reservations.css";
 import Navbar from "../components/navbar";
 import { initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingSpaces";
+import { format } from "date-fns";
 
 
 const OwnReservations: React.FC = () => {
@@ -53,25 +54,23 @@ const OwnReservations: React.FC = () => {
     }
    
     const [combinedData, setCombinedData] = useState<CombinedData[]>([]);
-    const [showModalInvoice, setShowModalInvoice] = useState<boolean>(false);
-    const [showModalInformation, setShowModalInformation] = useState<boolean>(false);
-    const [showModalImage, setShowModalImage] = useState<boolean>(false);
+    const [showPopoverInvoice, setShowPopoverInvoice] = useState<boolean>(false);
+    const [showPopovernformation, setShowPopoverInformation] = useState<boolean>(false);
+    const [showPopoverImage, setShowPopoverImage] = useState<boolean>(false);
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
     const [currentParkingSpot, setcurrentParkingspot] = useState<parkingSpace | null>(null);
     const [selectedImage, setSelectedImage] = useState('');
+    const [error, setError] = useState<string>("");
     
-    function setError(message: any) {
-        throw new Error("Function not implemented.");
-    }
+    
 
     useEffect(() => {
         const fetchUserData = async () => {
-            const token = AuthService.getToken();
             try {
                 
                 const reservationsResponse = await axios.get('https://server-y2mz.onrender.com/api/user_reservations', {
                     headers: {
-                        Authorization: `Bearer ${token}`
+                        Authorization: `Bearer ${AuthService.getToken()}`
                     }
                 });
                 
@@ -95,8 +94,9 @@ const OwnReservations: React.FC = () => {
 
     const combineData = (reservations: Reservation[], parkingspots: parkingSpace[]) => {
         const combined = reservations.map(reservation => {
-            const parkingspot = parkingspots.find(spot => spot.parkingspot_id === reservation.private_parkingspot_id);
-            return { reservation, parkingspot: parkingspot! };
+            const parkingspot = parkingspots.find(spot => spot.private_parkingspot_id === reservation.private_parkingspot_id);
+            if (!parkingspot) throw new Error("Parkingspot not found");
+            return { reservation, parkingspot};
         });
         setCombinedData(combined);
     };
@@ -111,9 +111,9 @@ const OwnReservations: React.FC = () => {
                 }
             });
             setSelectedInvoice(response.data);
-            setShowModalInvoice(true);
+            setShowPopoverInvoice(true);
         } catch (error: any) {
-            if (error.response && error.response.data && error.response.data.message) {
+            if (error?.response?.data?.message) {
                 setError(error.response.data.message);
             } else {
                 setError("An unexpected error occurred. Please try again later!");
@@ -121,51 +121,51 @@ const OwnReservations: React.FC = () => {
         }
     };
 
-    const openModalInformation = (spot: parkingSpace) => {
+    const openPopoverInformation = (spot: parkingSpace) => {
         setcurrentParkingspot(spot);
-        setShowModalInformation(true);
+        setShowPopoverInformation(true);
     }
-    const openModalImage = (imageUrl: string) => {
+    const openPopoverImage = (imageUrl: string) => {
         setSelectedImage(imageUrl);
-        setShowModalImage(true);
+        setShowPopoverImage(true);
     };
 
     
     return(
         <>
         <Navbar/>
-            <IonGrid>
                 <IonRow>
                     <IonCol size="10" size-sm="10" size-md="10">
                         <IonCard>
                             <IonCardContent>
-                            <div className="reservation-container">
-                            <IonText color="primary" className="profile-title">
+                            <IonText color="primary">
                                 <h1 className="reservation-heading">Reservierungen</h1>
                             </IonText>
                             <IonList>                               
                                 {combinedData && combinedData.map((data, index)  => (
                                     <IonItem key={index}>
-                                        <IonThumbnail slot="start" onClick={() => openModalImage(data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg")}>
+                                        <IonThumbnail slot="start" onClick={() => openPopoverImage(data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg")}>
                                             <img alt={`Thumbnail of ${data.parkingspot.name}`} src={data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
                                         </IonThumbnail>
                                         <div className="data-row">
                                         <IonLabel onClick={() => window.open(`http://localhost:8100/parkingspot_details/${data.parkingspot.parkingspot_id}`, '_self')}style={{ flex: 1 }}>{data.parkingspot.name}</IonLabel>                                            
                                             <IonLabel className="label-margin"><strong>Status:</strong> {data.reservation.status}</IonLabel>
-                                            <IonLabel className="label-margin"><strong>Start-Datum:</strong> {data.reservation.start_date}</IonLabel>
-                                            <IonLabel className="label-margin"><strong>End-Datum:</strong> {data.reservation.end_date}</IonLabel>                                            
+                                            <IonLabel className="label-margin"><strong>Start-Datum:</strong> {format(data.reservation.start_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
+                                            <IonLabel className="label-margin"><strong>End-Datum:</strong> {format(data.reservation.end_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>                                           
                                             <IonIcon
                                                 icon={informationCircleOutline}
-                                                onClick={() => openModalInformation(data.parkingspot)}
+                                                onClick={() => openPopoverInformation(data.parkingspot)}
                                                 className="icon-style" />                                            
                                             <IonIcon 
                                                 icon={cardOutline} 
                                                 onClick={() => fetchInvoiceDetails(data.reservation.reservation_id)} 
                                                 className="icon-style" /> 
+                                            {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
                                         </div>                                               
                                     </IonItem>
                                 ))}
-                                <IonModal isOpen={showModalInformation} onDidDismiss={() => setShowModalInformation(false)} className="custom-modal">                                
+                            </IonList>
+                                <IonPopover isOpen={showPopovernformation} onDidDismiss={() => setShowPopoverInformation(false)} className="custom-modal">                                
                                 <IonContent>
                                 {currentParkingSpot ? (
                                 <IonGrid>
@@ -205,6 +205,13 @@ const OwnReservations: React.FC = () => {
                                                     </IonLabel>                                                    
                                                 </IonCol>
                                             </IonRow>
+                                            <IonRow>    
+                                                <IonCol> 
+                                                    <IonLabel>      
+                                                        <strong>Preis pro Stunde:</strong> {currentParkingSpot.price_per_hour}
+                                                    </IonLabel>                                                                                       
+                                                </IonCol>
+                                            </IonRow>
                                             <IonRow>
                                                 <IonCol>
                                                     <IonLabel>
@@ -229,7 +236,7 @@ const OwnReservations: React.FC = () => {
                                         </IonCol>
                                         <IonRow>
                                             <IonCol className="ion-text-center">
-                                                <IonButton onClick={() => setShowModalInformation(false)}>Schließen</IonButton>
+                                                <IonButton onClick={() => setShowPopoverInformation(false)}>Schließen</IonButton>
                                             </IonCol>
                                         </IonRow>
                                     </IonRow>
@@ -238,8 +245,8 @@ const OwnReservations: React.FC = () => {
                                     <IonLabel>Laden...</IonLabel>
                                 )}
                                 </IonContent>
-                                </IonModal>
-                                <IonModal isOpen={showModalInvoice} onDidDismiss={() => setShowModalInvoice(false)} className="custom-modal">
+                                </IonPopover>
+                                <IonPopover isOpen={showPopoverInvoice} onDidDismiss={() => setShowPopoverInvoice(false)} className="custom-modal">
                                 <IonContent>
                                 {selectedInvoice ? (
                                 <IonGrid>
@@ -267,7 +274,7 @@ const OwnReservations: React.FC = () => {
                                     <IonRow>
                                         <IonCol>
                                             <IonLabel>
-                                                Zahlungsdatum: {selectedInvoice.payment_date}
+                                                Zahlungsdatum: {format(selectedInvoice.payment_date, 'dd.MM.yyy hh:mm')} Uhr
                                             </IonLabel>
                                         </IonCol>
                                     </IonRow>
@@ -280,7 +287,7 @@ const OwnReservations: React.FC = () => {
                                     </IonRow>
                                     <IonRow>
                                         <IonCol className="ion-text-center">
-                                            <IonButton onClick={() => setShowModalInvoice(false)}>Schließen</IonButton>
+                                            <IonButton onClick={() => setShowPopoverInvoice(false)}>Schließen</IonButton>
                                         </IonCol>
                                     </IonRow>
                                 </IonGrid>
@@ -288,20 +295,18 @@ const OwnReservations: React.FC = () => {
                                     <IonLabel>Laden...</IonLabel>
                                     )}
                                 </IonContent>
-                                </IonModal>
-                                <IonModal isOpen={showModalImage} onDidDismiss={() => setShowModalImage(false)}>
-                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                </IonPopover>
+                                <IonPopover isOpen={showPopoverImage} onDidDismiss={() => setShowPopoverImage(false)}>
+                                    <div className="image-style">
                                     <img src={selectedImage} alt="Selected" style={{ maxHeight: '90%', maxWidth: '90%' }} />
                                     </div>
-                                    <IonButton onClick={() => setShowModalImage(false)} expand="full">Schließen</IonButton>
-                                </IonModal>
-                            </IonList>
-                            </div>
+                                    <IonButton onClick={() => setShowPopoverImage(false)} expand="full">Schließen</IonButton>
+                                </IonPopover>
+                            
                             </IonCardContent>
                         </IonCard>
                     </IonCol>
                 </IonRow>
-            </IonGrid>
         </>
 
     );
