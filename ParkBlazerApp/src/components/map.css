@@ -38,3 +38,10 @@
 #btn-close {
 	padding-right: 20px;
 }
+
+#calendar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}

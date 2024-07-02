@@ -24,7 +24,6 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
   const locationMarker = useRef<maptilersdk.Marker>();
   const [selectedSpot, setSelectedSpot] = useState<parkingSpace | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [isPrivateModal, setIsPrivateModal] = useState(false);
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT';
 
@@ -82,7 +81,6 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
   
       marker.getElement().addEventListener('click', () => {
         setSelectedSpot(spot);
-        setIsPrivateModal(!!spot.price_per_hour);
         setShowModal(true);
       });
     });
@@ -150,19 +148,17 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
               <br></br>
               <IonText><strong>Lastwagen:</strong> <IonIcon icon={selectedSpot.type_truck ? checkmark : close} /></IonText>
             </IonCard>
-            {isPrivateModal && (
+            {!!selectedSpot.price_per_hour && (
               <>
                 <IonCard>
-                  <IonText><strong>Preis:</strong> {selectedSpot.price_per_hour} €</IonText>
+                  <IonText><strong>Preis pro Stunde:</strong> {selectedSpot.price_per_hour} €</IonText>
                 </IonCard>
-                {selectedSpot.availability_start_date && selectedSpot.availability_end_date && (
-                  <IonCard>
+                <IonCard>
                   <IonText><strong>Verfügbarkeit:</strong></IonText>
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-                    <IonDatetime className="date-picker" value={selectedSpot?.availability_start_date} readonly={true} />
+                  <div id="calendar-container">
+                  <IonDatetime className="date-picker" presentation='date' min={selectedSpot.availability_start_date} max={selectedSpot.availability_end_date} readonly={true} />
                   </div>
                 </IonCard>
-                )}
               </>
             )}
           </IonContent>
