@@ -1,31 +1,36 @@
-.heading {   
-   margin: 0;
-    padding: 0px;
-    background-color: 
-  black;
-    color: 
-  white;
-    text-align: center;
-  }
-  
-  .heading > h1 {
-    padding: 20px;
-    margin: 0;
-  }
+.heading {
+  margin: 0;
+  padding: 0px;
+  background-color:
+    black;
+  color:
+    white;
+  text-align: center;
+}
 
-  #nav-avatar {
-    width: 30px;
-    height: 30px;
-  }
+.heading > h1 {
+  padding: 20px;
+  margin: 0;
+}
 
-  #popover-button {
-    margin-right: 20px;
-  }
+#nav-avatar {
+  width: 30px;
+  height: 30px;
+}
 
-  .md.header-md.header-collapse-none {
-    box-shadow: none !important;
-  }
+#popover-button {
+  margin-right: 20px;
+}
 
-  #user-name .md {
-    font-weight: bold;
-  }
+.md.header-md.header-collapse-none {
+  box-shadow: none !important;
+}
+
+#user-name .md {
+  font-weight: bold;
+}
+
+#navbar-title {
+  cursor: pointer;
+  width: fit-content;
+}
