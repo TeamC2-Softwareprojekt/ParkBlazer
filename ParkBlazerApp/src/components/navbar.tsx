@@ -51,7 +51,7 @@ function Navbar() {
     }, [loggedIn]);
 
     return (
-        <IonHeader color="light">
+        <IonHeader color="light" className='navbar'>
             <IonToolbar color="light">
                 <IonTitle id="navbar-title" onClick={handleLogoClick}>ParkBlazer</IonTitle>
                 <IonButton
@@ -71,10 +71,16 @@ function Navbar() {
                                     <IonItem id='user-name'>
                                         {username && (<IonText>Hallo, {username}</IonText>)}
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/userprofile">
+                                    <IonItem button={true} detail={false} onClick={() => window.open(`/user_profile`, '_self')}>
                                         Profil
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/ownreservations">
+                                    <IonItem button={true} detail={false} onClick={() => window.open(`/user_parkingspots`, '_self')}>
+                                        Deine Parkplätze
+                                    </IonItem>
+                                    <IonItem button={true} detail={false} routerLink="/user_reports">
+                                        Deine Meldungen
+                                    </IonItem>
+                                    <IonItem button={true} detail={false} routerLink="/Reservations">
                                         Buchungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
@@ -83,10 +89,10 @@ function Navbar() {
                                 </>
                             ) : (
                                 <>
-                                    <IonItem button={true} detail={false} routerLink="/login">
+                                    <IonItem button={true} detail={false} onClick={() => window.open(`/login`, '_self')}>
                                         Login
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/registration">
+                                    <IonItem button={true} detail={false} onClick={() => window.open(`/registration`, '_self')}>
                                         Registrierung
                                     </IonItem>
                                 </>

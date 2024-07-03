@@ -4,6 +4,11 @@
 	text-align: center;
 }
 
+.parkingspace-label {
+    cursor: pointer;
+    flex: 1;
+}
+
 .custom-modal {
     --max-width: 50%; /* Maximale Breite des Modals */
     --max-height: 30%; /* Maximale Höhe des Modals */

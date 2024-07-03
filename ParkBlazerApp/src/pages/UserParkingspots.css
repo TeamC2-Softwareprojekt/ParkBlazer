@@ -1,0 +1,26 @@
+.userparkingspots-heading {
+	text-align: center;
+	margin: 5vh 0 5vh 0;
+	font-weight: bold;
+}
+
+.userparkingspots-second-heading {
+	font-size: 1rem;
+}
+
+.userparkingspots-grid ion-card-content {
+	padding: 0;
+}
+
+.userparkingspots-grid ion-item {
+	border: none !important;
+	--border-style: none;
+}
+
+.userparkingspots-grid ion-icon {
+	cursor: pointer;
+}
+
+#icon-parkingspot-details, #icon-parkingspot-edit {
+	padding-right: 5px;
+}

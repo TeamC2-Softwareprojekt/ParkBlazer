@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { IonButton, IonIcon, IonModal, IonHeader, IonTitle, IonSegment, IonSegmentButton, IonLabel, IonInput, IonCheckbox, IonFooter, IonSelect, IonSelectOption, SegmentValue } from "@ionic/react";
 import { closeSharp } from "ionicons/icons";
 import "./filter.css";
@@ -28,7 +28,7 @@ export const defaultFilterParams: FilterParams = {
     sort: { by: '', order: '' }
 };
 
-export default function Filter({ onFilterApply }: { onFilterApply: any }) {
+function Filter({ onFilterApply }: { onFilterApply: any }) {
     const segment = useRef<HTMLIonSegmentElement>(null);
     const selectSortBy = useRef<HTMLIonSelectElement>(null);
     const selectSortOrder = useRef<HTMLIonSelectElement>(null);
@@ -46,11 +46,11 @@ export default function Filter({ onFilterApply }: { onFilterApply: any }) {
     };
     const inputCity = {
         label: "city",
-        component: <IonInput ref={inputs.inputCity} label="Stadt" type="text" placeholder="Stadt" labelPlacement="stacked" fill="outline" clearOnEdit={true} inputMode="text" />
+        component: <IonInput ref={inputs.inputCity} label="Stadt" type="text" placeholder="Stadt" labelPlacement="stacked" fill="outline" inputMode="text" />
     };
     const inputRadius = {
         label: "radius",
-        component: <IonInput ref={inputs.inputRadius} label="Radius" type="number" placeholder="0km" labelPlacement="stacked" fill="outline" clearOnEdit={true} inputMode="numeric" min={0} />
+        component: <IonInput ref={inputs.inputRadius} label="Radius" type="number" placeholder="0km" labelPlacement="stacked" fill="outline" inputMode="numeric" min={0} />
     }
     const [showModal, setShowModal] = useState(false);
     const [searchMode, setSearchMode] = useState<any>(inputRadius);
@@ -70,6 +70,7 @@ export default function Filter({ onFilterApply }: { onFilterApply: any }) {
             if (checkbox) checkbox.checked = false;
         }
 
+        if (segment.current) segment.current.value = "all";
         if (selectSortBy.current) selectSortBy.current.value = "";
         if (selectSortOrder.current) selectSortOrder.current.value = "";
         applyFilter();
@@ -83,7 +84,7 @@ export default function Filter({ onFilterApply }: { onFilterApply: any }) {
         filterParams.type_car = checkboxes.checkboxCar.current?.checked ? 1 : 0;
         filterParams.type_truck = checkboxes.checkboxTruck.current?.checked ? 1 : 0;
         filterParams.mode = { mode: searchMode.label, value: (inputs.inputCity.current?.value || inputs.inputRadius.current?.value) as string };
-        filterParams.price = { min: parseInt(inputs.inputPriceMin.current?.value as string), max: parseInt(inputs.inputPriceMax.current?.value as string) };
+        filterParams.price = { min: parseFloat(inputs.inputPriceMin.current?.value as string), max: parseFloat(inputs.inputPriceMax.current?.value as string) };
         filterParams.minAvailableSpaces = parseInt(inputs.inputSpaces.current?.value as string);
         filterParams.sort = { by: selectSortBy.current?.value as string, order: selectSortOrder.current?.value as string };
 
@@ -121,13 +122,13 @@ export default function Filter({ onFilterApply }: { onFilterApply: any }) {
                             <IonCheckbox ref={checkboxes.checkboxTruck} labelPlacement="stacked">LKW</IonCheckbox>
                         </div>
                         <div id="filter-price-container" className="filter-content-section">
-                            <IonInput ref={inputs.inputPriceMin} label="Minimum" type="number" placeholder="0€" labelPlacement="stacked" fill="outline" clearOnEdit={true} inputMode="numeric" min={0} />
+                            <IonInput ref={inputs.inputPriceMin} label="Minimum" type="number" placeholder="0€" labelPlacement="stacked" fill="outline" inputMode="numeric" min={0} />
                             <IonLabel>-</IonLabel>
-                            <IonInput ref={inputs.inputPriceMax} label="Maximum" type="number" placeholder="0€" labelPlacement="stacked" fill="outline" clearOnEdit={true} inputMode="numeric" min={0} />
+                            <IonInput ref={inputs.inputPriceMax} label="Maximum" type="number" placeholder="0€" labelPlacement="stacked" fill="outline" inputMode="numeric" min={0} />
                         </div>
-                        <IonInput ref={inputs.inputSpaces} class="filter-content-section" label="Anzahl an Parkplätzen" type="number" placeholder="0" labelPlacement="stacked" fill="outline" clearOnEdit={true} inputMode="numeric" min={0} />
+                        <IonInput ref={inputs.inputSpaces} className="filter-content-section" label="Anzahl an Parkplätzen" type="number" placeholder="0" labelPlacement="stacked" fill="outline" inputMode="numeric" min={0} />
                         <div id="filter-mode" className="filter-content-section">
-                            <IonSelect id="filter-select-mode" className="filter-select" label="Filtern nach" placeholder={searchMode.component.props.label} interface="popover" fill="outline" labelPlacement="stacked" onIonChange={(event) => switchSearchMode(event)}>
+                            <IonSelect id="filter-select-mode" className="filter-select" label="Filtern nach" placeholder={searchMode.component.props.label} interface="popover" fill="outline" labelPlacement="stacked" onIonChange={switchSearchMode}>
                                 <IonSelectOption value="radius">Radius</IonSelectOption>
                                 <IonSelectOption value="city">Stadt</IonSelectOption>
                             </IonSelect>
@@ -138,6 +139,7 @@ export default function Filter({ onFilterApply }: { onFilterApply: any }) {
                                 <IonSelectOption value="price">Preis</IonSelectOption>
                                 <IonSelectOption value="distance">Entfernung</IonSelectOption>
                                 <IonSelectOption value="availableSpaces">Verfügbaren Parkplätze</IonSelectOption>
+                                <IonSelectOption value="rating">Bewertung</IonSelectOption>
                             </IonSelect>
                             <IonSelect ref={selectSortOrder} className="filter-select" id="filter-select-order" label="Reihenfolge" placeholder="Aufsteigend" labelPlacement="stacked" interface="popover" fill="outline">
                                 <IonSelectOption value="asc">Aufsteigend</IonSelectOption>
@@ -154,3 +156,5 @@ export default function Filter({ onFilterApply }: { onFilterApply: any }) {
         </>
     );
 }
+
+export default memo(Filter);
