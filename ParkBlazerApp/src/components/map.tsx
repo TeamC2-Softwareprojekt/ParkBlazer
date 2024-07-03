@@ -14,6 +14,7 @@ import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonTe
 import { checkmark, close, enterOutline, informationCircle } from 'ionicons/icons';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { getAvailabilityReports } from '../data/reports';
 
 let map: React.MutableRefObject<maptilersdk.Map | null>;
 
@@ -79,27 +80,26 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
       marker.getElement().addEventListener('click', () => {
         setSelectedSpot(spot);
         setShowModal(true);
-        fetchAvailabilityReports(spot.parkingspot_id);
+        fetchAvailabilityReports(spot);
       });
     });
   };
 
-  const fetchAvailabilityReports = async (parkingspotId: number) => {
-    try {
-      const response = await fetch(`https://server-y2mz.onrender.com/api/parking_availability_reports/${parkingspotId}`);
-      const data = await response.json();
+  const fetchAvailabilityReports = async (parkingspot: parkingSpace) => {
+    const response = await getAvailabilityReports(parkingspot);
 
-      // Ensure that parking_availability_report_date is a Date object
-      const sortedReports = data.reports.sort((a: any, b: any) => {
-        const dateA = new Date(a.parking_availability_report_date).getTime();
-        const dateB = new Date(b.parking_availability_report_date).getTime();
-        return dateB - dateA; // Most recent first
-      });
-
-      setAvailabilityReports(sortedReports);
-    } catch (error) {
-      console.error("Fehler beim Abrufen der Parkplatzverfügbarkeitsberichte:", error);
+    if (response.status !== 200) {
+      setAvailabilityReports([]);
+      return;
     }
+
+    const sortedReports = response.data.reports.sort((a: any, b: any) => {
+      const dateA = new Date(a.parking_availability_report_date).getTime();
+      const dateB = new Date(b.parking_availability_report_date).getTime();
+      return dateB - dateA;
+    });
+
+    setAvailabilityReports(sortedReports);
   };
 
 
