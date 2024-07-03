@@ -1,10 +1,11 @@
 /* Space between inputs */
-.profile-input {
+.userreports-input {
 	margin-bottom: 1.5vh;
 }
 
-.profile-heading {
+.userreports-heading {
 	text-align: center;
 	margin: 5vh 0 5vh 0;
 	font-weight: bold;
+	color: var(--ion-color-primary)
 }

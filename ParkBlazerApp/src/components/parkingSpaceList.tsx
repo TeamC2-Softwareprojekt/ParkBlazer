@@ -7,7 +7,6 @@ import {
   IonList,
 } from '@ionic/react';
 
-
 export default function ParkingSpaceList({ list }: { list: parkingSpace[] }) {
   return (
     <IonContent id="parking-space-list-container">

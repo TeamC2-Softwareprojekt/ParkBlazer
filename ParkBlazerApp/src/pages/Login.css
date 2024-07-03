@@ -4,12 +4,10 @@
 	text-align: center;
 }
 
-
 /* Space between inputs */
 .login-input {
 	margin-bottom: 1.5vh;
 }
-
 
 /* Show Error when email not valid */
 .login-input.has-value.ion-invalid .error-text.sc-ion-input-md {

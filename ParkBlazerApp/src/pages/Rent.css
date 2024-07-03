@@ -1,0 +1,116 @@
+.list-item {
+    margin-bottom: 20px;
+}
+
+.list-header {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.list-content {
+    font-size: 20px;
+}
+
+#information-list-container {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid gray;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+#rent-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#rent-header {
+    font-size: 30px;
+    font-weight: bold;
+    padding-top: 70px;
+    padding-bottom: 40px;
+}
+
+#rent-body {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+#rent-information-container {
+    margin-right: 100px;
+    min-width: 400px;
+    margin-bottom: 50px;
+}
+
+#payment-method {
+    margin-top: 10px;
+    border-bottom: 2px solid gray;
+    padding-bottom: 30px;
+}
+
+#payment-method-header {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+#payment-method-button {
+    width: 100%;
+}
+
+#login-warning {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+#login-register-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+#rent-button {
+    width: 100%;
+    margin-top: 30px;
+}
+
+#information-card {
+    box-shadow: 0px 0px 10px 0px #0054e9;
+    border-radius: 10px;
+}
+
+#information-card-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#information-card-header > div {
+    font-size: 15px;
+    margin-left: 10px;
+    color: var(--ion-color-step-850, var(--ion-text-color-step-150, #262626)); 
+}
+
+#information-card-parkingspace-image {
+    max-width: 150px;
+    border-radius: 10px;
+}
+
+#information-card-content {
+    display: flex;
+    flex-direction: column;
+    border-top: 2px solid gray;
+    margin: 15px;
+    -webkit-padding-start: 0px;
+}
+
+#information-card-content > ion-label {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: var(--ion-color-step-850, var(--ion-text-color-step-150, #262626)); 
+}
