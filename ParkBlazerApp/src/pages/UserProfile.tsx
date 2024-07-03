@@ -10,6 +10,15 @@ import {
   IonSelectOption,
   IonPage,
   IonContent,
+  IonRow,
+  IonCol,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonList,
+  IonItem,
+  IonLabel,
 } from "@ionic/react";
 import axios from "axios";
 import "./UserProfile.css";
@@ -40,6 +49,7 @@ const UserProfile: React.FC = () => {
   const [zipValid, setZipValid] = useState<boolean>(true);
   const [houseNumberValid, setHouseNumberValid] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [awards, setAwards] = useState<any[]>([]);
   const [countries, setCountries] = useState<{
     value: Key | null | undefined;
     label: ReactNode; name: string
@@ -49,11 +59,10 @@ const UserProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = AuthService.getToken();
       try {
         const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_details', {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${AuthService.getToken()}`
           }
         });
         const userDetails = response.data;
@@ -94,8 +103,22 @@ const UserProfile: React.FC = () => {
       }
     };
 
+    const fetchUserAwards = async () => {
+      try {
+        const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_awards', {
+          headers: {
+            Authorization: `Bearer ${AuthService.getToken()}`
+          }
+        });
+        setAwards(response.data.results);
+      } catch (error: any) {
+        handleError(error);
+      }
+    };
+
     fetchUserData();
     fetchCountries();
+    fetchUserAwards();
   }, []);
 
   const handleError = (error: any) => {
@@ -168,144 +191,167 @@ const UserProfile: React.FC = () => {
       <Navbar />
       <IonContent className="main-content">
         <IonGrid fixed className="profile-grid">
-          <div className="profile-container">
-            <IonText color="primary" className="profile-title">
-              <h1 className="profile-heading">Dein Nutzerprofil</h1>
-            </IonText>
-            <IonInput
-              className="profile-input"
-              type="text"
-              fill="solid"
-              label="Username"
-              labelPlacement="floating"
-              value={userData.username}
-              disabled
-            />
-            <IonInput
-              className="profile-input"
-              type="text"
-              fill="solid"
-              label="First Name"
-              labelPlacement="floating"
-              value={userData.firstname}
-              disabled
-            />
-            <IonInput
-              className="profile-input"
-              type="text"
-              fill="solid"
-              label="Last Name"
-              labelPlacement="floating"
-              value={userData.lastname}
-              disabled
-            />
-            <IonInput
-              className={"profile-input"}
-              type="email"
-              fill="solid"
-              label="Email"
-              labelPlacement="floating"
-              value={userData.email}
-              disabled
-            />
-            <IonInput
-              className={`profile-input ${!passwordValid ? "ion-invalid" : ""}`}
-              type="password"
-              fill="solid"
-              label="Password"
-              labelPlacement="floating"
-              value={userData.password}
-              disabled={!editMode}
-              onIonInput={handleInputChange("password")}
-              errorText={!passwordValid ? "Password must be longer than 10 characters!" : ""}
-            />
-            <IonInput
-              className="profile-input"
-              type="text"
-              fill="solid"
-              label="Birth Date"
-              labelPlacement="floating"
-              value={userData.birthdate}
-              disabled
-            />
-            <IonInput
-              className={`profile-input ${!cityValid ? "ion-invalid" : ""}`}
-              type="text"
-              fill="solid"
-              label="City"
-              labelPlacement="floating"
-              value={userData.city}
-              disabled={!editMode}
-              onIonInput={handleInputChange("city")}
-              errorText={!cityValid ? "City is required!" : ""}
-            />
-            <IonInput
-              className={`profile-input ${!streetValid ? "ion-invalid" : ""}`}
-              type="text"
-              fill="solid"
-              label="Street"
-              labelPlacement="floating"
-              value={userData.street}
-              disabled={!editMode}
-              onIonInput={handleInputChange("street")}
-              errorText={!streetValid ? "Street is required!" : ""}
-            />
-            <IonInput
-              className={`profile-input ${!zipValid ? "ion-invalid" : ""}`}
-              type="text"
-              fill="solid"
-              label="Zip"
-              labelPlacement="floating"
-              value={userData.zip}
-              disabled={!editMode}
-              onIonInput={handleInputChange("zip")}
-              errorText={!zipValid ? "Zip code is required!" : ""}
-            />
-            <IonInput
-              className={`profile-input ${!houseNumberValid ? "ion-invalid" : ""}`}
-              type="text"
-              fill="solid"
-              label="House Number"
-              labelPlacement="floating"
-              value={userData.house_number}
-              disabled={!editMode}
-              onIonInput={handleInputChange("house_number")}
-              errorText={!houseNumberValid ? "House number is required!" : ""}
-            />
-            <IonSelect
-              aria-label="Country"
-              label="Select Country"
-              labelPlacement="floating"
-              fill="solid"
-              value={userData.country}
-              disabled={!editMode}
-              onIonChange={(e) => setUserData((prevState) => ({ ...prevState, country: e.detail.value! }))}
-            >
-              {countries.map(country => (
-                <IonSelectOption key={country.value} value={country.value}>
-                  {country.label}
-                </IonSelectOption>
-              ))}
-            </IonSelect>
-            <IonButton
-              expand="block"
-              onClick={toggleEditMode}
-              className="profile-button"
-            >
-              {editMode ? "Cancel" : "Edit Profile"}
-            </IonButton>
-            {editMode && (
-              <IonButton
-                expand="block"
-                onClick={handleUpdateProfile}
-                className="profile-button"
-                disabled={!passwordValid || !cityValid || !streetValid || !zipValid || !houseNumberValid}
-              >
-                Save Changes
-              </IonButton>
-            )}
-            {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
-          </div>
+          <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+            <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
+              <div className="profile-container">
+                <IonText color="primary" className="profile-title">
+                  <h1 className="profile-heading">Dein Nutzerprofil</h1>
+                </IonText>
+                <IonInput
+                  className="profile-input"
+                  type="text"
+                  fill="solid"
+                  label="Username"
+                  labelPlacement="floating"
+                  value={userData.username}
+                  disabled
+                />
+                <IonInput
+                  className="profile-input"
+                  type="text"
+                  fill="solid"
+                  label="First Name"
+                  labelPlacement="floating"
+                  value={userData.firstname}
+                  disabled
+                />
+                <IonInput
+                  className="profile-input"
+                  type="text"
+                  fill="solid"
+                  label="Last Name"
+                  labelPlacement="floating"
+                  value={userData.lastname}
+                  disabled
+                />
+                <IonInput
+                  className={"profile-input"}
+                  type="email"
+                  fill="solid"
+                  label="Email"
+                  labelPlacement="floating"
+                  value={userData.email}
+                  disabled
+                />
+                <IonInput
+                  className={`profile-input ${!passwordValid ? "ion-invalid" : ""}`}
+                  type="password"
+                  fill="solid"
+                  label="Password"
+                  labelPlacement="floating"
+                  value={userData.password}
+                  disabled={!editMode}
+                  onIonInput={handleInputChange("password")}
+                  errorText={!passwordValid ? "Password must be longer than 10 characters!" : ""}
+                />
+                <IonInput
+                  className="profile-input"
+                  type="text"
+                  fill="solid"
+                  label="Birth Date"
+                  labelPlacement="floating"
+                  value={userData.birthdate}
+                  disabled
+                />
+                <IonInput
+                  className={`profile-input ${!cityValid ? "ion-invalid" : ""}`}
+                  type="text"
+                  fill="solid"
+                  label="City"
+                  labelPlacement="floating"
+                  value={userData.city}
+                  disabled={!editMode}
+                  onIonInput={handleInputChange("city")}
+                  errorText={!cityValid ? "City is required!" : ""}
+                />
+                <IonInput
+                  className={`profile-input ${!streetValid ? "ion-invalid" : ""}`}
+                  type="text"
+                  fill="solid"
+                  label="Street"
+                  labelPlacement="floating"
+                  value={userData.street}
+                  disabled={!editMode}
+                  onIonInput={handleInputChange("street")}
+                  errorText={!streetValid ? "Street is required!" : ""}
+                />
+                <IonInput
+                  className={`profile-input ${!zipValid ? "ion-invalid" : ""}`}
+                  type="text"
+                  fill="solid"
+                  label="Zip"
+                  labelPlacement="floating"
+                  value={userData.zip}
+                  disabled={!editMode}
+                  onIonInput={handleInputChange("zip")}
+                  errorText={!zipValid ? "Zip code is required!" : ""}
+                />
+                <IonInput
+                  className={`profile-input ${!houseNumberValid ? "ion-invalid" : ""}`}
+                  type="text"
+                  fill="solid"
+                  label="House Number"
+                  labelPlacement="floating"
+                  value={userData.house_number}
+                  disabled={!editMode}
+                  onIonInput={handleInputChange("house_number")}
+                  errorText={!houseNumberValid ? "House number is required!" : ""}
+                />
+                <IonSelect
+                  aria-label="Country"
+                  label="Select Country"
+                  labelPlacement="floating"
+                  fill="solid"
+                  value={userData.country}
+                  disabled={!editMode}
+                  onIonChange={(e) => setUserData((prevState) => ({ ...prevState, country: e.detail.value! }))}
+                >
+                  {countries.map(country => (
+                    <IonSelectOption key={country.value} value={country.value}>
+                      {country.label}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+                <IonButton
+                  expand="block"
+                  onClick={toggleEditMode}
+                  className="profile-button"
+                >
+                  {editMode ? "Cancel" : "Edit Profile"}
+                </IonButton>
+                {editMode && (
+                  <IonButton
+                    expand="block"
+                    onClick={handleUpdateProfile}
+                    className="profile-button"
+                    disabled={!passwordValid || !cityValid || !streetValid || !zipValid || !houseNumberValid}
+                  >
+                    Save Changes
+                  </IonButton>
+                )}
+                {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
+              </div>
+            </IonCol>
+          </IonRow>
+          <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+            <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
+              <IonCard>
+                <IonCardHeader>
+                  <IonCardTitle>Deine Awards</IonCardTitle>
+                </IonCardHeader>
+                <IonCardContent>
+                  <IonList>
+                    {awards && awards.map((award, index) => (
+                      <IonItem key={index}>
+                        <IonLabel>{award.title}</IonLabel>
+                        <IonLabel>{award.points} Punkte</IonLabel>
+                      </IonItem>
+                    ))}
+                  </IonList>
+                </IonCardContent>
+              </IonCard>
+            </IonCol>
+          </IonRow>
         </IonGrid>
       </IonContent>
     </IonPage>
