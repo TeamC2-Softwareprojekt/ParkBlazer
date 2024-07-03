@@ -7,8 +7,8 @@ import Login from './pages/Login';
 import Registration from './pages/Registration';
 import UserProfile from './pages/UserProfile';
 import ViewMessage from './pages/ViewMessage';
-import Marker from './components/MarkerMenu'; // Import der Marker-Komponente
 import ParkingspotDetails from './pages/ParkingspotDetails';
+import Rent from './pages/Rent';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -85,6 +85,7 @@ const App: React.FC = () => (
         <Route>
           <Redirect to="/home" />
         </Route>
+        <Route path="/Rent/:id" component={Rent} />
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
