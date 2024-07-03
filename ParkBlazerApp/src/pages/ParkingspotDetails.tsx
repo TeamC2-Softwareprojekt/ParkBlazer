@@ -21,8 +21,6 @@ import {
 } from "@ionic/react";
 import "./ParkingspotDetails.css";
 import Navbar from "../components/navbar";
-import ImageUploader from "../components/ImageUploader";
-import axios from "axios";
 import { bicycle, bus, car } from "ionicons/icons";
 import AuthService from "../utils/AuthService";
 import StarRating from "../components/StarRating";
@@ -30,6 +28,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { parkingSpace, parkingspaces, initParkingSpaces } from '../data/parkingSpaces';
 import RentCard from "../components/RentCard";
+import { createReview, getAverageRatingOfParkingspot, getReviewsOfParkingspot, initReviews } from "../data/review";
 
 const ParkingspotDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,46 +51,12 @@ const ParkingspotDetails: React.FC = () => {
       }
     };
 
+    initReviews().then(() => setReviews(getReviewsOfParkingspot(parseInt(id))));
     initParkingSpaces().then(fetchParkingspotDetails);
   }, [id]);
 
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await axios.post('https://server-y2mz.onrender.com/api/get_reviews_of_parkingspot', {
-          parkingspot_id: id
-        });
-        const reviewDetails = response.data;
-        setReviews(reviewDetails);
-      } catch (error: any) {
-        if (error.response && error.response.data && error.response.data.message) {
-          setError(error.response.data.message);
-        } else {
-          setError("An unexpected error occurred. Please try again later!");
-        }
-      }
-    };
-
-    fetchReviews();
-  }, [id]);
-
   const handleRatingSubmit = async () => {
-    try {
-      const token = AuthService.getToken();
-      await axios.post('https://server-y2mz.onrender.com/api/create_review', {
-        rating: rating,
-        comment: comment,
-        parkingspot_id: id,
-      },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-      setAlert(true);
-    } catch (error: any) {
-      console.error("There was an error submitting the rating:", error);
-    }
+    setAlert(await createReview(rating, comment, parseInt(id)));
   };
 
   const openModal = (imageUrl: string) => {
@@ -99,17 +64,16 @@ const ParkingspotDetails: React.FC = () => {
     setShowModal(true);
   };
 
-  const calculateAverageRating = (reviews: any[]) => {
+  const getAverageRating = () => {
     if (!reviews || reviews.length === 0) return "No reviews yet";
 
-    const totalRating = reviews.reduce((acc, curr) => acc + curr.rating, 0);
-    const averageRatingNumber = totalRating / reviews.length;
-    const averageRating = Math.round((totalRating / reviews.length) * 2) / 2;
+    const averageRating = getAverageRatingOfParkingspot(parseInt(id));
+    const averageRatingRound = Math.round(averageRating * 2) / 2;
 
     return (
       <>
-        <StarRating rating={averageRating} />
-        <strong>{averageRatingNumber}</strong>
+        <StarRating rating={averageRatingRound} />
+        <strong>{averageRating}</strong>
       </>
     );
   };
@@ -122,7 +86,7 @@ const ParkingspotDetails: React.FC = () => {
           <p>{error}</p>
         </IonText>
       )}
-      {!parkingspot && reviews && !error && (
+      {(!parkingspot || !reviews) && !error && (
         <IonText color="primary">
           <p>Daten werden geladen...</p>
         </IonText>
@@ -138,13 +102,12 @@ const ParkingspotDetails: React.FC = () => {
           </IonCard>
           <div id="parkingspotdetails-rent-container">
             <div id="parkingspotdetails-container">
-              <IonCard>
+            <IonCard>
                 <IonCardContent id="average-rating">
                   <IonCardTitle>Average rating:</IonCardTitle>
-                  {calculateAverageRating(reviews)}
+                  {getAverageRating()}
                 </IonCardContent>
               </IonCard>
-
               <IonCard>
                 <IonCardContent>
                   <IonCardTitle>Available parkingspot types:</IonCardTitle>
@@ -159,7 +122,6 @@ const ParkingspotDetails: React.FC = () => {
                   <IonText><strong>{parkingspot.available_spaces}</strong></IonText>
                 </IonCardContent>
               </IonCard>
-
               <IonCard>
                 <IonCardContent>
                   <IonCardTitle>Address:</IonCardTitle>
@@ -243,8 +205,6 @@ const ParkingspotDetails: React.FC = () => {
           </IonModal>
         </IonContent>
       )}
-
-      <ImageUploader />
     </IonPage>
   );
 };

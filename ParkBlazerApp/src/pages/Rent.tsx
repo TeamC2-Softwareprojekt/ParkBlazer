@@ -8,10 +8,10 @@ import "./Rent.css";
 import AuthService from "../utils/AuthService";
 import { de } from 'date-fns/locale';
 import StarRating from "../components/StarRating";
-import axios from "axios";
 import { adjustMinutes, findRestrictedDateInRange, adjustDateToAvailability } from "../utils/dateUtils";
 import PriceCalculation from "../components/PriceCalculation";
 import { createReservation, getReservedDates } from "../data/reservation";
+import { getAverageRatingOfParkingspot, initReviews } from "../data/review";
 
 export default function Rent() {
   const [parkingspace, setParkingspot] = useState<parkingSpace | null>(null);
@@ -19,7 +19,6 @@ export default function Rent() {
   const [end_date, setEndDate] = useState<Date | null>();
   const [rentTimeInHours, setRentTimeInHours] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<string>("Paypal");
-  const [reviews, setReviews] = useState<any>(null);
   const [restrictedDates, setRestrictedDates] = useState<Date[][] | null>(null);
   const [error, setError] = useState<string>("");
   const { id } = useParams<{ id: string }>();
@@ -35,8 +34,9 @@ export default function Rent() {
     setStartDate(startDate);
     setEndDate(endDate);
 
-    async function getParkingspot() {
+    async function fetchData() {
       await initParkingSpaces();
+      await initReviews();
       const parkingspotDetails = parkingspaces.find(ps => ps.parkingspot_id === Number(id));
       if (parkingspotDetails) {
         setParkingspot(parkingspotDetails);
@@ -47,20 +47,7 @@ export default function Rent() {
       }
     }
 
-    async function fetchReviews() {
-      try {
-        const response = await axios.post('https://server-y2mz.onrender.com/api/get_reviews_of_parkingspot', {
-          parkingspot_id: id
-        });
-        const reviewDetails = response.data;
-        setReviews(reviewDetails);
-      } catch (error: any) {
-        console.error(error);
-      }
-    };
-
-    fetchReviews();
-    getParkingspot();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -72,17 +59,6 @@ export default function Rent() {
       setRentTimeInHours(parseFloat(((end_date!.getTime() - start_date!.getTime()) / (1000 * 60 * 60)).toFixed(2)));
     }
   }, [restrictedDates]);
-
-  function calculateAverageRating(reviews: any[]) {
-    if (!reviews || reviews.length === 0) return "No reviews yet";
-
-    const totalRating = reviews.reduce((acc, curr) => acc + curr.rating, 0);
-    const averageRating = Math.round((totalRating / reviews.length) * 2) / 2;
-
-    return (
-      <StarRating rating={averageRating} />
-    );
-  };
 
   function validateDates(startDate: Date, endDate: Date) {
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
@@ -194,7 +170,7 @@ export default function Rent() {
                     <div>
                       <strong>{parkingspace?.name}</strong> <br />
                       {parkingspace?.city + " " + parkingspace?.zip + ", " + parkingspace?.street + " " + parkingspace?.house_number} <br />
-                      {calculateAverageRating(reviews)}
+                      <StarRating rating={getAverageRatingOfParkingspot(parkingspace?.parkingspot_id)} />
                     </div>
                   </IonCardHeader>
                   <IonCardContent id="information-card-content">

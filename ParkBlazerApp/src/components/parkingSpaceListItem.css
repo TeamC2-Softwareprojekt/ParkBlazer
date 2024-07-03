@@ -1,3 +1,15 @@
+.parking-space-list-item {
+    --color: black;
+    --background: white;
+    --min-height: 94.5px;
+    --padding-start: 0px;
+}
+
+.parking-space-list-container {
+    padding-left: 8px;
+    width: 100%;
+}
+
 .parking-space-list-private-indicator {
     position: absolute;
     right: 0px;
@@ -5,9 +17,29 @@
     width: 5%;
 }
 
+.parking-space-list-private-indicator.private {
+    background-color: #1BB367;
+}
+
+.parking-space-list-private-indicator.public {
+    background-color: #4d8dff;
+}
+
 .parking-space-list-address-container {
+    display: flex;
+    flex-direction: column;
     margin-top: 5px;
     font-size: large;
+}
+
+#parking-space-list-rating {
+    display: flex;
+    flex-direction: row;
+    padding-right: 5px;
+}
+
+#parking-space-list-rating ion-label:first-child {
+    flex: 1;
 }
 
 .parking-space-list-detail-container {
@@ -23,20 +55,9 @@
     padding-right: 15px;
 }
 
-.parking-space-list-container {
-    padding-left: 8px;
-}
-
 .parking-space-list-radio {
     --color: #0054e9;
     --color-checked: #0054e9;
-}
-
-.parking-space-list-item {
-    --color: black;
-    --background: white;
-    --min-height: 94.5px;
-    --padding-start: 0px;
 }
 
 .parking-space-list-icon {
