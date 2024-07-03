@@ -18,6 +18,7 @@ import {
   IonInput,
   IonModal,
   IonImg,
+  IonToggle,
 } from "@ionic/react";
 import "./ParkingspotDetails.css";
 import Navbar from "../components/navbar";

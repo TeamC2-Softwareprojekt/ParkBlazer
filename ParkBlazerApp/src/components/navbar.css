@@ -1,10 +1,8 @@
 .heading {
   margin: 0;
   padding: 0px;
-  background-color:
-    black;
-  color:
-    white;
+  background-color: black;
+  color: white;
   text-align: center;
 }
 
@@ -33,4 +31,8 @@
 #navbar-title {
   cursor: pointer;
   width: fit-content;
+}
+
+.navbar ion-toolbar {
+	padding: 0 1vw;
 }
