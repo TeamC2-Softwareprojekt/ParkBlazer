@@ -50,6 +50,7 @@ const UserProfile: React.FC = () => {
     const [houseNumberValid, setHouseNumberValid] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
     const [parkingSpots, setParkingSpots] = useState<any[]>([]);
+    const [awards, setAwards] = useState<any[]>([]);
 
     const history = useHistory();
 
@@ -66,6 +67,7 @@ const UserProfile: React.FC = () => {
                 setUserData(userDetails.userDetails[0]);
                 setOriginalUserData(userDetails.userDetails[0]);
                 fetchParkingSpots(userDetails.userDetails[0].username);
+                fetchUserAwards();
             } catch (error: any) {
                 if (error.response && error.response.data && error.response.data.message) {
                     setError(error.response.data.message);
@@ -81,6 +83,24 @@ const UserProfile: React.FC = () => {
     const fetchParkingSpots = (username: string) => {
         const userParkingSpots = parkingspaces.filter(spot => spot.username === username);
         setParkingSpots(userParkingSpots);
+    };
+
+    const fetchUserAwards = async () => {
+        const token = AuthService.getToken();
+        try {
+            const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_awards', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setAwards(response.data.results);
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message);
+            } else {
+                setError("An unexpected error occurred. Please try again later!");
+            }
+        }
     };
 
     const validatePassword = useCallback((password: string) => {
@@ -302,6 +322,25 @@ const UserProfile: React.FC = () => {
                                             </IonThumbnail>
                                             <IonLabel onClick={() => window.open(`http://localhost:8100/parkingspot_details/${spot.parkingspot_id}`, '_self')}>{spot.name}</IonLabel>
                                             <IonLabel>{spot.description}</IonLabel>
+                                        </IonItem>
+                                    ))}
+                                </IonList>
+                            </IonCardContent>
+                        </IonCard>
+                    </IonCol>
+                </IonRow>
+                <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+                    <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
+                        <IonCard>
+                            <IonCardHeader>
+                                <IonCardTitle>Deine Awards</IonCardTitle>
+                            </IonCardHeader>
+                            <IonCardContent>
+                                <IonList>
+                                    {awards && awards.map((award, index) => (
+                                        <IonItem key={index}>
+                                            <IonLabel>{award.title}</IonLabel>
+                                            <IonLabel>{award.points} Punkte</IonLabel>
                                         </IonItem>
                                     ))}
                                 </IonList>
