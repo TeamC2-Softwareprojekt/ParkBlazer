@@ -13,8 +13,8 @@ const UserReports: React.FC = () => {
   useEffect(() => {
     const fetchAvailabilityReports = async () => {
       const response = await getCurrentUserReports();
-      if (response.status === 200) {
-        setReports(response.data.reports);
+      if (response) {
+        setReports(response);
       } else {
         setReports([]);
       }

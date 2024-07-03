@@ -14,7 +14,7 @@ import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonTe
 import { checkmark, close, enterOutline, informationCircle } from 'ionicons/icons';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { getAvailabilityReports } from '../data/reports';
+import { AvailabilityReport, getAvailabilityReports } from '../data/reports';
 import { getReservedDates } from '../data/reservation';
 import { findRestrictedDateInRange } from '../utils/dateUtils';
 
@@ -29,7 +29,7 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
   const locationMarker = useRef<maptilersdk.Marker>();
   const [selectedSpot, setSelectedSpot] = useState<parkingSpace | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [availabilityReports, setAvailabilityReports] = useState<any[]>([]);
+  const [availabilityReports, setAvailabilityReports] = useState<AvailabilityReport[]>([]);
   const [restrictedDates, setRestrictedDates] = useState<Date[][]>([]);
 
   maptilersdk.config.apiKey = 'K3LqtEaJcxyh4Nf6BEPT';
@@ -74,15 +74,15 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
 
   const displayParkingSpotsOnMap = () => {
     if (!map.current) return;
-  
+
     parkingspaces?.forEach((spot) => {
       let markerColor = "#4d8dff";
       if (spot.price_per_hour) markerColor = "#1BB367";
-  
+
       const marker = new maptilersdk.Marker({ color: markerColor })
         .setLngLat([spot.longitude, spot.latitude])
         .addTo(map.current!);
-  
+
       marker.getElement().addEventListener('click', async () => {
         setSelectedSpot(spot);
         setShowModal(true);
@@ -97,17 +97,16 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
   const fetchAvailabilityReports = async (parkingspot: parkingSpace) => {
     const response = await getAvailabilityReports(parkingspot);
 
-    if (response.status !== 200) {
+    if (!response) {
       setAvailabilityReports([]);
       return;
     }
 
-    const sortedReports = response.data.reports.sort((a: any, b: any) => {
+    const sortedReports = response.sort((a: any, b: any) => {
       const dateA = new Date(a.parking_availability_report_date).getTime();
       const dateB = new Date(b.parking_availability_report_date).getTime();
       return dateB - dateA;
     });
-
     setAvailabilityReports(sortedReports);
   };
 
@@ -196,7 +195,7 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
                 <IonCard>
                   <IonText><strong>Verfügbarkeit:</strong></IonText>
                   <div id="calendar-container">
-                  <IonDatetime id="date-picker" presentation='date' isDateEnabled={dateISOString => !findRestrictedDateInRange(new Date(dateISOString), new Date(dateISOString), restrictedDates)} min={selectedSpot.availability_start_date} max={selectedSpot.availability_end_date} readonly={true} />
+                    <IonDatetime id="date-picker" presentation='date' isDateEnabled={dateISOString => !findRestrictedDateInRange(new Date(dateISOString), new Date(dateISOString), restrictedDates)} min={selectedSpot.availability_start_date} max={selectedSpot.availability_end_date} readonly={true} />
                   </div>
                 </IonCard>
               </>

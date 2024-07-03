@@ -1,0 +1,85 @@
+/* Style Heading */
+.reservation-heading {
+	font-weight: bold;
+	text-align: center;
+}
+
+.parkingspace-label {
+    cursor: pointer;
+    flex: 1;
+}
+
+.custom-modal {
+    --max-width: 50%; /* Maximale Breite des Modals */
+    --max-height: 30%; /* Maximale Höhe des Modals */
+    --min-height: auto; /* Mindesthöhe des Modals */
+    --overflow: hidden; /* Verhindert Überlauf */
+    --position: relative; /* Relative Positionierung */
+    --top: 80%; /* Zentriert das Modal vertikal */
+    --left: 100%; /* Zentriert das Modal horizontal */
+    
+}
+
+.label-margin {
+    margin-left: 50px;
+}
+
+.icon-style {
+    margin-left: 20px;
+    cursor: pointer;
+    color: white;
+    font-size: 25px;
+}
+
+.image-style {
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 10px;
+}
+
+.header-label {
+    flex: 1;
+    margin-left: 50px;
+}
+
+.data-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Allow items to wrap */
+    width: 100%; /* Ensure full width */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .label-margin {
+        margin-left: 20px;
+    }
+
+    .header-label {
+        margin-left: 20px;
+    }
+
+    .icon-style {
+        font-size: 20px;
+    }
+
+    .data-row {
+        flex-direction: column; /* Stack items vertically on small screens */
+        align-items: flex-start; /* Align items to start */
+    }
+
+    .header-row {
+        flex-direction: column; /* Stack header items vertically on small screens */
+        align-items: flex-start; /* Align items to start */
+    }
+}

@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Registration from './pages/Registration';
 import UserProfile from './pages/UserProfile';
+import Reservations from './pages/Reservations';
 import ParkingspotDetails from './pages/ParkingspotDetails';
 import ParkingspotReport from './pages/ParkingspotReport';
 import Rent from './pages/Rent';
@@ -105,6 +106,13 @@ const App: React.FC = () => (
         <Route path="/user_parkingspots">
           {AuthService.isLoggedIn() ? (
             <UserParkingspots />
+          ) : (
+            <Redirect to="/home" />
+          )}
+        </Route>
+        <Route path="/Reservations">
+          {AuthService.isLoggedIn() ? (
+            <Reservations/>
           ) : (
             <Redirect to="/home" />
           )}

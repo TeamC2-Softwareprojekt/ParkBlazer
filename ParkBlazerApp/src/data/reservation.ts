@@ -2,7 +2,7 @@ import axios from "axios";
 import AuthService from "../utils/AuthService";
 import { parkingSpace } from "./parkingSpaces";
 
-interface Reservation {
+export interface Reservation {
     availability_start_date: string;
     availability_end_date: string;
     start_date: string;
@@ -13,6 +13,22 @@ interface Reservation {
     email: string;
     username: string;
     status: string;
+    private_parkingspot_id: number; 
+}
+
+export async function getCurrentUserReservations(): Promise<Reservation[]> {
+    let response;
+    try {
+        response = await axios.get('https://server-y2mz.onrender.com/api/user_reservations', {
+            headers: {
+                Authorization: `Bearer ${AuthService.getToken()}`
+            }
+        });
+    } catch (error: any) {
+        console.error(error);
+        return error;
+    }
+    return response?.data;
 }
 
 export async function getReservedDates(private_parkingspt_id: number): Promise<Reservation[]> {
