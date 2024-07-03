@@ -53,8 +53,6 @@ export const MarkerMenu: React.FC = () => {
   const [notificationColor, setNotificationColor] = useState('success');
   const [alert, setAlert] = useState(false);
 
-  const token = AuthService.getToken();
-
   function handleMapClick(e: any) {
     const coords = e.lngLat;
     setLatitude(coords.lat.toString());

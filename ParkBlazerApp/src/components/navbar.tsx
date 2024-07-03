@@ -77,6 +77,9 @@ function Navbar() {
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_parkingspots`, '_self')}>
                                         Deine Parkplätze
                                     </IonItem>
+                                    <IonItem button={true} detail={false} routerLink="/user_reports">
+                                        Deine Meldungen
+                                    </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
                                         Logout
                                     </IonItem>
