@@ -3,6 +3,7 @@ import { IonButton, IonToolbar, IonTitle, IonHeader, IonAvatar, IonPopover, IonL
 import AuthService from '../utils/AuthService';
 import { useHistory } from 'react-router-dom';
 import './navbar.css';
+import '../theme/global.css'
 import axios from 'axios';
 
 function Navbar() {
@@ -52,7 +53,7 @@ function Navbar() {
 
     return (
         <IonHeader color="light" className='navbar'>
-            <IonToolbar color="light">
+            <IonToolbar >
                 <IonTitle id="navbar-title" onClick={handleLogoClick}>ParkBlazer</IonTitle>
                 <IonButton
                     id="popover-button"
@@ -72,7 +73,7 @@ function Navbar() {
                                         {username && (<IonText>Hallo, {username}</IonText>)}
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_profile`, '_self')}>
-                                        Profil
+                                        Dein Profil
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_parkingspots`, '_self')}>
                                         Deine Parkplätze
@@ -81,7 +82,7 @@ function Navbar() {
                                         Deine Meldungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} routerLink="/Reservations">
-                                        Buchungen
+                                        Deine Buchungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
                                         Logout
