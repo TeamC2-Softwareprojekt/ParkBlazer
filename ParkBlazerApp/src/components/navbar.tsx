@@ -8,6 +8,7 @@ import axios from 'axios';
 function Navbar() {
     const [loggedIn, setLoggedIn] = useState(AuthService.isLoggedIn());
     const [username, setUsername] = useState<string>(localStorage.getItem('username') || "");
+    const [userPoints, setUserPoints] = useState<string>();
     const history = useHistory();
 
     const handleLogout = () => {
@@ -22,7 +23,7 @@ function Navbar() {
     };
 
     const handleUserMenu = async () => {
-        if (!username) {
+        if (!username || !userPoints) {
             const token = AuthService.getToken();
             try {
                 const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_details', {
@@ -32,7 +33,9 @@ function Navbar() {
                 });
                 const userDetails = response.data;
                 const fetchedUsername = userDetails.userDetails[0].username;
+                const fetchedUserPoints = userDetails.userDetails[0].points;
                 setUsername(fetchedUsername);
+                setUserPoints(fetchedUserPoints);
                 localStorage.setItem('username', fetchedUsername);
             } catch (error: any) {
                 if (error.response && error.response.data && error.response.data.message) {
@@ -45,7 +48,7 @@ function Navbar() {
     };
 
     useEffect(() => {
-        if (loggedIn && !username) {
+        if (loggedIn && (!username || !userPoints)) {
             handleUserMenu();
         }
     }, [loggedIn]);
@@ -70,6 +73,9 @@ function Navbar() {
                                 <>
                                     <IonItem id='user-name'>
                                         {username && (<IonText>Hallo, {username}</IonText>)}
+                                    </IonItem>
+                                    <IonItem id='points'>
+                                        {userPoints && (<IonText>Dein Punktestand: {userPoints}</IonText>)}
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_profile`, '_self')}>
                                         Profil
