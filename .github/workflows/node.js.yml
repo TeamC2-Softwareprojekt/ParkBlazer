@@ -2,12 +2,12 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main", "48-update-tests" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "48-update-tests" ]
+    branches: [ "main" ]
 
 jobs:
-  test:
+  Tests:
 
     runs-on: ubuntu-latest
 
