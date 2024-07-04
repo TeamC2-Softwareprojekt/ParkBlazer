@@ -12,13 +12,6 @@ import {
   IonContent,
   IonRow,
   IonCol,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonList,
-  IonItem,
-  IonLabel,
 } from "@ionic/react";
 import axios from "axios";
 import "./UserProfile.css";
