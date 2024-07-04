@@ -1,17 +1,18 @@
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonContent, IonLabel, IonSelect, IonSelectOption, IonSpinner, IonText } from "@ionic/react";
-import { initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingSpaces";
-import { useEffect, useState } from "react";
-import Navbar from "../components/navbar";
-import { useHistory, useParams } from "react-router";
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCheckbox, IonContent, IonLabel, IonSelect, IonSelectOption, IonSpinner, IonText } from "@ionic/react";
+import axios from "axios";
 import { format } from "date-fns";
-import "./Rent.css";
-import AuthService from "../utils/AuthService";
 import { de } from 'date-fns/locale';
-import StarRating from "../components/StarRating";
-import { adjustMinutes, findRestrictedDateInRange, adjustDateToAvailability } from "../utils/dateUtils";
+import { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router";
+import Navbar from "../components/navbar";
 import PriceCalculation from "../components/PriceCalculation";
+import StarRating from "../components/StarRating";
+import { initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingSpaces";
 import { createReservation, getReservedDates } from "../data/reservation";
 import { getAverageRatingOfParkingspot, initReviews } from "../data/review";
+import AuthService from "../utils/AuthService";
+import { adjustDateToAvailability, adjustMinutes, findRestrictedDateInRange } from "../utils/dateUtils";
+import "./Rent.css";
 
 export default function Rent() {
   const [parkingspace, setParkingspot] = useState<parkingSpace | null>(null);
@@ -21,6 +22,9 @@ export default function Rent() {
   const [paymentMethod, setPaymentMethod] = useState<string>("Paypal");
   const [restrictedDates, setRestrictedDates] = useState<Date[][] | null>(null);
   const [error, setError] = useState<string>("");
+  const [usePoints, setUsePoints] = useState<boolean>(false);
+  const [points, setPoints] = useState<number>(0);
+  const [price, setPrice] = useState<number>(0);
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
 
@@ -44,6 +48,20 @@ export default function Rent() {
         setRestrictedDates(data.map(reservation => [new Date(reservation.start_date), new Date(reservation.end_date)]));
       } else {
         setError("Parkingspot not found");
+        return;
+      }
+
+      try {
+        const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_details', {
+          headers: {
+            Authorization: `Bearer ${AuthService.getToken()}`
+          }
+        });
+        setPoints(response.data.userDetails[0].points);
+      } catch (error) {
+        console.error('Error while fetching user data', error);
+        setError("Error while fetching user data");
+        return;
       }
     }
 
@@ -79,9 +97,12 @@ export default function Rent() {
   }
 
   async function handleRentClick() {
-    if (!await createReservation(start_date!, end_date!, parkingspace!, rentTimeInHours, paymentMethod)) {
+    if (!await createReservation(start_date!, end_date!, parkingspace!, price, paymentMethod)) {
       alert("Fehler beim Mieten des Parkplatzes");
       return;
+    }
+    if (usePoints) {
+      // TODO remove points
     }
     handleRedirect("/home");
   }
@@ -154,7 +175,13 @@ export default function Rent() {
                     </IonSelect>
                   </div>
                   {AuthService.isLoggedIn() ?
-                    <IonButton disabled={!(rentTimeInHours > 0)} onClick={handleRentClick} id="rent-button">Mieten</IonButton> :
+                    <>
+                      <div id="user-point-selection-container">
+                        <IonLabel>Möchten sie ihre Punkte gegen einen Rabatt eintauschen?</IonLabel>
+                        <IonCheckbox onIonChange={e => { setUsePoints(!usePoints) }} />
+                      </div>
+                      <IonButton disabled={!(rentTimeInHours > 0)} onClick={handleRentClick} id="rent-button">Mieten</IonButton>
+                    </> :
                     <>
                       <div id="login-warning">Logge dich ein oder registriere dich, um zu Mieten</div>
                       <div id="login-register-buttons">
@@ -179,7 +206,7 @@ export default function Rent() {
                       !start_date && !end_date ?
                         <IonText color="danger">Invalides Datum</IonText> :
                         <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> :
-                      <PriceCalculation parkingspace={parkingspace} rentTimeInHours={rentTimeInHours} />
+                      <PriceCalculation parkingspace={parkingspace} rentTimeInHours={rentTimeInHours} pointAmount={usePoints ? points : 0} setTotalPrice={setPrice} />
                     }
                   </IonCardContent>
                 </IonCard>
