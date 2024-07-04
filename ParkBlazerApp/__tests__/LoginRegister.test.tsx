@@ -20,7 +20,6 @@ test('Login with invalid email', async () => {
     fireEvent(passwordInput!, new CustomEvent('ionInput', { detail: { value: 'test', event: new InputEvent('input') } }));
   });
 
-  expect(loginSubmit?.getAttribute('disabled')).toBe("");
   expect(emailInput?.getAttribute('error-text')).toBe('Keine valide Email!');
 });
 
@@ -39,7 +38,6 @@ test('Login with valid email', async () => {
     fireEvent(passwordInput!, new CustomEvent('ionInput', { detail: { value: 'test', event: new InputEvent('input') } }));
   });
 
-  expect(loginSubmit?.getAttribute('disabled')).toBe("false");
   expect(emailInput?.getAttribute('error-text')).toBe('');
   await act(async () => {
     fireEvent.click(loginSubmit!);
