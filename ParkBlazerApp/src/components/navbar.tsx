@@ -55,7 +55,7 @@ function Navbar() {
             <IonToolbar color="light">
                 <IonTitle id="navbar-title" onClick={handleLogoClick}>ParkBlazer</IonTitle>
                 <IonButton
-                    id="popover-button"
+                    id="profile-button"
                     slot="end"
                     onClick={AuthService.isLoggedIn() ? handleUserMenu : undefined}
                 >
@@ -63,7 +63,7 @@ function Navbar() {
                         <img alt="Avatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
                     </IonAvatar>
                 </IonButton>
-                <IonPopover trigger="popover-button" dismissOnSelect={true}>
+                <IonPopover trigger="profile-button" dismissOnSelect={true}>
                     <IonContent>
                         <IonList>
                             {AuthService.isLoggedIn() ? (

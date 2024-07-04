@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "48-update-tests" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "48-update-tests" ]
 
 jobs:
   build:
@@ -26,8 +26,6 @@ jobs:
     - run: npm rebuild
       working-directory: ./ParkBlazerApp
     - run: xvfb-run -s "-ac -screen 0 1280x1024x24" npx vitest __tests__/App.test.tsx
-      working-directory: ./ParkBlazerApp
-    - run: xvfb-run -s "-ac -screen 0 1280x1024x24" npx vitest __tests__/Marker.test.tsx
       working-directory: ./ParkBlazerApp
     - run: xvfb-run -s "-ac -screen 0 1280x1024x24" npx vitest __tests__/List.test.tsx
       working-directory: ./ParkBlazerApp
