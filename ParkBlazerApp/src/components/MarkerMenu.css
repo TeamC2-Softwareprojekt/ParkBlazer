@@ -2,6 +2,14 @@
     font-size: 18px;
 }
 
+.input-label {
+    margin-right: 10px;
+}
+
+#country-select {
+    margin-bottom: 0px;
+}
+
 .marker-menu-checkbox {
     margin-left: 5px;
 }

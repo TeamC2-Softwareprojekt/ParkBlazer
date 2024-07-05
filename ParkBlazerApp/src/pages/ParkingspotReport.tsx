@@ -88,7 +88,7 @@ const ParkingspotReport: React.FC = () => {
 
   function handleAvailabilityChange(event: IonInputCustomEvent<InputChangeEventDetail>): void {
     const value = event.detail.value;
-    if (value && (!isNaN(Number(value)) && Number(value) >= 0 && Number(value) <= 80)) {
+    if (value && (!isNaN(Number(value)) && Number(value) >= 0 && Number(value) <= parkingspot!.available_spaces)) {
       setAvailabilityValid(true);
       setCurrentAvailability(Number(value));
     } else {
