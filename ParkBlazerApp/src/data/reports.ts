@@ -66,7 +66,7 @@ export async function createAvailabilityReport(parkingspace: parkingSpace, curre
     return true;
 }
 
-export async function createReport(parkingspace: parkingSpace, reportType: number, reportDescription: string): Promise<boolean> {
+export async function createReport(parkingspace: parkingSpace, reportType: string, reportDescription: string): Promise<boolean> {
     try {
         await axios.post('https://server-y2mz.onrender.com/api/insert_parking_report',
             {

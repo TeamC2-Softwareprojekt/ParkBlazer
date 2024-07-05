@@ -7,6 +7,7 @@ import AuthService from '../utils/AuthService';
 import { parkingspaces } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
 import ImageUploader from '../components/ImageUploader';
+import axios from 'axios';
 
 
 export const MarkerMenu: React.FC = () => {
@@ -160,7 +161,7 @@ export const MarkerMenu: React.FC = () => {
       return;
     }
 
-    let data = JSON.stringify({
+    let data = {
       name: title,
       description: description,
       available_spaces: availableSpaces,
@@ -178,42 +179,30 @@ export const MarkerMenu: React.FC = () => {
       availability_start_date: privateSpot ? selectedStartDate?.toISOString() : undefined,
       availability_end_date: privateSpot ? selectedEndDate?.toISOString() : undefined,
       price_per_hour: privateSpot ? pricePerHour : undefined,
-    });
+    };
 
     let url = 'https://server-y2mz.onrender.com/api/create_parkingspot';
     if (privateSpot) url = 'https://server-y2mz.onrender.com/api/create_privateparkingspot';
 
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${AuthService.getToken()}`
-        },
-        body: data
-      });
-
-      if (response.ok) {
-        setNotificationMessage('Parkingspace saved successfully.');
-        setNotificationColor('success');
-        setShowNotification(true);
-        resetAttributes();
-        window.location.reload();
-      } else {
-        const errorData = await response.json();
-        setNotificationMessage(errorData.message || 'Error while saving.');
-        setNotificationColor('danger');
-        setShowNotification(true);
-        console.error('Error while saving:', errorData);
-      }
+      await axios.post(url,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${AuthService.getToken()}`
+          }
+        }
+      );
     } catch (error) {
-      console.error('Fehler beim Speichern:', error);
       setNotificationMessage('Fehler beim Speichern.');
       setNotificationColor('danger');
       setShowNotification(true);
       console.error('Fehler beim Speichern:', error);
     }
-    closeModalCoordinates();
+    setNotificationMessage('Parkingspace saved successfully.');
+    setNotificationColor('success');
+    setShowNotification(true);
+    window.location.reload();
   };
 
   const handleUseCurrentLocation = () => {
@@ -279,33 +268,6 @@ export const MarkerMenu: React.FC = () => {
     fetchCountries();
   }, []);
 
-  const resetAttributes = () => {
-    setLatitude('');
-    setLongitude('');
-    setTitle('');
-    setDescription('');
-    setAvailableSpaces('');
-    setImageUrl('');
-    setStreet('');
-    setHouseNumber('');
-    setZip('');
-    setCity('');
-    setCountry('');
-    setPricePerHour(undefined);
-    setSelectedDocument(null);
-    setErrorTitle('');
-    setErrorDescription('');
-    setErrorAvailableSpaces('');
-    setErrorImage('');
-    setErrorStreet('');
-    setErrorHouseNumber('');
-    setErrorZip('');
-    setErrorCity('');
-    setErrorCountry('');
-    setErrorPricePerHour('');
-    setErrorDocument('');
-  };
-
   return (
     <div id='marker-menu'>
       <IonFab vertical="bottom" horizontal="end" slot="fixed">
@@ -313,9 +275,11 @@ export const MarkerMenu: React.FC = () => {
           <IonIcon icon={chevronUpCircle} />
         </IonFabButton>
         <IonFabList side="top" activated={showMenu}>
-          <IonFabButton id='create-marker-modal-button' onClick={openModal}>
-            <IonIcon icon={add} />
-          </IonFabButton>
+          {AuthService.isLoggedIn() && (
+            <IonFabButton id='create-marker-modal-button' onClick={openModal}>
+              <IonIcon icon={add} />
+            </IonFabButton>
+          )}
         </IonFabList>
       </IonFab>
       <IonModal isOpen={showModal} onDidDismiss={closeModal}>

@@ -123,14 +123,14 @@ export default function DateInput({ parkingspace, setStartDate, setEndDate }: { 
   return (
     <>
       <div className="date-input-container" id="date-card-popover-trigger">
-        <IonInput value={start_date ? format(start_date, 'dd.MM.yyyy hh:mm') : ""} label="Start Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY hh:mm" onIonChange={e => handleDateTextChange(e)} className="date-input start-date" />
-        <IonInput value={end_date ? format(end_date, 'dd.MM.yyyy hh:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY hh:mm" onIonChange={e => handleDateTextChange(e)} className="date-input" />
+        <IonInput value={start_date ? format(start_date, 'dd.MM.yyyy HH:mm') : ""} label="Start Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} className="date-input start-date" />
+        <IonInput value={end_date ? format(end_date, 'dd.MM.yyyy HH:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} className="date-input" />
       </div>
       <IonPopover keepContentsMounted={true} trigger="date-card-popover-trigger" id="date-card-popover" side="bottom" alignment="start">
         <div id="date-card-popover-input-container">
           <div className="date-input-container">
-            <IonInput value={start_date ? format(start_date, 'dd.MM.yyyy hh:mm') : ""} label="Start Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY hh:mm" onIonChange={e => handleDateTextChange(e)} className="date-input start-date" />
-            <IonInput value={end_date ? format(end_date, 'dd.MM.yyyy hh:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY hh:mm" onIonChange={e => handleDateTextChange(e)} className="date-input" />
+            <IonInput value={start_date ? format(start_date, 'dd.MM.yyyy HH:mm') : ""} label="Start Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} className="date-input start-date" />
+            <IonInput value={end_date ? format(end_date, 'dd.MM.yyyy HH:mm') : ""} label="End Datum" labelPlacement="stacked" placeholder="DD-MM-YYYY HH:mm" onIonChange={e => handleDateTextChange(e)} className="date-input" />
           </div>
           <IonDatetime isDateEnabled={dateISOString => !findRestrictedDateInRange(new Date(dateISOString), new Date(dateISOString), restrictedDates)} ref={calendarRef} presentation="date" multiple={true} min={parkingspace.availability_start_date} max={parkingspace.availability_end_date} onIonChange={e => handleCalenderChange(e)} />
         </div>
