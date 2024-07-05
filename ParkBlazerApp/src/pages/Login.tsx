@@ -65,16 +65,16 @@ const Login: React.FC = () => {
             <IonCol size="12" size-sm="12" size-md="12">
               <div className="login-container">
                 <IonText color="primary" className="login-title">
-                  <h1 className="login-heading">LOGIN</h1>
+                  <h1 className="login-heading">Einloggen</h1>
                 </IonText>
                 <IonInput
                   className={`login-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
                   id="email-input"
                   type="email"
                   fill="solid"
-                  label="Email"
+                  label="E-Mail"
                   labelPlacement="floating"
-                  errorText={!emailValid ? "Keine valide Email!" : ""}
+                  errorText={!emailValid ? "Keine valide Email! Bitte überprüfen sie ihre Eingabe, und versuchen Sie es erneut." : ""}
                   onIonInput={handleEmailChange}
                   value={email}
                 />
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
                   id="password-input"
                   type="password"
                   fill="solid"
-                  label="Password"
+                  label="Passwort"
                   labelPlacement="floating"
                   onIonInput={handlePasswordChange}
                   value={password}

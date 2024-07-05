@@ -42,7 +42,7 @@ const ParkingspotReport: React.FC = () => {
       if (parkingspotDetails) {
         setParkingspot(parkingspotDetails);
       } else {
-        console.error("Parkingspot not found.");
+        console.error("Parkplatz nicht gefunden");
       }
     };
 

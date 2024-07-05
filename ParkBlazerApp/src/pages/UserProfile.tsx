@@ -103,7 +103,7 @@ const UserProfile: React.FC = () => {
     if (error?.response?.data?.message) {
       setError(error.response.data.message);
     } else {
-      setError("An unexpected error occurred. Please try again later!");
+      setError("Ein unerwarteter Fehler ist aufgetreten, bitte versuche es später erneut!");
     }
   };
 
@@ -179,7 +179,7 @@ const UserProfile: React.FC = () => {
                   className="profile-input"
                   type="text"
                   fill="solid"
-                  label="Username"
+                  label="Nutzername"
                   labelPlacement="floating"
                   value={userData.username}
                   disabled
@@ -188,7 +188,7 @@ const UserProfile: React.FC = () => {
                   className="profile-input"
                   type="text"
                   fill="solid"
-                  label="First Name"
+                  label="Vorname"
                   labelPlacement="floating"
                   value={userData.firstname}
                   disabled
@@ -197,7 +197,7 @@ const UserProfile: React.FC = () => {
                   className="profile-input"
                   type="text"
                   fill="solid"
-                  label="Last Name"
+                  label="Nachname"
                   labelPlacement="floating"
                   value={userData.lastname}
                   disabled
@@ -206,7 +206,7 @@ const UserProfile: React.FC = () => {
                   className={"profile-input"}
                   type="email"
                   fill="solid"
-                  label="Email"
+                  label="E-Mail"
                   labelPlacement="floating"
                   value={userData.email}
                   disabled
@@ -215,7 +215,7 @@ const UserProfile: React.FC = () => {
                   className={`profile-input ${!passwordValid ? "ion-invalid" : ""}`}
                   type="password"
                   fill="solid"
-                  label="Password"
+                  label="Passwort"
                   labelPlacement="floating"
                   value={userData.password}
                   disabled={!editMode}
@@ -226,7 +226,7 @@ const UserProfile: React.FC = () => {
                   className="profile-input"
                   type="text"
                   fill="solid"
-                  label="Birth Date"
+                  label="Geburtstag"
                   labelPlacement="floating"
                   value={userData.birthdate}
                   disabled
@@ -235,7 +235,7 @@ const UserProfile: React.FC = () => {
                   className={`profile-input ${!cityValid ? "ion-invalid" : ""}`}
                   type="text"
                   fill="solid"
-                  label="City"
+                  label="Stadt"
                   labelPlacement="floating"
                   value={userData.city}
                   disabled={!editMode}
@@ -246,7 +246,7 @@ const UserProfile: React.FC = () => {
                   className={`profile-input ${!streetValid ? "ion-invalid" : ""}`}
                   type="text"
                   fill="solid"
-                  label="Street"
+                  label="Straße"
                   labelPlacement="floating"
                   value={userData.street}
                   disabled={!editMode}
@@ -257,7 +257,7 @@ const UserProfile: React.FC = () => {
                   className={`profile-input ${!zipValid ? "ion-invalid" : ""}`}
                   type="text"
                   fill="solid"
-                  label="Zip"
+                  label="PLZ"
                   labelPlacement="floating"
                   value={userData.zip}
                   disabled={!editMode}
@@ -268,7 +268,7 @@ const UserProfile: React.FC = () => {
                   className={`profile-input ${!houseNumberValid ? "ion-invalid" : ""}`}
                   type="text"
                   fill="solid"
-                  label="House Number"
+                  label="Hausnummer"
                   labelPlacement="floating"
                   value={userData.house_number}
                   disabled={!editMode}
@@ -277,7 +277,7 @@ const UserProfile: React.FC = () => {
                 />
                 <IonSelect
                   aria-label="Country"
-                  label="Select Country"
+                  label="Land"
                   labelPlacement="floating"
                   fill="solid"
                   value={userData.country}
@@ -295,7 +295,7 @@ const UserProfile: React.FC = () => {
                   onClick={toggleEditMode}
                   className="profile-button"
                 >
-                  {editMode ? "Cancel" : "Edit Profile"}
+                  {editMode ? "Abbrechen" : "Profil bearbeiten"}
                 </IonButton>
                 {editMode && (
                   <IonButton
@@ -304,7 +304,7 @@ const UserProfile: React.FC = () => {
                     className="profile-button"
                     disabled={!passwordValid || !cityValid || !streetValid || !zipValid || !houseNumberValid}
                   >
-                    Save Changes
+                    Änderungen speichern
                   </IonButton>
                 )}
                 {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
