@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { IonAlert, IonIcon, IonModal, IonPopover } from '@ionic/react';
+import { IonAlert, IonIcon, IonModal, IonPage, IonPopover } from '@ionic/react';
 import { informationCircleOutline } from 'ionicons/icons';
 import { cardOutline } from 'ionicons/icons';
 import { bicycle, bus, car } from "ionicons/icons";
@@ -60,48 +60,56 @@ const Reservations: React.FC = () => {
   };
 
   return (
-    <>
+    <IonPage>
       <Navbar />
-      <IonCard>
-        <IonCardContent>
-          <IonText color="primary">
-            <h1 className="reservation-heading">Reservierungen</h1>
-          </IonText>
-          <IonList>
-            {combinedData && combinedData.map((data, index) => (
-              <IonItem key={index}>
-                <IonThumbnail slot="start" onClick={() => openPopoverImage(data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg")}>
-                  <img alt={`Thumbnail of ${data.parkingspot.name}`} src={data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
-                </IonThumbnail>
-                <div className="data-row">
-                  <IonLabel className="parkingspace-label" onClick={() => window.open(`/parkingspot_details/${data.parkingspot.parkingspot_id}`, '_self')}>{data.parkingspot.name}</IonLabel>
-                  <IonLabel className="label-margin"><strong>Status:</strong> {data.reservation.status}</IonLabel>
-                  <IonLabel className="label-margin"><strong>Start-Datum:</strong> {format(data.reservation.start_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
-                  <IonLabel className="label-margin"><strong>End-Datum:</strong> {format(data.reservation.end_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
-                  <IonIcon
-                    icon={informationCircleOutline}
-                    className="icon-style"
-                    id={index.toString() + "-information"} />
-                  <IonIcon
-                    icon={cardOutline}
-                    className="icon-style"
-                    id={index.toString() + "-invoice"} />
-                  {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
-                </div>
-                <PopoverInformation parkingspace={data.parkingspot!} trigger={index.toString() + "-information"} />
-                <PopoverInvoice reservationID={data.reservation.reservation_id} trigger={index.toString() + "-invoice"} />
-              </IonItem>
-            ))}
-          </IonList>
-          <IonModal isOpen={showPopoverImage} onDidDismiss={() => setShowPopoverImage(false)}>
-            <div className="image-style">
-              <img src={selectedImage} alt="Selected" style={{ maxHeight: '90%', maxWidth: '90%' }} />
-            </div>
-            <IonButton onClick={() => setShowPopoverImage(false)} expand="full">Schließen</IonButton>
-          </IonModal>
-        </IonCardContent>
-      </IonCard>
-    </>
+      <IonContent>
+        <IonGrid fixed className="login-grid">
+          <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+            <IonCol size="12" size-sm="12" size-md="12">
+              <IonText color="primary">
+                <h1 className="reservation-heading">Reservierungen</h1>
+              </IonText>
+              <IonCard>
+                <IonCardContent>
+                  <IonList>
+                    {combinedData && combinedData.map((data, index) => (
+                      <IonItem key={index}>
+                        <IonThumbnail slot="start" onClick={() => openPopoverImage(data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg")}>
+                          <img alt={`Thumbnail of ${data.parkingspot.name}`} src={data.parkingspot.image_url || "https://ionicframework.com/docs/img/demos/thumbnail.svg"} />
+                        </IonThumbnail>
+                        <div className="data-row">
+                          <IonLabel className="parkingspace-label" onClick={() => window.open(`/parkingspot_details/${data.parkingspot.parkingspot_id}`, '_self')}>{data.parkingspot.name}</IonLabel>
+                          <IonLabel className="label-margin"><strong>Status:</strong> {data.reservation.status}</IonLabel>
+                          <IonLabel className="label-margin"><strong>Start-Datum:</strong> {format(data.reservation.start_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
+                          <IonLabel className="label-margin"><strong>End-Datum:</strong> {format(data.reservation.end_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
+                          <IonIcon
+                            icon={informationCircleOutline}
+                            className="icon-style"
+                            id={index.toString() + "-information"} />
+                          <IonIcon
+                            icon={cardOutline}
+                            className="icon-style"
+                            id={index.toString() + "-invoice"} />
+                          {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
+                        </div>
+                        <PopoverInformation parkingspace={data.parkingspot!} trigger={index.toString() + "-information"} />
+                        <PopoverInvoice reservationID={data.reservation.reservation_id} trigger={index.toString() + "-invoice"} />
+                      </IonItem>
+                    ))}
+                  </IonList>
+                  <IonModal isOpen={showPopoverImage} onDidDismiss={() => setShowPopoverImage(false)}>
+                    <div className="image-style">
+                      <img src={selectedImage} alt="Selected" style={{ maxHeight: '90%', maxWidth: '90%' }} />
+                    </div>
+                    <IonButton onClick={() => setShowPopoverImage(false)} expand="full">Schließen</IonButton>
+                  </IonModal>
+                </IonCardContent>
+              </IonCard>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
+      </IonContent>
+    </IonPage>
   );
 }
 

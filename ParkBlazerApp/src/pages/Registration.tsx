@@ -10,7 +10,9 @@ import {
     IonAlert,
     IonText,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonContent,
+    IonPage
 } from "@ionic/react";
 import "./Registration.css";
 import axios from "axios";
@@ -105,146 +107,148 @@ const Registration: React.FC = () => {
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
                 setError(error.response.data.message);
-              } else {
+            } else {
                 setError("An unexpected error occurred. Please try again later!");
-              }
+            }
         }
 
     };
 
     return (
-        <>
-        <Navbar/>
-        <IonGrid fixed className="register-grid">
-            <IonRow className="ion-justify-content-center ion-align-items-center full-height" overflow-scroll="true">
-                <IonCol className="register-col" size="12" size-sm="8" size-md="8" overflow-scroll="true">
-                    <div className="register-container" overflow-scroll="true">
-                        <IonText color="primary" className="register-title">
-                            <h1 className="login-heading">REGISTER</h1>
-                        </IonText>
-                        <IonInput
-                            className={`register-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
-                            id="username-input"
-                            type="text"
-                            fill="solid"
-                            label="Username"
-                            labelPlacement="floating"
-                            value={username}
-                            onIonInput={(e) => setUsername(e.detail.value!)}
-                        />
-                        <IonInput
-                            className="register-input"
-                            id="firstname-input"
-                            type="text"
-                            fill="solid"
-                            label="First Name"
-                            labelPlacement="floating"
-                            value={firstname}
-                            onIonInput={(e) => setFirstname(e.detail.value!)}
-                        />
-                        <IonInput
-                            className="register-input"
-                            id="lastname-input"
-                            type="text"
-                            fill="solid"
-                            label="Last Name"
-                            labelPlacement="floating"
-                            value={lastname}
-                            onIonInput={(e) => setLastname(e.detail.value!)}
-                        />
-                        <IonInput
-                            className={`register-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
-                            id="email-input"
-                            type="email"
-                            fill="solid"
-                            label="Email"
-                            labelPlacement="floating"
-                            value={email}
-                            onIonInput={handleEmailChange}
-                            errorText={!emailValid ? "Keine valide Email!" : ""}
-                        />
-                        <IonInput
-                            className={`register-input ${isPasswordTouched && !passwordValid ? "ion-invalid" : ""}`}
-                            id="password-input"
-                            type="password"
-                            fill="solid"
-                            label="Password"
-                            labelPlacement="floating"
-                            value={password}
-                            onIonInput={handlePasswordChange}
-                            errorText={!passwordValid ? "Passwort muss länger als 10 Zeichen sein!" : ""}
-                        />
-                        <IonInput
-                            className={`register-input ${isBirthdateTouched && !birthdateValid ? "ion-invalid" : ""}`}
-                            id="birthdate-input"
-                            type="date"
-                            fill="solid"
-                            label="Birth Date"
-                            labelPlacement="floating"
-                            value={birthdate}
-                            onIonInput={handleBirthdateChange}
-                            errorText={!birthdateValid ? "Keine 18 Jahre alt!" : ""}
-                        />
-                        <IonInput
-                            className="register-input"
-                            id="street-input"
-                            type="text"
-                            fill="solid"
-                            label="Street"
-                            labelPlacement="floating"
-                            value={street}
-                            onIonInput={(e) => setStreet(e.detail.value!)}
-                        />
-                        <IonInput
-                            className="register-input"
-                            id="house-number-input"
-                            type="text"
-                            fill="solid"
-                            label="House Number"
-                            labelPlacement="floating"
-                            value={houseNumber}
-                            onIonInput={(e) => setHouseNumber(e.detail.value!)}
-                        />
-                        <IonInput
-                            className="register-input"
-                            id="zip-input"
-                            type="text"
-                            fill="solid"
-                            label="Zip"
-                            labelPlacement="floating"
-                            value={zip}
-                            onIonInput={(e) => setZip(e.detail.value!)}
-                        />
-                        <IonInput
-                            className="register-input"
-                            id="city-input"
-                            type="text"
-                            fill="solid"
-                            label="City"
-                            labelPlacement="floating"
-                            value={city}
-                            onIonInput={(e) => setCity(e.detail.value!)}
-                        />
-                        <IonSelect id="country-input" aria-label="Country" label="Select Country" labelPlacement="floating" fill="solid" onIonChange={(e) => setCountry(e.detail.value!)}>
-                            <IonSelectOption value="germany">Germany</IonSelectOption>
-                            <IonSelectOption value="austria">Austria</IonSelectOption>
-                            <IonSelectOption value="netherlands">Netherlands</IonSelectOption>
-                        </IonSelect>
-                        <IonButton
-                            expand="block"
-                            onClick={handleRegister}
-                            className="register-button"
-                            id="register-submit"
-                            disabled={!username || !firstname || !lastname || !email || !password || !birthdate || !street || !houseNumber || !zip || !city || !country || !emailValid || !passwordValid || !birthdateValid}
-                        >
-                            Register
-                        </IonButton>
-                        {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
-                    </div>
-                </IonCol>
-            </IonRow>
-        </IonGrid>
-        </>
+        <IonPage>
+            <Navbar />
+            <IonContent className="main-content">
+                <IonGrid fixed className="register-grid">
+                    <IonRow className="ion-justify-content-center ion-align-items-center full-height" overflow-scroll="true">
+                        <IonCol className="register-col" size="12" size-sm="12" size-md="12" overflow-scroll="true">
+                            <div className="register-container" overflow-scroll="true">
+                                <IonText color="primary" className="register-title">
+                                    <h1 className="login-heading">REGISTER</h1>
+                                </IonText>
+                                <IonInput
+                                    className={`register-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
+                                    id="username-input"
+                                    type="text"
+                                    fill="solid"
+                                    label="Username"
+                                    labelPlacement="floating"
+                                    value={username}
+                                    onIonInput={(e) => setUsername(e.detail.value!)}
+                                />
+                                <IonInput
+                                    className="register-input"
+                                    id="firstname-input"
+                                    type="text"
+                                    fill="solid"
+                                    label="First Name"
+                                    labelPlacement="floating"
+                                    value={firstname}
+                                    onIonInput={(e) => setFirstname(e.detail.value!)}
+                                />
+                                <IonInput
+                                    className="register-input"
+                                    id="lastname-input"
+                                    type="text"
+                                    fill="solid"
+                                    label="Last Name"
+                                    labelPlacement="floating"
+                                    value={lastname}
+                                    onIonInput={(e) => setLastname(e.detail.value!)}
+                                />
+                                <IonInput
+                                    className={`register-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
+                                    id="email-input"
+                                    type="email"
+                                    fill="solid"
+                                    label="Email"
+                                    labelPlacement="floating"
+                                    value={email}
+                                    onIonInput={handleEmailChange}
+                                    errorText={!emailValid ? "Keine valide Email!" : ""}
+                                />
+                                <IonInput
+                                    className={`register-input ${isPasswordTouched && !passwordValid ? "ion-invalid" : ""}`}
+                                    id="password-input"
+                                    type="password"
+                                    fill="solid"
+                                    label="Password"
+                                    labelPlacement="floating"
+                                    value={password}
+                                    onIonInput={handlePasswordChange}
+                                    errorText={!passwordValid ? "Passwort muss länger als 10 Zeichen sein!" : ""}
+                                />
+                                <IonInput
+                                    className={`register-input ${isBirthdateTouched && !birthdateValid ? "ion-invalid" : ""}`}
+                                    id="birthdate-input"
+                                    type="date"
+                                    fill="solid"
+                                    label="Birth Date"
+                                    labelPlacement="floating"
+                                    value={birthdate}
+                                    onIonInput={handleBirthdateChange}
+                                    errorText={!birthdateValid ? "Keine 18 Jahre alt!" : ""}
+                                />
+                                <IonInput
+                                    className="register-input"
+                                    id="street-input"
+                                    type="text"
+                                    fill="solid"
+                                    label="Street"
+                                    labelPlacement="floating"
+                                    value={street}
+                                    onIonInput={(e) => setStreet(e.detail.value!)}
+                                />
+                                <IonInput
+                                    className="register-input"
+                                    id="house-number-input"
+                                    type="text"
+                                    fill="solid"
+                                    label="House Number"
+                                    labelPlacement="floating"
+                                    value={houseNumber}
+                                    onIonInput={(e) => setHouseNumber(e.detail.value!)}
+                                />
+                                <IonInput
+                                    className="register-input"
+                                    id="zip-input"
+                                    type="text"
+                                    fill="solid"
+                                    label="Zip"
+                                    labelPlacement="floating"
+                                    value={zip}
+                                    onIonInput={(e) => setZip(e.detail.value!)}
+                                />
+                                <IonInput
+                                    className="register-input"
+                                    id="city-input"
+                                    type="text"
+                                    fill="solid"
+                                    label="City"
+                                    labelPlacement="floating"
+                                    value={city}
+                                    onIonInput={(e) => setCity(e.detail.value!)}
+                                />
+                                <IonSelect id="country-input" aria-label="Country" label="Select Country" labelPlacement="floating" fill="solid" onIonChange={(e) => setCountry(e.detail.value!)}>
+                                    <IonSelectOption value="germany">Germany</IonSelectOption>
+                                    <IonSelectOption value="austria">Austria</IonSelectOption>
+                                    <IonSelectOption value="netherlands">Netherlands</IonSelectOption>
+                                </IonSelect>
+                                <IonButton
+                                    expand="block"
+                                    onClick={handleRegister}
+                                    className="register-button"
+                                    id="register-submit"
+                                    disabled={!username || !firstname || !lastname || !email || !password || !birthdate || !street || !houseNumber || !zip || !city || !country || !emailValid || !passwordValid || !birthdateValid}
+                                >
+                                    Register
+                                </IonButton>
+                                {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
+                            </div>
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
+            </IonContent>
+        </IonPage>
     );
 };
 

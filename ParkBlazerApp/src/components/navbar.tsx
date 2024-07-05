@@ -3,6 +3,7 @@ import { IonButton, IonToolbar, IonTitle, IonHeader, IonAvatar, IonPopover, IonL
 import AuthService from '../utils/AuthService';
 import { useHistory } from 'react-router-dom';
 import './navbar.css';
+import '../theme/global.css'
 import axios from 'axios';
 
 function Navbar() {
@@ -55,7 +56,7 @@ function Navbar() {
 
     return (
         <IonHeader color="light" className='navbar'>
-            <IonToolbar color="light">
+            <IonToolbar >
                 <IonTitle id="navbar-title" onClick={handleLogoClick}>ParkBlazer</IonTitle>
                 <IonButton
                     id="popover-button"
@@ -78,7 +79,7 @@ function Navbar() {
                                         {userPoints && (<IonText>Dein Punktestand: {userPoints}</IonText>)}
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_profile`, '_self')}>
-                                        Profil
+                                        Dein Profil
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_parkingspots`, '_self')}>
                                         Deine Parkplätze
@@ -86,8 +87,8 @@ function Navbar() {
                                     <IonItem button={true} detail={false} routerLink="/user_reports">
                                         Deine Meldungen
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/Reservations">
-                                        Buchungen
+                                    <IonItem button={true} detail={false} routerLink="/user_reservations">
+                                        Deine Buchungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
                                         Logout

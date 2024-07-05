@@ -7,9 +7,11 @@ import Filter, { FilterParams, defaultFilterParams } from '../components/filter'
 import { parkingSpace, initParkingSpaces, parkingspaces, getFilteredParkingSpaces, setDistancesToPoint } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
 import { getAverageRatingOfParkingspot, getReviewsOfParkingspot, initReviews } from '../data/review';
+import { MarkerMenu } from '../components/MarkerMenu'; // Import MarkerMenu
 
 function Home() {
   const [parkingSpacesList, setParkingSpaces] = useState<parkingSpace[]>([]);
+  const [isListVisible, setIsListVisible] = useState(true); // Zustand für die Sichtbarkeit der Liste
   const currentFilterParamsRef = useRef<FilterParams>(defaultFilterParams);
   let currentFilterParams: FilterParams = currentFilterParamsRef.current;
 
@@ -85,14 +87,19 @@ function Home() {
     setParkingSpaces(filteredParkingSpaces);
   }, []);
 
+  const toggleList = () => {
+    setIsListVisible(!isListVisible);
+  };
+
   return (
     <div className="Home">
       <Navbar />
       <Map onUpdateList={updateList} onLocationMarkerUpdate={updateDistancesToUserLocation} />
-      <ParkingSpaceList list={parkingSpacesList} />
+      {isListVisible && <ParkingSpaceList list={parkingSpacesList} />}
       <Filter onFilterApply={applyFilter} />
+      <MarkerMenu toggleList={toggleList} /> 
     </div>
-  )
+  );
 }
 
 export default Home;

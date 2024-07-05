@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert, IonPopover, IonDatetime } from '@ionic/react';
-import { chevronUpCircle, add } from 'ionicons/icons';
+import { chevronUpCircle, add, listCircleOutline } from 'ionicons/icons';
 import './MarkerMenu.css';
 import { map } from './map';
 import AuthService from '../utils/AuthService';
@@ -8,8 +8,11 @@ import { parkingspaces } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
 import ImageUploader from '../components/ImageUploader';
 
+interface MarkerMenuProps {
+  toggleList?: () => void;
+}
 
-export const MarkerMenu: React.FC = () => {
+export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showModalCoordinates, setShowModalCoordinates] = useState(false);
@@ -306,6 +309,14 @@ export const MarkerMenu: React.FC = () => {
     setErrorDocument('');
   };
 
+  const handleListToggle = () => {
+    if (toggleList) {
+      toggleList();
+    }
+    setShowMenu(false);
+  };
+
+
   return (
     <div id='marker-menu'>
       <IonFab vertical="bottom" horizontal="end" slot="fixed">
@@ -315,6 +326,9 @@ export const MarkerMenu: React.FC = () => {
         <IonFabList side="top" activated={showMenu}>
           <IonFabButton id='create-marker-modal-button' onClick={openModal}>
             <IonIcon icon={add} />
+          </IonFabButton>
+          <IonFabButton onClick={handleListToggle}>
+            <IonIcon icon={listCircleOutline} />
           </IonFabButton>
         </IonFabList>
       </IonFab>
