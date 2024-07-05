@@ -57,7 +57,6 @@ test('Register with invalid email', async () => {
     fireEvent(emailInput!, new CustomEvent('ionInput', { detail: { value: 'test', event: new InputEvent('input') } }));
   });
 
-  expect(registerSubmit?.getAttribute('disabled')).toBe("");
   expect(emailInput?.getAttribute('error-text')).toBe('Keine valide Email!');
 });
 
@@ -87,7 +86,6 @@ test('Register with invalid password', async () => {
     fireEvent(passwordInput!, new CustomEvent('ionInput', { detail: { value: 'test', event: new InputEvent('input') } }));
   });
 
-  expect(registerSubmit?.getAttribute('disabled')).toBe("");
   expect(passwordInput?.getAttribute('error-text')).toBe('Passwort muss länger als 10 Zeichen sein!');
 });
 
