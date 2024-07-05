@@ -3,11 +3,13 @@ import { IonButton, IonToolbar, IonTitle, IonHeader, IonAvatar, IonPopover, IonL
 import AuthService from '../utils/AuthService';
 import { useHistory } from 'react-router-dom';
 import './navbar.css';
+import '../theme/global.css'
 import axios from 'axios';
 
 function Navbar() {
     const [loggedIn, setLoggedIn] = useState(AuthService.isLoggedIn());
     const [username, setUsername] = useState<string>(localStorage.getItem('username') || "");
+    const [userPoints, setUserPoints] = useState<string>();
     const history = useHistory();
 
     const handleLogout = () => {
@@ -22,7 +24,7 @@ function Navbar() {
     };
 
     const handleUserMenu = async () => {
-        if (!username) {
+        if (!username || !userPoints) {
             const token = AuthService.getToken();
             try {
                 const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_details', {
@@ -32,7 +34,9 @@ function Navbar() {
                 });
                 const userDetails = response.data;
                 const fetchedUsername = userDetails.userDetails[0].username;
+                const fetchedUserPoints = userDetails.userDetails[0].points;
                 setUsername(fetchedUsername);
+                setUserPoints(fetchedUserPoints);
                 localStorage.setItem('username', fetchedUsername);
             } catch (error: any) {
                 if (error.response && error.response.data && error.response.data.message) {
@@ -45,14 +49,14 @@ function Navbar() {
     };
 
     useEffect(() => {
-        if (loggedIn && !username) {
+        if (loggedIn && (!username || !userPoints)) {
             handleUserMenu();
         }
     }, [loggedIn]);
 
     return (
         <IonHeader color="light" className='navbar'>
-            <IonToolbar color="light">
+            <IonToolbar >
                 <IonTitle id="navbar-title" onClick={handleLogoClick}>ParkBlazer</IonTitle>
                 <IonButton
                     id="profile-button"
@@ -71,8 +75,11 @@ function Navbar() {
                                     <IonItem id='user-name'>
                                         {username && (<IonText>Hallo, {username}</IonText>)}
                                     </IonItem>
+                                    <IonItem id='points'>
+                                        {userPoints && (<IonText>Dein Punktestand: {userPoints}</IonText>)}
+                                    </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_profile`, '_self')}>
-                                        Profil
+                                        Dein Profil
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_parkingspots`, '_self')}>
                                         Deine Parkplätze
@@ -80,8 +87,8 @@ function Navbar() {
                                     <IonItem button={true} detail={false} routerLink="/user_reports">
                                         Deine Meldungen
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/Reservations">
-                                        Buchungen
+                                    <IonItem button={true} detail={false} routerLink="/user_reservations">
+                                        Deine Buchungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
                                         Logout

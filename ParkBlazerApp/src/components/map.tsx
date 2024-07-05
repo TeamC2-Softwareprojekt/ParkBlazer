@@ -130,9 +130,6 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
         <GeocodingControl apiKey={maptilersdk.config.apiKey} mapController={mapController} onPick={(e) => handleSearch(e)} />
       </div>
       <div ref={mapContainer} className="map" />
-      <div className="marker-container">
-        <MarkerMenu />
-      </div>
 
       {selectedSpot && (
         <IonModal className='modal_parkingspot_marker' isOpen={showModal} onDidDismiss={() => setShowModal(false)}>

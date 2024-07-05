@@ -12,13 +12,6 @@ import {
   IonContent,
   IonRow,
   IonCol,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonList,
-  IonItem,
-  IonLabel,
 } from "@ionic/react";
 import axios from "axios";
 import "./UserProfile.css";
@@ -49,7 +42,6 @@ const UserProfile: React.FC = () => {
   const [zipValid, setZipValid] = useState<boolean>(true);
   const [houseNumberValid, setHouseNumberValid] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const [awards, setAwards] = useState<any[]>([]);
   const [countries, setCountries] = useState<{
     value: Key | null | undefined;
     label: ReactNode; name: string
@@ -103,22 +95,8 @@ const UserProfile: React.FC = () => {
       }
     };
 
-    const fetchUserAwards = async () => {
-      try {
-        const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_awards', {
-          headers: {
-            Authorization: `Bearer ${AuthService.getToken()}`
-          }
-        });
-        setAwards(response.data.results);
-      } catch (error: any) {
-        handleError(error);
-      }
-    };
-
     fetchUserData();
     fetchCountries();
-    fetchUserAwards();
   }, []);
 
   const handleError = (error: any) => {
@@ -190,9 +168,9 @@ const UserProfile: React.FC = () => {
     <IonPage>
       <Navbar />
       <IonContent className="main-content">
-        <IonGrid fixed className="profile-grid">
+        <IonGrid fixed>
           <IonRow className="ion-justify-content-center ion-align-items-center full-height">
-            <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
+            <IonCol className="profile-col" size="12" size-sm="12" size-md="12">
               <div className="profile-container">
                 <IonText color="primary" className="profile-title">
                   <h1 className="profile-heading">Dein Nutzerprofil</h1>
@@ -331,25 +309,6 @@ const UserProfile: React.FC = () => {
                 )}
                 {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
               </div>
-            </IonCol>
-          </IonRow>
-          <IonRow className="ion-justify-content-center ion-align-items-center full-height">
-            <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
-              <IonCard>
-                <IonCardHeader>
-                  <IonCardTitle>Deine Awards</IonCardTitle>
-                </IonCardHeader>
-                <IonCardContent>
-                  <IonList>
-                    {awards && awards.map((award, index) => (
-                      <IonItem key={index}>
-                        <IonLabel>{award.title}</IonLabel>
-                        <IonLabel>{award.points} Punkte</IonLabel>
-                      </IonItem>
-                    ))}
-                  </IonList>
-                </IonCardContent>
-              </IonCard>
             </IonCol>
           </IonRow>
         </IonGrid>
