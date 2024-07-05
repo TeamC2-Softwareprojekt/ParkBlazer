@@ -114,3 +114,16 @@
     margin-top: 10px;
     color: var(--ion-color-step-850, var(--ion-text-color-step-150, #262626)); 
 }
+
+#user-point-selection-container {
+    display: flex;
+    align-items: center;
+    margin-top: 30px;
+    padding-bottom: 30px;
+    font-weight: bold;
+    border-bottom: 2px solid gray;
+}
+
+#user-point-selection-container > ion-label {
+    margin-right: 10px;
+}

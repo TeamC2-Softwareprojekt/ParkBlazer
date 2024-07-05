@@ -7,7 +7,6 @@ import "@maptiler/geocoding-control/style.css";
 import 'maplibre-gl/dist/maplibre-gl.css';
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import './map.css';
-import MarkerMenu from './MarkerMenu';
 import { initParkingSpaces, parkingSpace, parkingspaces } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
 import { IonModal, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonIcon, IonCard, IonCardHeader, IonCardSubtitle, IonDatetime } from '@ionic/react';
@@ -130,9 +129,6 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
         <GeocodingControl apiKey={maptilersdk.config.apiKey} mapController={mapController} onPick={(e) => handleSearch(e)} />
       </div>
       <div ref={mapContainer} className="map" />
-      <div className="marker-container">
-        <MarkerMenu />
-      </div>
 
       {selectedSpot && (
         <IonModal className='modal_parkingspot_marker' isOpen={showModal} onDidDismiss={() => setShowModal(false)}>

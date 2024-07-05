@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert, IonPopover, IonDatetime } from '@ionic/react';
-import { chevronUpCircle, add } from 'ionicons/icons';
+import { chevronUpCircle, add, listCircleOutline } from 'ionicons/icons';
 import './MarkerMenu.css';
 import { map } from './map';
 import AuthService from '../utils/AuthService';
@@ -9,8 +9,11 @@ import { getUserLocation } from '../data/userLocation';
 import ImageUploader from '../components/ImageUploader';
 import axios from 'axios';
 
+interface MarkerMenuProps {
+  toggleList?: () => void;
+}
 
-export const MarkerMenu: React.FC = () => {
+export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showModalCoordinates, setShowModalCoordinates] = useState(false);
@@ -268,6 +271,13 @@ export const MarkerMenu: React.FC = () => {
     fetchCountries();
   }, []);
 
+  const handleListToggle = () => {
+    if (toggleList) {
+      toggleList();
+    }
+    setShowMenu(false);
+  };
+
   return (
     <div id='marker-menu'>
       <IonFab vertical="bottom" horizontal="end" slot="fixed">
@@ -280,6 +290,9 @@ export const MarkerMenu: React.FC = () => {
               <IonIcon icon={add} />
             </IonFabButton>
           )}
+          <IonFabButton onClick={handleListToggle}>
+            <IonIcon icon={listCircleOutline} />
+          </IonFabButton>
         </IonFabList>
       </IonFab>
       <IonModal isOpen={showModal} onDidDismiss={closeModal}>
@@ -434,5 +447,3 @@ export const MarkerMenu: React.FC = () => {
 };
 
 export default MarkerMenu;
-
-

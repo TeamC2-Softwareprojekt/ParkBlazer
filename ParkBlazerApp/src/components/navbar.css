@@ -1,3 +1,7 @@
+.navbar ion-toolbar {
+  padding: 0 1vw;
+}
+
 .heading {
   margin: 0;
   padding: 0px;
@@ -12,12 +16,14 @@
 }
 
 #nav-avatar {
-  width: 30px;
-  height: 30px;
+	width: 36px;
+	height: 36px;
 }
 
-#popover-button {
-  margin-right: 20px;
+#profile-button {
+	margin-right: 20px;
+	--box-shadow: none !important;
+	--background: var(--ion-color-primary, #0054e9);
 }
 
 .md.header-md.header-collapse-none {
@@ -31,8 +37,5 @@
 #navbar-title {
   cursor: pointer;
   width: fit-content;
-}
-
-.navbar ion-toolbar {
-	padding: 0 1vw;
+  font-weight: bold;
 }

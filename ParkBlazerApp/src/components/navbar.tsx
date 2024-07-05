@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { IonButton, IonToolbar, IonTitle, IonHeader, IonAvatar, IonPopover, IonList, IonContent, IonItem, IonText } from '@ionic/react';
 import AuthService from '../utils/AuthService';
 import './navbar.css';
+import '../theme/global.css'
 import axios from 'axios';
 
 function Navbar() {
@@ -43,10 +44,10 @@ function Navbar() {
 
     return (
         <IonHeader color="light" className='navbar'>
-            <IonToolbar color="light">
+            <IonToolbar>
                 <IonTitle id="navbar-title" onClick={() => window.open('/home', "_self")}>ParkBlazer</IonTitle>
                 <IonButton
-                    id="popover-button"
+                    id="profile-button"
                     slot="end"
                     onClick={AuthService.isLoggedIn() ? handleUserMenu : undefined}
                 >
@@ -54,7 +55,7 @@ function Navbar() {
                         <img alt="Avatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
                     </IonAvatar>
                 </IonButton>
-                <IonPopover trigger="popover-button">
+                <IonPopover trigger="profile-button">
                     <IonContent>
                         <IonList>
                             {AuthService.isLoggedIn() ? (
@@ -66,7 +67,7 @@ function Navbar() {
                                         {userPoints && (<IonText>Dein Punktestand: {userPoints}</IonText>)}
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_profile`, '_self')}>
-                                        Profil
+                                        Dein Profil
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_parkingspots`, '_self')}>
                                         Deine Parkplätze
@@ -75,7 +76,7 @@ function Navbar() {
                                         Deine Meldungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_reservations`, '_self')}>
-                                        Buchungen
+                                        Deine Buchungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
                                         Logout

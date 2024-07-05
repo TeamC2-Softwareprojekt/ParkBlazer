@@ -43,14 +43,14 @@ export async function getReservedDates(private_parkingspt_id: number): Promise<R
     return response?.data;
 }
 
-export async function createReservation(start_date: Date, end_date: Date, parkingspace: parkingSpace, rentTimeInHours: number, paymentMethod: string): Promise<Boolean> {
+export async function createReservation(start_date: Date, end_date: Date, parkingspace: parkingSpace, price: number, paymentMethod: string): Promise<Boolean> {
     try {
         await axios.post('https://server-y2mz.onrender.com/api/create_reservation',
             {
                 start_date: start_date.toISOString(),
                 end_date: end_date.toISOString(),
                 private_parkingspot_id: parkingspace.private_parkingspot_id,
-                amount: Number((parkingspace.price_per_hour! * rentTimeInHours * 1.29).toFixed(2)),
+                amount: Number(price.toFixed(2)),
                 payment_method: paymentMethod
             },
             {
