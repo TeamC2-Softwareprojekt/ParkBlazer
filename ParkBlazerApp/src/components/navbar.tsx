@@ -81,7 +81,7 @@ function Navbar() {
                                     <IonItem button={true} detail={false} routerLink="/user_reports">
                                         Deine Meldungen
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/Reservations">
+                                    <IonItem button={true} detail={false} routerLink="/user_reservations">
                                         Deine Buchungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>

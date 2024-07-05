@@ -190,9 +190,9 @@ const UserProfile: React.FC = () => {
     <IonPage>
       <Navbar />
       <IonContent className="main-content">
-        <IonGrid fixed className="profile-grid">
+        <IonGrid fixed>
           <IonRow className="ion-justify-content-center ion-align-items-center full-height">
-            <IonCol className="profile-col" size="12" size-sm="8" size-md="8">
+            <IonCol className="profile-col" size="12" size-sm="12" size-md="12">
               <div className="profile-container">
                 <IonText color="primary" className="profile-title">
                   <h1 className="profile-heading">Dein Nutzerprofil</h1>

@@ -110,7 +110,7 @@ const App: React.FC = () => (
             <Redirect to="/home" />
           )}
         </Route>
-        <Route path="/Reservations">
+        <Route path="/user_reservations">
           {AuthService.isLoggedIn() ? (
             <Reservations/>
           ) : (

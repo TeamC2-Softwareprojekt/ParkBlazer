@@ -7,7 +7,9 @@ import {
   IonRow,
   IonButton,
   IonAlert,
-  IonText
+  IonText,
+  IonPage,
+  IonContent
 } from "@ionic/react";
 import AuthService from "../utils/AuthService";
 import "./Login.css";
@@ -48,57 +50,59 @@ const Login: React.FC = () => {
     setError("");
     try {
       await AuthService.login(email, password);
-      history.push("/home");
+      window.open(`/home`, '_self')
     } catch (error: any) {
       setError(error.message);
     }
   };
 
   return (
-    <>
-    <Navbar/>
-    <IonGrid fixed className="login-grid">
-      <IonRow className="ion-justify-content-center ion-align-items-center full-height">
-        <IonCol size="12" size-sm="8" size-md="8">
-          <div className="login-container">
-            <IonText color="primary" className="login-title">
-              <h1 className="login-heading">LOGIN</h1>
-            </IonText>
-            <IonInput
-              className={`login-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
-              id="email-input"
-              type="email"
-              fill="solid"
-              label="Email"
-              labelPlacement="floating"
-              errorText={!emailValid ? "Keine valide Email!" : ""}
-              onIonInput={handleEmailChange}
-              value={email}
-            />
-            <IonInput
-              className="login-input"
-              id="password-input"
-              type="password"
-              fill="solid"
-              label="Password"
-              labelPlacement="floating"
-              onIonInput={handlePasswordChange}
-              value={password}
-            />
-            <IonButton
-              expand="block"
-              onClick={handleLogin}
-              id="login-submit"
-              disabled={!email || !password || !emailValid}
-            >
-              Login
-            </IonButton>
-            {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
-          </div>
-        </IonCol>
-      </IonRow>
-    </IonGrid>
-    </>
+    <IonPage>
+      <Navbar />
+      <IonContent>
+        <IonGrid fixed className="login-grid">
+          <IonRow className="ion-justify-content-center ion-align-items-center full-height">
+            <IonCol size="12" size-sm="12" size-md="12">
+              <div className="login-container">
+                <IonText color="primary" className="login-title">
+                  <h1 className="login-heading">LOGIN</h1>
+                </IonText>
+                <IonInput
+                  className={`login-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
+                  id="email-input"
+                  type="email"
+                  fill="solid"
+                  label="Email"
+                  labelPlacement="floating"
+                  errorText={!emailValid ? "Keine valide Email!" : ""}
+                  onIonInput={handleEmailChange}
+                  value={email}
+                />
+                <IonInput
+                  className="login-input"
+                  id="password-input"
+                  type="password"
+                  fill="solid"
+                  label="Password"
+                  labelPlacement="floating"
+                  onIonInput={handlePasswordChange}
+                  value={password}
+                />
+                <IonButton
+                  expand="block"
+                  onClick={handleLogin}
+                  id="login-submit"
+                  disabled={!email || !password || !emailValid}
+                >
+                  Login
+                </IonButton>
+                {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
+              </div>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
+      </IonContent>
+    </IonPage>
   );
 };
 

@@ -1,7 +1,7 @@
-/* Style Heading */
 .reservation-heading {
-	font-weight: bold;
 	text-align: center;
+	margin: 5vh 0 5vh 0;
+	font-weight: bold;
 }
 
 .parkingspace-label {
