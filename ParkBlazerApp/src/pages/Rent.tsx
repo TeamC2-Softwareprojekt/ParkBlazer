@@ -25,6 +25,7 @@ export default function Rent() {
   const [usePoints, setUsePoints] = useState<boolean>(false);
   const [points, setPoints] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
+  const [usedPointsAmount, setUsedPointsAmount] = useState<number>(0);
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
 
@@ -102,7 +103,20 @@ export default function Rent() {
       return;
     }
     if (usePoints) {
-      // TODO remove points
+      try {
+        await axios.post('https://server-y2mz.onrender.com/api/reduce_user_points/' + usedPointsAmount,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${AuthService.getToken()}`
+            }
+          }
+        );
+      } catch (error) {
+        console.error('Error while reducing user points', error);
+        alert("Fehler beim Einlösen der Punkte");
+        return;
+      }
     }
     handleRedirect("/home");
   }
@@ -206,7 +220,7 @@ export default function Rent() {
                       !start_date && !end_date ?
                         <IonText color="danger">Invalides Datum</IonText> :
                         <IonText color="danger">Mindestmietdauer: 30 Minuten</IonText> :
-                      <PriceCalculation parkingspace={parkingspace} rentTimeInHours={rentTimeInHours} pointAmount={usePoints ? points : 0} setTotalPrice={setPrice} />
+                      <PriceCalculation parkingspace={parkingspace} rentTimeInHours={rentTimeInHours} pointAmount={usePoints ? points : 0} setTotalPrice={setPrice} setUsedPoints={setUsedPointsAmount} />
                     }
                   </IonCardContent>
                 </IonCard>

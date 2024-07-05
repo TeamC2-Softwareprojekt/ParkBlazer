@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { parkingSpace } from "../data/parkingSpaces";
 import "./PriceCalculation.css";
 
-export default function PriceCalculation({ parkingspace, rentTimeInHours, pointAmount = 0, setTotalPrice }: { parkingspace: parkingSpace, rentTimeInHours: number, pointAmount?: number, setTotalPrice?: (price: number) => void }) {
+export default function PriceCalculation({ parkingspace, rentTimeInHours, pointAmount = 0, setTotalPrice, setUsedPoints }: { parkingspace: parkingSpace, rentTimeInHours: number, pointAmount?: number, setTotalPrice?: (price: number) => void, setUsedPoints?: (points: number) => void}) {
   const pointValue = 0.01; // 1 Point = 0.01€
+  const maxDiscountPercentage = 0.7; // Max 70% discount
   const serviceFee = 0.1;
   const tax = 0.19;
   const finalPrice = 1 + serviceFee + tax;
@@ -13,12 +14,17 @@ export default function PriceCalculation({ parkingspace, rentTimeInHours, pointA
   const [discount, setDiscount] = useState<number>(0);
 
   useEffect(() => {
-    setThisTotalPrice(parkingspace.price_per_hour! * rentTimeInHours * finalPrice);
-    setDiscount(pointAmount * pointValue);
+    let price = parkingspace.price_per_hour! * rentTimeInHours * finalPrice;
+    let discount = pointAmount * pointValue;
+    let maxDiscount = Number((price * maxDiscountPercentage).toFixed(2));
+    if (discount > maxDiscount) discount = maxDiscount;
+    setThisTotalPrice(price);
+    setDiscount(discount);
   }, [pointAmount, parkingspace.price_per_hour, rentTimeInHours]);
 
   useEffect(() => {
     setTotalPrice?.(totalPrice - discount);
+    setUsedPoints?.(Math.round(discount / pointValue));
   }, [discount, totalPrice, setTotalPrice]);
 
   return (
@@ -37,7 +43,7 @@ export default function PriceCalculation({ parkingspace, rentTimeInHours, pointA
       </div>
       {pointAmount > 0 && (
         <div className="price-calculation">
-          <IonLabel>{pointAmount} Punkte</IonLabel>
+          <IonLabel>{Math.round(discount / pointValue)} Punkte</IonLabel>
           -{discount.toFixed(2) + "€"}
         </div>
       )}
