@@ -38,7 +38,7 @@ const ParkingspotEdit: React.FC = () => {
             if (parkingspotDetails) {
                 setParkingspot(parkingspotDetails);
             } else {
-                setError("Parkingspot not found.");
+                setError("Parkplatz nicht gefunden.");
             }
         };
 
@@ -107,7 +107,7 @@ const ParkingspotEdit: React.FC = () => {
                                 <h1 className="userparkingspots-heading">Bearbeite deinen Parkplatz</h1>
                             </IonText>
                             <IonCard>
-                                <img alt="Parkingspot Image" src={imageUrl} />
+                                <img alt="Parkplatz Bild" src={imageUrl} />
                                 <div hidden={!editMode} id="upload-new-image">
                                     <ImageUploader onUploadComplete={handleUploadComplete} />
                                 </div>

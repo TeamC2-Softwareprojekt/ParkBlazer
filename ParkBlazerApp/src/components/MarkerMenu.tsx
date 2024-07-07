@@ -474,7 +474,7 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
           setAlert(false);
           window.location.reload();
         }}
-        header={"Successful"}
+        header={"Erfolgreich"}
         message={"Parkplatz erfolgreich erstellt."}
         buttons={["OK"]}
       />

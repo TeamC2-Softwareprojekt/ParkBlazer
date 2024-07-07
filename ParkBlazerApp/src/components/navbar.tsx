@@ -91,16 +91,16 @@ function Navbar() {
                                         Deine Buchungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>
-                                        Logout
+                                        Ausloggen
                                     </IonItem>
                                 </>
                             ) : (
                                 <>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/login`, '_self')}>
-                                        Login
+                                        Einloggen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/registration`, '_self')}>
-                                        Registrierung
+                                        Registrieren
                                     </IonItem>
                                 </>
                             )}

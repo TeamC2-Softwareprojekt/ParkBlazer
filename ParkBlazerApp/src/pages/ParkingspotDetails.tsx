@@ -64,7 +64,7 @@ const ParkingspotDetails: React.FC = () => {
   };
 
   const getAverageRating = () => {
-    if (!reviews || reviews.length === 0) return "No reviews yet";
+    if (!reviews || reviews.length === 0) return "Keine Bewertungen vorhanden.";
 
     const averageRating = getAverageRatingOfParkingspot(parseInt(id));
     const averageRatingRound = Math.round(averageRating * 2) / 2;
@@ -72,7 +72,7 @@ const ParkingspotDetails: React.FC = () => {
     return (
       <>
         <StarRating rating={averageRatingRound} />
-        <strong>{averageRating}</strong>
+        <strong>{averageRating} / 5</strong>
       </>
     );
   };
@@ -93,7 +93,7 @@ const ParkingspotDetails: React.FC = () => {
       {parkingspot && reviews && (
         <IonContent className="parkingspotdetails-content ion-padding">
           <IonCard>
-            <img alt="Parkingspot Image" src={parkingspot.image_url} onClick={() => openModal(parkingspot.image_url)} />
+            <img alt="Parkplatz Bild" src={parkingspot.image_url} onClick={() => openModal(parkingspot.image_url)} />
             <IonCardHeader>
               <IonCardTitle className="card-title">{parkingspot.name}</IonCardTitle>
               <IonCardSubtitle>{parkingspot.description}</IonCardSubtitle>
@@ -103,13 +103,13 @@ const ParkingspotDetails: React.FC = () => {
             <div id="parkingspotdetails-container">
               <IonCard>
                 <IonCardContent id="average-rating">
-                  <IonCardTitle>Average rating:</IonCardTitle>
+                  <IonCardTitle>Durchschnittliche Bewertung:</IonCardTitle>
                   {getAverageRating()}
                 </IonCardContent>
               </IonCard>
               <IonCard>
                 <IonCardContent>
-                  <IonCardTitle>Available parkingspot types:</IonCardTitle>
+                  <IonCardTitle>Verfügbare Parkplatztypen:</IonCardTitle>
                   {parkingspot.type_car ? <IonIcon icon={car} size="large" color="primary"></IonIcon> : ""}
                   {parkingspot.type_bike ? <IonIcon icon={bicycle} size="large" color="primary"></IonIcon> : ""}
                   {parkingspot.type_truck ? <IonIcon icon={bus} size="large" color="primary"></IonIcon> : ""}
@@ -117,22 +117,22 @@ const ParkingspotDetails: React.FC = () => {
               </IonCard>
               <IonCard>
                 <IonCardContent>
-                  <IonCardTitle>Available parkingspots:</IonCardTitle>
+                  <IonCardTitle>Verfügbare Parkplätze:</IonCardTitle>
                   <IonText><strong>{parkingspot.available_spaces}</strong></IonText>
                 </IonCardContent>
               </IonCard>
               <IonCard>
                 <IonCardContent>
-                  <IonCardTitle>Address:</IonCardTitle>
-                  <IonText><strong>Street:</strong> {parkingspot.street}</IonText>
+                  <IonCardTitle>Adresse:</IonCardTitle>
+                  <IonText><strong>Straße:</strong> {parkingspot.street}</IonText>
                   <br></br>
-                  <IonText><strong>House number:</strong> {parkingspot.house_number}</IonText>
+                  <IonText><strong>Hausnummer:</strong> {parkingspot.house_number}</IonText>
                   <br></br>
-                  <IonText><strong>Zip:</strong> {parkingspot.zip}</IonText>
+                  <IonText><strong>PLZ:</strong> {parkingspot.zip}</IonText>
                   <br></br>
-                  <IonText><strong>City:</strong> {parkingspot.city}</IonText>
+                  <IonText><strong>Stadt:</strong> {parkingspot.city}</IonText>
                   <br></br>
-                  <IonText><strong>Country:</strong> {parkingspot.country}</IonText>
+                  <IonText><strong>Land:</strong> {parkingspot.country}</IonText>
                 </IonCardContent>
               </IonCard>
             </div>
@@ -143,7 +143,7 @@ const ParkingspotDetails: React.FC = () => {
 
           <IonCard>
             <IonCardHeader>
-              <IonCardTitle>Reviews:</IonCardTitle>
+              <IonCardTitle>Bewertungen:</IonCardTitle>
             </IonCardHeader>
             <IonCardContent>
               <IonGrid className="reviews">
@@ -163,25 +163,25 @@ const ParkingspotDetails: React.FC = () => {
           {AuthService.isLoggedIn() && (
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>Rate the parkingspot:</IonCardTitle>
+                <IonCardTitle>Bewerte den Parkplatz:</IonCardTitle>
               </IonCardHeader>
               <IonCardContent id="rate-parkingspot">
                 <IonGrid>
                   <IonRow>
                     <IonCol>
-                      <IonText>Rating (1-5):</IonText>
+                      <IonText>Bewertung (1-5):</IonText>
                       <StarRating rating={rating} onRatingChange={setRating} /> { }
                     </IonCol>
                   </IonRow>
                   <IonRow>
                     <IonCol>
-                      <IonText>Comment:</IonText>
+                      <IonText>Kommentar:</IonText>
                       <IonInput value={comment} onIonChange={e => setComment(e.detail.value!)}></IonInput>
                     </IonCol>
                   </IonRow>
                   <IonRow>
                     <IonCol>
-                      <IonButton onClick={handleRatingSubmit}>Save</IonButton>
+                      <IonButton onClick={handleRatingSubmit}>Bewerten</IonButton>
                     </IonCol>
                   </IonRow>
                 </IonGrid>
@@ -192,8 +192,8 @@ const ParkingspotDetails: React.FC = () => {
           <IonAlert
             isOpen={alert}
             onDidDismiss={() => window.location.reload()}
-            header={"Successful"}
-            message={"Your review has been successfully submitted."}
+            header={"Erfolgreich!"}
+            message={"Vielen Dank für deine Bewertung, sie wurde erfolgreich gespeichert."}
             buttons={["OK"]}
           />
 
