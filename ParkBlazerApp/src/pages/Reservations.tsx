@@ -65,7 +65,7 @@ const Reservations: React.FC = () => {
       <IonContent>
         <IonGrid fixed className="login-grid">
           <IonRow className="ion-justify-content-center ion-align-items-center full-height">
-            <IonCol size="12" size-sm="12" size-md="12">
+            <IonCol size="12" size-sm="14" size-md="14">
               <IonText color="primary">
                 <h1 className="reservation-heading">Reservierungen</h1>
               </IonText>
