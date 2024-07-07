@@ -72,7 +72,7 @@ const ParkingspotDetails: React.FC = () => {
     return (
       <>
         <StarRating rating={averageRatingRound} />
-        <strong>{averageRating}</strong>
+        <strong>{averageRating} / 5</strong>
       </>
     );
   };
@@ -104,7 +104,7 @@ const ParkingspotDetails: React.FC = () => {
               <IonCard>
                 <IonCardContent id="average-rating">
                   <IonCardTitle>Durchschnittliche Bewertung:</IonCardTitle>
-                  {getAverageRating()} / 5
+                  {getAverageRating()}
                 </IonCardContent>
               </IonCard>
               <IonCard>

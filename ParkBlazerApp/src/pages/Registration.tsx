@@ -240,7 +240,7 @@ const Registration: React.FC = () => {
                                     id="register-submit"
                                     disabled={!username || !firstname || !lastname || !email || !password || !birthdate || !street || !houseNumber || !zip || !city || !country || !emailValid || !passwordValid || !birthdateValid}
                                 >
-                                    Register
+                                    Jetzt Registrieren!
                                 </IonButton>
                                 {error && <IonAlert isOpen={!!error} message={error} buttons={["OK"]} />}
                             </div>
