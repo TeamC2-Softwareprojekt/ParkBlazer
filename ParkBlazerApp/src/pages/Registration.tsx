@@ -123,7 +123,7 @@ const Registration: React.FC = () => {
                         <IonCol className="register-col" size="12" size-sm="12" size-md="12" overflow-scroll="true">
                             <div className="register-container" overflow-scroll="true">
                                 <IonText color="primary" className="register-title">
-                                    <h1 className="login-heading">Regestrierung</h1>
+                                    <h1 className="login-heading">Registrierung</h1>
                                 </IonText>
                                 <IonInput
                                     className={`register-input ${isEmailTouched && !emailValid ? "ion-invalid" : ""}`}
