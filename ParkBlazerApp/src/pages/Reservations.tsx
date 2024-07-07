@@ -54,6 +54,21 @@ const Reservations: React.FC = () => {
     setCombinedData(combined);
   };
 
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case 'accepted':
+        return 'akzeptiert';
+      case 'pending':
+        return 'ausstehend';
+      case 'rejected':
+        return 'abgelehnt';
+      case 'confirmed':
+        return 'bestätigt';
+      default:
+        return status;
+    }
+  };
+
   const openPopoverImage = (imageUrl: string) => {
     setSelectedImage(imageUrl);
     setShowPopoverImage(true);
@@ -79,7 +94,7 @@ const Reservations: React.FC = () => {
                         </IonThumbnail>
                         <div className="data-row">
                           <IonLabel className="parkingspace-label" onClick={() => window.open(`/parkingspot_details/${data.parkingspot.parkingspot_id}`, '_self')}>{data.parkingspot.name}</IonLabel>
-                          <IonLabel className="label-margin"><strong>Status:</strong> {data.reservation.status}</IonLabel>
+                          <IonLabel className="label-margin"><strong>Status:</strong> {translateStatus(data.reservation.status)}</IonLabel>
                           <IonLabel className="label-margin"><strong>Start-Datum:</strong> {format(data.reservation.start_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
                           <IonLabel className="label-margin"><strong>End-Datum:</strong> {format(data.reservation.end_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
                           <IonIcon
