@@ -25,6 +25,21 @@ import { initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingS
 import { format } from "date-fns";
 import { Reservation, getCurrentUserReservations } from "../data/reservation";
 
+const translateStatus = (status: string) => {
+  switch (status) {
+    case 'accepted':
+      return 'akzeptiert';
+    case 'pending':
+      return 'ausstehend';
+    case 'rejected':
+      return 'abgelehnt';
+    case 'confirmed':
+      return 'bestätigt';
+    default:
+      return status;
+  }
+};
+
 const Reservations: React.FC = () => {
   const [combinedData, setCombinedData] = useState<any[]>([]);
   const [showPopoverImage, setShowPopoverImage] = useState<boolean>(false);
@@ -79,7 +94,7 @@ const Reservations: React.FC = () => {
                         </IonThumbnail>
                         <div className="data-row">
                           <IonLabel className="parkingspace-label" onClick={() => window.open(`/parkingspot_details/${data.parkingspot.parkingspot_id}`, '_self')}>{data.parkingspot.name}</IonLabel>
-                          <IonLabel className="label-margin"><strong>Status:</strong> {data.reservation.status}</IonLabel>
+                          <IonLabel className="label-margin"><strong>Status:</strong> {translateStatus(data.reservation.status)}</IonLabel>
                           <IonLabel className="label-margin"><strong>Start-Datum:</strong> {format(data.reservation.start_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
                           <IonLabel className="label-margin"><strong>End-Datum:</strong> {format(data.reservation.end_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
                           <IonIcon
@@ -259,7 +274,7 @@ function PopoverInvoice({ reservationID, trigger }: { reservationID: number, tri
             <IonRow>
               <IonCol>
                 <IonLabel>
-                  Status: {selectedInvoice.status}
+                  Status: {translateStatus(selectedInvoice.status)}
                 </IonLabel>
               </IonCol>
             </IonRow>

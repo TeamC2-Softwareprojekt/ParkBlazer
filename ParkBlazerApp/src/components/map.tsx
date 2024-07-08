@@ -126,7 +126,7 @@ export default function Map({ onUpdateList, onLocationMarkerUpdate }: any) {
   return (
     <div className="map-wrap">
       <div className="geocoding">
-        <GeocodingControl apiKey={maptilersdk.config.apiKey} mapController={mapController} onPick={(e) => handleSearch(e)} />
+        <GeocodingControl apiKey={maptilersdk.config.apiKey} mapController={mapController} onPick={(e) => handleSearch(e)}  placeholder='Suche' />
       </div>
       <div ref={mapContainer} className="map" />
 
