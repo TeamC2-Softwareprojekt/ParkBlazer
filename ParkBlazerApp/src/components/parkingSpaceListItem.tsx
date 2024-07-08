@@ -8,7 +8,7 @@ import {
   IonIcon,
 } from '@ionic/react';
 import { map } from './map';
-import { star } from "ionicons/icons";
+import { star, bicycleOutline, carOutline, busOutline, cardOutline, locationOutline, barChartOutline } from "ionicons/icons";
 import { parkingSpace } from '../data/parkingSpaces';
 import { getAverageRatingOfParkingspot, getReviewsOfParkingspot } from '../data/review';
 
@@ -34,17 +34,17 @@ export default function ParkingSpaceListItem({ parkingSpace }: { parkingSpace: p
           <IonLabel>{parkingSpace.city + " " + parkingSpace.zip}</IonLabel>
         </div>
         <div className="parking-space-list-detail-container">
-          <RadioType type="bike" isEnabled={parkingSpace.type_bike} />
-          <RadioType type="car" isEnabled={parkingSpace.type_car} />
-          <RadioType type="truck" isEnabled={parkingSpace.type_truck} />
+          <RadioType icon={bicycleOutline} isEnabled={parkingSpace.type_bike} />
+          <RadioType icon={carOutline} isEnabled={parkingSpace.type_car} />
+          <RadioType icon={busOutline} isEnabled={parkingSpace.type_truck} />
           {!!parkingSpace.available_spaces && (
-            <ListDetail iconURL="src/icons/amount.svg" text={parkingSpace.available_spaces.toString()} />
+            <ListDetail icon={barChartOutline} text={parkingSpace.available_spaces.toString()} />
           )}
           {!!parkingSpace.distance && (
-            <ListDetail iconURL="src/icons/distance.svg" text={parkingSpace.distance?.toFixed(0) + " km"} />
+            <ListDetail icon={locationOutline} text={parkingSpace.distance?.toFixed(0) + " km"} />
           )}
           {!!parkingSpace.price_per_hour && (
-            <ListDetail iconURL="src/icons/euro.svg" text={parkingSpace.price_per_hour + "€"} />
+            <ListDetail icon={cardOutline} text={parkingSpace.price_per_hour + "€"} />
           )}
         </div>
       </div>
@@ -52,10 +52,10 @@ export default function ParkingSpaceListItem({ parkingSpace }: { parkingSpace: p
   );
 }
 
-function RadioType({ type, isEnabled }: { type: string, isEnabled: number }) {
+function RadioType({ icon, isEnabled }: { icon: any, isEnabled: number }) {
   return (
     <div className="parking-space-list-detail">
-      <IonIcon className="parking-space-list-icon" src={`src/icons/${type}.svg`} />
+      <IonIcon className="parking-space-list-icon" icon={icon} />
       <IonRadioGroup value={isEnabled}>
         <IonRadio className="parking-space-list-radio" value={1} disabled />
       </IonRadioGroup>
@@ -63,10 +63,10 @@ function RadioType({ type, isEnabled }: { type: string, isEnabled: number }) {
   );
 }
 
-function ListDetail({ iconURL, text }: { iconURL: string, text: string }) {
+function ListDetail({ icon, text }: { icon: any, text: string }) {
   return (
     <div className="parking-space-list-detail">
-      <IonIcon className="parking-space-list-icon" src={iconURL} />
+      <IonIcon className="parking-space-list-icon" icon={icon} />
       <IonLabel>{text}</IonLabel>
     </div>
   );
