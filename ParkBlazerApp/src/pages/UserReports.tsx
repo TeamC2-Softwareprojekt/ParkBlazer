@@ -34,7 +34,7 @@ const UserReports: React.FC = () => {
               {reports && reports.map((report: any, index: any) => (
                 <IonCard key={index}>
                   <IonCardContent>
-                    <IonText><strong>Datum:</strong> {format(report.report_date, "dd.MM.yyyy hh:mm")} Uhr ({formatDistanceToNow(report.report_date, { addSuffix: true, locale: de })})</IonText>                                        <br />
+                    <IonText><strong>Datum:</strong> {format(report.report_date, "dd.MM.yyyy HH:mm")} Uhr ({formatDistanceToNow(report.report_date, { addSuffix: true, locale: de })})</IonText>                                        <br />
                     <IonText><strong>Grund:</strong> {report.report_type}</IonText>
                     <br />
                     <IonText><strong>Kommentar:</strong> {report.description}</IonText>

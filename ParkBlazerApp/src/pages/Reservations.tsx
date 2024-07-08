@@ -95,8 +95,8 @@ const Reservations: React.FC = () => {
                         <div className="data-row">
                           <IonLabel className="parkingspace-label" onClick={() => window.open(`/parkingspot_details/${data.parkingspot.parkingspot_id}`, '_self')}>{data.parkingspot.name}</IonLabel>
                           <IonLabel className="label-margin"><strong>Status:</strong> {translateStatus(data.reservation.status)}</IonLabel>
-                          <IonLabel className="label-margin"><strong>Start-Datum:</strong> {format(data.reservation.start_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
-                          <IonLabel className="label-margin"><strong>End-Datum:</strong> {format(data.reservation.end_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
+                          <IonLabel className="label-margin"><strong>Start-Datum:</strong> {format(data.reservation.start_date, 'dd.MM.yyy HH:mm')} Uhr</IonLabel>
+                          <IonLabel className="label-margin"><strong>End-Datum:</strong> {format(data.reservation.end_date, 'dd.MM.yyy HH:mm')} Uhr</IonLabel>
                           <IonIcon
                             icon={informationCircleOutline}
                             className="icon-style"
@@ -267,7 +267,7 @@ function PopoverInvoice({ reservationID, trigger }: { reservationID: number, tri
             <IonRow>
               <IonCol>
                 <IonLabel>
-                  Zahlungsdatum: {selectedInvoice?.payment_date ? format(selectedInvoice.payment_date, 'dd.MM.yyy hh:mm') + " Uhr" : "Keine Zahlung"}
+                  Zahlungsdatum: {selectedInvoice?.payment_date ? format(selectedInvoice.payment_date, 'dd.MM.yyy HH:mm') + " Uhr" : "Keine Zahlung"}
                 </IonLabel>
               </IonCol>
             </IonRow>
