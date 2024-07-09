@@ -1,6 +1,6 @@
 import { memo, useRef, useState } from "react";
 import { IonButton, IonIcon, IonModal, IonHeader, IonTitle, IonSegment, IonSegmentButton, IonLabel, IonInput, IonCheckbox, IonFooter, IonSelect, IonSelectOption, SegmentValue } from "@ionic/react";
-import { closeSharp } from "ionicons/icons";
+import { closeSharp, optionsOutline } from "ionicons/icons";
 import "./filter.css";
 
 export interface FilterParams {
@@ -94,7 +94,7 @@ function Filter({ onFilterApply }: { onFilterApply: any }) {
     return (
         <>
             <IonButton id="filter-button-open" onClick={() => setShowModal(true)}>
-                <IonIcon src="src/icons/filter.svg" />
+                <IonIcon icon={optionsOutline} />
             </IonButton>
             <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
                 <div id="filter-modal">

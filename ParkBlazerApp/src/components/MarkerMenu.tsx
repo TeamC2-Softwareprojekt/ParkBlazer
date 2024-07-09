@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonTitle, IonToolbar, IonModal, IonInput, IonButton, IonList, IonItem, IonText, IonToast, IonCheckbox, IonLabel, IonSelect, IonSelectOption, IonAlert, IonPopover, IonDatetime } from '@ionic/react';
-import { chevronUpCircle, add, listCircleOutline } from 'ionicons/icons';
+import { chevronUpCircle, add, listCircleOutline, informationCircleOutline } from 'ionicons/icons';
 import './MarkerMenu.css';
 import { map } from './map';
 import AuthService from '../utils/AuthService';
@@ -394,7 +394,7 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
                   {errorDocument && <IonText color="danger">{errorDocument}</IonText>}
                   <label>{selectedDocument?.split('\\')[2]}</label>
                   <IonButton id="document-information">
-                    <IonIcon src="src\icons\information-circle-outline.svg" id='document-information-icon' />
+                    <IonIcon icon={informationCircleOutline} id='document-information-icon' />
                     <IonPopover trigger="document-information" id="document-explanation">Ein Dokument, das beweist, dass Sie diesen Parkplatz besitzen und vermieten können.</IonPopover>
                   </IonButton>
                 </IonItem>
