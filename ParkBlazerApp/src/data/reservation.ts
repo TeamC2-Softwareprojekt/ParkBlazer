@@ -13,17 +13,19 @@ export interface Reservation {
     email: string;
     username: string;
     status: string;
-    private_parkingspot_id: number; 
+    private_parkingspot_id: number;
 }
 
 export async function getCurrentUserReservations(): Promise<Reservation[]> {
     let response;
     try {
-        response = await axios.get('https://server-y2mz.onrender.com/api/user_reservations', {
-            headers: {
-                Authorization: `Bearer ${AuthService.getToken()}`
+        response = await axios.get('https://server-y2mz.onrender.com/api/user_reservations',
+            {
+                headers: {
+                    Authorization: `Bearer ${AuthService.getToken()}`
+                }
             }
-        });
+        );
     } catch (error: any) {
         console.error(error);
         return error;
@@ -43,18 +45,20 @@ export async function getReservedDates(private_parkingspt_id: number): Promise<R
 
 export async function createReservation(start_date: Date, end_date: Date, parkingspace: parkingSpace, price: number, paymentMethod: string): Promise<Boolean> {
     try {
-        await axios.post('https://server-y2mz.onrender.com/api/create_reservation', {
-            start_date: start_date.toISOString(),
-            end_date: end_date.toISOString(),
-            private_parkingspot_id: parkingspace.private_parkingspot_id,
-            amount: Number(price.toFixed(2)),
-            payment_method: paymentMethod,
-            userId: AuthService.getToken()
-        }, {
-            headers: {
-                Authorization: `Bearer ${AuthService.getToken()}`
+        await axios.post('https://server-y2mz.onrender.com/api/create_reservation',
+            {
+                start_date: start_date.toISOString(),
+                end_date: end_date.toISOString(),
+                private_parkingspot_id: parkingspace.private_parkingspot_id,
+                amount: Number(price.toFixed(2)),
+                payment_method: paymentMethod
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${AuthService.getToken()}`
+                }
             }
-        });
+        );
     } catch (error: any) {
         console.error(error);
         return false;

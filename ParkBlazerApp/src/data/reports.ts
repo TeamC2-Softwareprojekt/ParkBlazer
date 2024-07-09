@@ -28,6 +28,12 @@ export async function getAvailabilityReports(parkingspace: parkingSpace): Promis
         console.error("Error while fetching availability reports", error);
         return [];
     }
+    // Adjust dates to local timezone
+    response.data.reports.map((report: AvailabilityReport) => {
+        let date = new Date(report.parking_availability_report_date);
+        date.setHours(date.getHours() - 2);
+        report.parking_availability_report_date = date.toISOString();
+    });
     return response?.data.reports;
 }
 
@@ -43,6 +49,12 @@ export async function getCurrentUserReports(): Promise<Report[]> {
         console.error("Error while fetching user reports", error);
         return [];
     }
+    // Adjust dates to local timezone
+    response.data.reports.map((report: Report) => {
+        let date = new Date(report.report_date);
+        date.setHours(date.getHours() - 2);
+        report.report_date = date.toISOString();
+    });
     return response?.data.reports;
 }
 
@@ -66,7 +78,7 @@ export async function createAvailabilityReport(parkingspace: parkingSpace, curre
     return true;
 }
 
-export async function createReport(parkingspace: parkingSpace, reportType: number, reportDescription: string): Promise<boolean> {
+export async function createReport(parkingspace: parkingSpace, reportType: string, reportDescription: string): Promise<boolean> {
     try {
         await axios.post('https://server-y2mz.onrender.com/api/insert_parking_report',
             {

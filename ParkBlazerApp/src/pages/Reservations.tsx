@@ -25,6 +25,21 @@ import { initParkingSpaces, parkingSpace, parkingspaces } from "../data/parkingS
 import { format } from "date-fns";
 import { Reservation, getCurrentUserReservations } from "../data/reservation";
 
+const translateStatus = (status: string) => {
+  switch (status) {
+    case 'accepted':
+      return 'akzeptiert';
+    case 'pending':
+      return 'ausstehend';
+    case 'rejected':
+      return 'abgelehnt';
+    case 'confirmed':
+      return 'bestätigt';
+    default:
+      return status;
+  }
+};
+
 const Reservations: React.FC = () => {
   const [combinedData, setCombinedData] = useState<any[]>([]);
   const [showPopoverImage, setShowPopoverImage] = useState<boolean>(false);
@@ -54,21 +69,6 @@ const Reservations: React.FC = () => {
     setCombinedData(combined);
   };
 
-  const translateStatus = (status: string) => {
-    switch (status) {
-      case 'accepted':
-        return 'akzeptiert';
-      case 'pending':
-        return 'ausstehend';
-      case 'rejected':
-        return 'abgelehnt';
-      case 'confirmed':
-        return 'bestätigt';
-      default:
-        return status;
-    }
-  };
-
   const openPopoverImage = (imageUrl: string) => {
     setSelectedImage(imageUrl);
     setShowPopoverImage(true);
@@ -80,7 +80,7 @@ const Reservations: React.FC = () => {
       <IonContent>
         <IonGrid fixed className="login-grid">
           <IonRow className="ion-justify-content-center ion-align-items-center full-height">
-            <IonCol size="12" size-sm="12" size-md="12">
+            <IonCol size="12" size-sm="14" size-md="14">
               <IonText color="primary">
                 <h1 className="reservation-heading">Reservierungen</h1>
               </IonText>
@@ -95,8 +95,8 @@ const Reservations: React.FC = () => {
                         <div className="data-row">
                           <IonLabel className="parkingspace-label" onClick={() => window.open(`/parkingspot_details/${data.parkingspot.parkingspot_id}`, '_self')}>{data.parkingspot.name}</IonLabel>
                           <IonLabel className="label-margin"><strong>Status:</strong> {translateStatus(data.reservation.status)}</IonLabel>
-                          <IonLabel className="label-margin"><strong>Start-Datum:</strong> {format(data.reservation.start_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
-                          <IonLabel className="label-margin"><strong>End-Datum:</strong> {format(data.reservation.end_date, 'dd.MM.yyy hh:mm')} Uhr</IonLabel>
+                          <IonLabel className="label-margin"><strong>Start-Datum:</strong> {format(data.reservation.start_date, 'dd.MM.yyy HH:mm')} Uhr</IonLabel>
+                          <IonLabel className="label-margin"><strong>End-Datum:</strong> {format(data.reservation.end_date, 'dd.MM.yyy HH:mm')} Uhr</IonLabel>
                           <IonIcon
                             icon={informationCircleOutline}
                             className="icon-style"
@@ -267,14 +267,14 @@ function PopoverInvoice({ reservationID, trigger }: { reservationID: number, tri
             <IonRow>
               <IonCol>
                 <IonLabel>
-                  Zahlungsdatum: {selectedInvoice?.payment_date ? format(selectedInvoice.payment_date, 'dd.MM.yyy hh:mm') + " Uhr" : "Keine Zahlung"}
+                  Zahlungsdatum: {selectedInvoice?.payment_date ? format(selectedInvoice.payment_date, 'dd.MM.yyy HH:mm') + " Uhr" : "Keine Zahlung"}
                 </IonLabel>
               </IonCol>
             </IonRow>
             <IonRow>
               <IonCol>
                 <IonLabel>
-                  Status: {selectedInvoice.status}
+                  Status: {translateStatus(selectedInvoice.status)}
                 </IonLabel>
               </IonCol>
             </IonRow>

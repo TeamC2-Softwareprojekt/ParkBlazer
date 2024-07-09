@@ -19,11 +19,11 @@ import { IonInputCustomEvent } from "@ionic/core";
 import { createAvailabilityReport, createReport } from "../data/reports";
 
 enum ReportType {
-  None = 0,
-  Availability = 1,
-  NotExisting = 2,
-  Update = 3,
-  Other = 4
+  None = "",
+  Availability = "Aktuelle Auslastung melden",
+  NotExisting = "Parkplatz existiert nicht",
+  Update = "Parkplatzdetails aktualisieren",
+  Other = "Sonstiges"
 }
 
 const ParkingspotReport: React.FC = () => {
@@ -79,7 +79,7 @@ const ParkingspotReport: React.FC = () => {
     } else {
       response = await createReport(parkingspot!, reportType, reportDescription!);
     }
-    if (response.status === 200) {
+    if (response) {
       window.open(`/parkingspot_details/${parkingspot?.parkingspot_id}`, '_self');
     } else {
       setError("Ein Fehler ist aufgetreten. Bitte später erneut versuchen!");
@@ -88,7 +88,7 @@ const ParkingspotReport: React.FC = () => {
 
   function handleAvailabilityChange(event: IonInputCustomEvent<InputChangeEventDetail>): void {
     const value = event.detail.value;
-    if (value && (!isNaN(Number(value)) && Number(value) >= 0 && Number(value) <= 80)) {
+    if (value && (!isNaN(Number(value)) && Number(value) >= 0 && Number(value) <= parkingspot!.available_spaces)) {
       setAvailabilityValid(true);
       setCurrentAvailability(Number(value));
     } else {

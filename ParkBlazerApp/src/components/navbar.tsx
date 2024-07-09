@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { IonButton, IonToolbar, IonTitle, IonHeader, IonAvatar, IonPopover, IonList, IonContent, IonItem, IonText } from '@ionic/react';
 import AuthService from '../utils/AuthService';
-import { useHistory } from 'react-router-dom';
 import './navbar.css';
 import '../theme/global.css'
 import axios from 'axios';
@@ -10,7 +9,6 @@ function Navbar() {
     const [loggedIn, setLoggedIn] = useState(AuthService.isLoggedIn());
     const [username, setUsername] = useState<string>(localStorage.getItem('username') || "");
     const [userPoints, setUserPoints] = useState<string>();
-    const history = useHistory();
 
     const handleLogout = () => {
         AuthService.logout();
@@ -19,31 +17,21 @@ function Navbar() {
         window.open('/home', "_self");
     };
 
-    const handleLogoClick = () => {
-        window.open('/home', "_self");
-    };
-
     const handleUserMenu = async () => {
         if (!username || !userPoints) {
-            const token = AuthService.getToken();
             try {
                 const response = await axios.get('https://server-y2mz.onrender.com/api/get_user_details', {
                     headers: {
-                        Authorization: `Bearer ${token}`
+                        Authorization: `Bearer ${AuthService.getToken()}`
                     }
                 });
-                const userDetails = response.data;
-                const fetchedUsername = userDetails.userDetails[0].username;
-                const fetchedUserPoints = userDetails.userDetails[0].points;
+                const fetchedUsername = response.data.userDetails[0].username;
+                const fetchedUserPoints = response.data.userDetails[0].points;
                 setUsername(fetchedUsername);
                 setUserPoints(fetchedUserPoints);
                 localStorage.setItem('username', fetchedUsername);
             } catch (error: any) {
-                if (error.response && error.response.data && error.response.data.message) {
-                    throw new Error(error.response.data.message);
-                } else {
-                    throw new Error("An unexpected error occurred. Please try again later!");
-                }
+                throw new Error(error?.response?.data?.message || "An unexpected error occurred. Please try again later!");
             }
         }
     };
@@ -56,8 +44,8 @@ function Navbar() {
 
     return (
         <IonHeader color="light" className='navbar'>
-            <IonToolbar >
-                <IonTitle id="navbar-title" onClick={handleLogoClick}>ParkBlazer</IonTitle>
+            <IonToolbar>
+                <IonTitle id="navbar-title" onClick={() => window.open('/home', "_self")}>ParkBlazer</IonTitle>
                 <IonButton
                     id="profile-button"
                     slot="end"
@@ -67,7 +55,7 @@ function Navbar() {
                         <img alt="Avatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
                     </IonAvatar>
                 </IonButton>
-                <IonPopover trigger="profile-button" dismissOnSelect={true}>
+                <IonPopover trigger="profile-button">
                     <IonContent>
                         <IonList>
                             {AuthService.isLoggedIn() ? (
@@ -84,10 +72,10 @@ function Navbar() {
                                     <IonItem button={true} detail={false} onClick={() => window.open(`/user_parkingspots`, '_self')}>
                                         Deine Parkplätze
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/user_reports">
+                                    <IonItem button={true} detail={false} onClick={() => window.open(`/user_reports`, '_self')}>
                                         Deine Meldungen
                                     </IonItem>
-                                    <IonItem button={true} detail={false} routerLink="/user_reservations">
+                                    <IonItem button={true} detail={false} onClick={() => window.open(`/user_reservations`, '_self')}>
                                         Deine Buchungen
                                     </IonItem>
                                     <IonItem button={true} detail={false} onClick={handleLogout}>

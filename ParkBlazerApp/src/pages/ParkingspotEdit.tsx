@@ -63,7 +63,7 @@ const ParkingspotEdit: React.FC = () => {
                 name,
                 description,
                 available_spaces: parseInt(availableSpaces),
-                image_url: imageUrl
+                image_url: imageUrl ? imageUrl : "Empty"
             };
             const response = await axios.put(`https://server-y2mz.onrender.com/api/update_parkingspot/${parkingspot?.parkingspot_id}`, updatedParkingspot, {
                 headers: {

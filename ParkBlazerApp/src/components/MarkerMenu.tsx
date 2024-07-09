@@ -7,6 +7,7 @@ import AuthService from '../utils/AuthService';
 import { parkingspaces } from '../data/parkingSpaces';
 import { getUserLocation } from '../data/userLocation';
 import ImageUploader from '../components/ImageUploader';
+import axios from 'axios';
 
 interface MarkerMenuProps {
   toggleList?: () => void;
@@ -163,7 +164,7 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
       return;
     }
 
-    let data = JSON.stringify({
+    let data = {
       name: title,
       description: description,
       available_spaces: availableSpaces,
@@ -181,42 +182,30 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
       availability_start_date: privateSpot ? selectedStartDate?.toISOString() : undefined,
       availability_end_date: privateSpot ? selectedEndDate?.toISOString() : undefined,
       price_per_hour: privateSpot ? pricePerHour : undefined,
-    });
+    };
 
     let url = 'https://server-y2mz.onrender.com/api/create_parkingspot';
     if (privateSpot) url = 'https://server-y2mz.onrender.com/api/create_privateparkingspot';
 
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${AuthService.getToken()}`
-        },
-        body: data
-      });
-
-      if (response.ok) {
-        setNotificationMessage('Parkingspace saved successfully.');
-        setNotificationColor('success');
-        setShowNotification(true);
-        resetAttributes();
-        window.location.reload();
-      } else {
-        const errorData = await response.json();
-        setNotificationMessage(errorData.message || 'Error while saving.');
-        setNotificationColor('danger');
-        setShowNotification(true);
-        console.error('Error while saving:', errorData);
-      }
+      await axios.post(url,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${AuthService.getToken()}`
+          }
+        }
+      );
     } catch (error) {
-      console.error('Fehler beim Speichern:', error);
       setNotificationMessage('Fehler beim Speichern.');
       setNotificationColor('danger');
       setShowNotification(true);
       console.error('Fehler beim Speichern:', error);
     }
-    closeModalCoordinates();
+    setNotificationMessage('Parkingspace saved successfully.');
+    setNotificationColor('success');
+    setShowNotification(true);
+    window.location.reload();
   };
 
   const handleUseCurrentLocation = () => {
@@ -282,40 +271,12 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
     fetchCountries();
   }, []);
 
-  const resetAttributes = () => {
-    setLatitude('');
-    setLongitude('');
-    setTitle('');
-    setDescription('');
-    setAvailableSpaces('');
-    setImageUrl('');
-    setStreet('');
-    setHouseNumber('');
-    setZip('');
-    setCity('');
-    setCountry('');
-    setPricePerHour(undefined);
-    setSelectedDocument(null);
-    setErrorTitle('');
-    setErrorDescription('');
-    setErrorAvailableSpaces('');
-    setErrorImage('');
-    setErrorStreet('');
-    setErrorHouseNumber('');
-    setErrorZip('');
-    setErrorCity('');
-    setErrorCountry('');
-    setErrorPricePerHour('');
-    setErrorDocument('');
-  };
-
   const handleListToggle = () => {
     if (toggleList) {
       toggleList();
     }
     setShowMenu(false);
   };
-
 
   return (
     <div id='marker-menu'>
@@ -324,9 +285,11 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
           <IonIcon icon={chevronUpCircle} />
         </IonFabButton>
         <IonFabList side="top" activated={showMenu}>
-          <IonFabButton id='create-marker-modal-button' onClick={openModal}>
-            <IonIcon icon={add} />
-          </IonFabButton>
+          {AuthService.isLoggedIn() && (
+            <IonFabButton id='create-marker-modal-button' onClick={openModal}>
+              <IonIcon icon={add} />
+            </IonFabButton>
+          )}
           <IonFabButton onClick={handleListToggle}>
             <IonIcon icon={listCircleOutline} />
           </IonFabButton>
@@ -359,43 +322,38 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
         <IonContent className="ion-padding">
           <IonList>
             <IonItem>
-              <IonLabel style={{ marginRight: '10px' }}>Titel: </IonLabel>
-              <IonInput id='title-input' value={title} onIonChange={e => setTitle(e.detail.value || '')} />
+              <IonInput id='title-input' label="Titel:" value={title} onIonChange={e => setTitle(e.detail.value || '')} />
               {errorTitle && <IonText id='error-title-input' color="danger">{errorTitle}</IonText>}
             </IonItem>
             <IonItem>
-              <IonLabel style={{ marginRight: '10px' }}>Beschreibung: </IonLabel>
-              <IonInput id='description-input' value={description} onIonChange={e => setDescription(e.detail.value || '')} />
+              <IonInput id='description-input' label='Beschreibung:' value={description} onIonChange={e => setDescription(e.detail.value || '')} />
               {errorDescription && <IonText id='error-description-input' color="danger">{errorDescription}</IonText>}
             </IonItem>
             <IonItem>
-              <IonLabel style={{ marginRight: '10px' }}>Anzahl Parkplätze: </IonLabel>
-              <IonInput id='available-spaces-input' value={availableSpaces} onIonChange={e => setAvailableSpaces(e.detail.value || '')} />
+              <IonInput id='available-spaces-input' label='Anzahl Parkplätze:' value={availableSpaces} onIonChange={e => setAvailableSpaces(e.detail.value || '')} />
               {errorAvailableSpaces && <IonText id='error-available-spaces-input' color="danger">{errorAvailableSpaces}</IonText>}
             </IonItem>
             <IonItem>
-              <IonLabel style={{ marginRight: '10px' }}>Straße: </IonLabel>
-              <IonInput id='street-input' value={street} onIonChange={e => setStreet(e.detail.value || '')} />
+              <IonInput id='street-input' label='Straße:' value={street} onIonChange={e => setStreet(e.detail.value || '')} />
               {errorStreet && <IonText id='error-street-input' color="danger">{errorStreet}</IonText>}
             </IonItem>
             <IonItem>
-              <IonLabel style={{ marginRight: '10px' }}>Hausnummer: </IonLabel>
-              <IonInput id='house-number-input' value={houseNumber} onIonChange={e => setHouseNumber(e.detail.value || '')} />
+              <IonInput id='house-number-input' label='Hausnummer:' value={houseNumber} onIonChange={e => setHouseNumber(e.detail.value || '')} />
               {errorHouseNumber && <IonText id='error-house-number-input' color="danger">{errorHouseNumber}</IonText>}
             </IonItem>
             <IonItem>
-              <IonLabel style={{ marginRight: '10px' }}>PLZ: </IonLabel>
-              <IonInput id='zip-input' value={zip} onIonChange={e => setZip(e.detail.value || '')} />
+              <IonInput id='zip-input' label='PLZ:' value={zip} onIonChange={e => setZip(e.detail.value || '')} />
               {errorZip && <IonText id='error-zip-input' color="danger">{errorZip}</IonText>}
             </IonItem>
             <IonItem>
-              <IonLabel style={{ marginRight: '10px' }}>Stadt: </IonLabel>
-              <IonInput id='city-input' value={city} onIonChange={e => setCity(e.detail.value || '')} />
+              <IonInput id='city-input' label='Stadt:' value={city} onIonChange={e => setCity(e.detail.value || '')} />
               {errorCity && <IonText id='error-city-input' color="danger">{errorCity}</IonText>}
             </IonItem>
             <IonItem>
-              <IonLabel style={{ marginRight: '10px' }}>Land: </IonLabel>
               <IonSelect
+                id='country-select'
+                label='Land:'
+                justify='start'
                 value={selectedCountry}
                 placeholder="Wählen Sie ein Land"
                 onIonChange={e => {
@@ -424,34 +382,40 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
             <IonItem>
               Privat<IonCheckbox class="marker-menu-checkbox" checked={privateSpot} onIonChange={e => setPrivateSpot(e.detail.checked)} />
             </IonItem>
-            <div style={{ display: privateSpot ? "" : "none" }}>
-              <IonItem>
-                <IonInput onInput={e => { setPricePerHour(Number((e.target as HTMLInputElement).value)); setErrorPricePerHour('') }} value={pricePerHour} class="price-input" label="Preis pro Stunde" type="number" placeholder="0€" labelPlacement="stacked" inputMode="numeric" min={0} />
-                {errorPricePerHour && <IonText id='error-price-per-hour-input' color="danger">{errorPricePerHour}</IonText>}
-              </IonItem>
-              <IonItem>
-                <input type="file" ref={documentInputRef} style={{ display: "none" }} onChange={e => setSelectedDocument(e.target.value)} />
-                <IonButton onClick={() => { documentInputRef.current?.click(); setErrorDocument('') }}>Dokument hochladen</IonButton>
-                {errorDocument && <IonText color="danger">{errorDocument}</IonText>}
-                <label>{selectedDocument?.split('\\')[2]}</label>
-                <IonButton id="document-information">
-                  <IonIcon src="src\icons\information-circle-outline.svg" id='document-information-icon' />
-                  <IonPopover trigger="document-information" id="document-explanation">Ein Dokument, das beweist, dass Sie diesen Parkplatz besitzen und vermieten können.</IonPopover>
-                </IonButton>
-              </IonItem>
-              <IonItem>
-                <div id="availability-container">
-                  <div>
-                    <IonLabel>Verfügbarkeitszeitraum</IonLabel>
-                    {errorDate && <IonText color="danger">{errorDate}</IonText>}
+            {privateSpot && (
+              <div>
+                <IonItem>
+                  <IonInput onInput={e => { setPricePerHour(Number((e.target as HTMLInputElement).value)); setErrorPricePerHour('') }} value={pricePerHour} class="price-input" label="Preis pro Stunde" type="number" placeholder="0€" labelPlacement="stacked" inputMode="numeric" min={0} />
+                  {errorPricePerHour && <IonText id='error-price-per-hour-input' color="danger">{errorPricePerHour}</IonText>}
+                </IonItem>
+                <IonItem>
+                  <input type="file" ref={documentInputRef} style={{ display: "none" }} onChange={e => setSelectedDocument(e.target.value)} />
+                  <IonButton onClick={() => { documentInputRef.current?.click(); setErrorDocument('') }}>Dokument hochladen</IonButton>
+                  {errorDocument && <IonText color="danger">{errorDocument}</IonText>}
+                  <label>{selectedDocument?.split('\\')[2]}</label>
+                  <IonButton id="document-information">
+                    <IonIcon src="src\icons\information-circle-outline.svg" id='document-information-icon' />
+                    <IonPopover trigger="document-information" id="document-explanation">Ein Dokument, das beweist, dass Sie diesen Parkplatz besitzen und vermieten können.</IonPopover>
+                  </IonButton>
+                </IonItem>
+                <IonItem>
+                  <div id="availability-container">
+                    <div>
+                      <IonLabel>Verfügbarkeitszeitraum</IonLabel>
+                      {errorDate && <IonText color="danger">{errorDate}</IonText>}
+                    </div>
+                    <div id="date-container">
+                      <IonDatetime onIonChange={e => { setSelectedStartDate(new Date(String(e.detail.value))); setErrorDate(''); }}>
+                        <span slot='time-label'>Zeit</span>
+                      </IonDatetime>
+                      <IonDatetime onIonChange={e => { setSelectedEndDate(new Date(String(e.detail.value))); setErrorDate(''); }}>
+                        <span slot='time-label'>Zeit</span>
+                      </IonDatetime>
+                    </div>
                   </div>
-                  <div id="date-container">
-                    <IonDatetime onIonChange={e => { setSelectedStartDate(new Date(String(e.detail.value))); setErrorDate(''); }} />
-                    <IonDatetime onIonChange={e => { setSelectedEndDate(new Date(String(e.detail.value))); setErrorDate(''); }} />
-                  </div>
-                </div>
-              </IonItem>
-            </div>
+                </IonItem>
+              </div>
+            )}
           </IonList>
           <IonButton expand="block" id='marker-submit' onClick={handleSaveCoordinates}>
             Speichern
@@ -483,5 +447,3 @@ export const MarkerMenu: React.FC<MarkerMenuProps> = ({ toggleList }) => {
 };
 
 export default MarkerMenu;
-
-

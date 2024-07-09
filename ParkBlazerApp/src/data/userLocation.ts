@@ -24,6 +24,10 @@ function findUserLocation() {
         }
         setUserLocation(position.coords.latitude, position.coords.longitude);
     }, (error) => {
+        if (error.code === 1) {
+            stopUserLocationUpdate();
+            return;
+        }
         console.error('Error getting user location', error);
     }, {
         enableHighAccuracy: true,
